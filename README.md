@@ -55,7 +55,7 @@ Windows 11 ARM64には、PowerShellで動かす専用のデモ入口がありま
 詳しい手順は[START_HERE.md](START_HERE.md)と[Windowsの説明](docs/windows_native_demo.md)を参照してください。
 
 GitHubとVercelを連携して架空データの試用デモを置く場合は、[Vercelデモの説明](docs/vercel_demo.md)を参照してください。
-Vercel版の編集内容は一時保存です。
+Vercel版の編集内容はブラウザごとの一時保存で、ログアウトすると初期状態に戻ります。
 
 ## お寺に合わせて育てる
 

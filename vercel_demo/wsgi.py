@@ -60,7 +60,14 @@ def application(environ, start_response):
         token = SIGNER.sign(identifier)
 
         def respond(status, headers, exc_info=None):
-            headers.append(("Set-Cookie", f"{COOKIE}={token}; Path=/; Max-Age=14400; Secure; HttpOnly; SameSite=Lax"))
+            logged_out = (
+                environ.get("PATH_INFO") == "/logout/"
+                and environ.get("REQUEST_METHOD") == "POST"
+                and 300 <= int(status.split()[0]) < 400
+            )
+            # Dropping this browser's identifier starts a fresh copy next time.
+            value = "; Max-Age=0" if logged_out else token
+            headers.append(("Set-Cookie", f"{COOKIE}={value}; Path=/; Secure; HttpOnly; SameSite=Lax"))
             return start_response(status, headers, exc_info)
 
         response = handler(environ, respond)

@@ -3,7 +3,7 @@ import re
 BANNER = (
     '<aside style="padding:10px;background:#dceeff;color:#142b44;text-align:center" '
     'role="note">架空データだけの試用デモです。実際の個人情報は入力しないでください。'
-    'ログイン：demo / demo。変更はこのブラウザの一時データに保存されます。'
+    'ログイン：demo / demo。変更はこのブラウザのセッション中だけ有効で、ログアウトすると初期状態に戻ります。'
     'Vercelの実行環境が変わると初期状態に戻ることがあります。</aside>'
 ).encode()
 
