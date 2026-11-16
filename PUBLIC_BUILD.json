@@ -7,7 +7,7 @@
       "mode": 420
     },
     ".github/workflows/smoke.yml": {
-      "sha256": "03b178f986421d6e9f59c11c59a0ced034b8b48109dd487cf99b6056a057ac1f",
+      "sha256": "0516e1b26aa82fe5303db2b47020563ca7acb773e011525e9047c3b839f18123",
       "mode": 420
     },
     ".gitignore": {
@@ -23,7 +23,7 @@
       "mode": 420
     },
     "CHANGELOG.md": {
-      "sha256": "6c0e720ad0d0c13df2cc4a8d20eef474771867756facb0bc5f8525f23b33232a",
+      "sha256": "65186cbb14a908d9dd419a056a548e0f6146763108633e6214f4767ecad3a805",
       "mode": 420
     },
     "CONTRIBUTING.md": {
@@ -2519,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "747c6269f49195bb7cad8f4bc875823fdae5a9fd8dc72f367b6bcc4bfbaa75ec",
+      "sha256": "90b4c596abdf012c09689334a7620ebcf84015b6d6d8cb47d127788155fe6fa6",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
@@ -3150,6 +3150,10 @@
       "sha256": "ca54ba087e8a6211844c8405be4cf53935d8db47194031cd103f96835a917a9d",
       "mode": 420
     },
+    "bin/check_vercel_demo.py": {
+      "sha256": "d176422e9b20e33ffca1d8f20c07a452a1d911bd56139a3bbc1006d07b316ea6",
+      "mode": 420
+    },
     "bin/cleanup_demo_environment.sh": {
       "sha256": "67293f91b5c8a4a2d04e447aa6016ba3917600b470eba0c8137801a43bfbc58e",
       "mode": 493
@@ -3307,7 +3311,7 @@
       "mode": 420
     },
     "docs/vercel_demo.md": {
-      "sha256": "2a21d05f1ce6527ae13da6dc5a16620ab967aba41386f77dcc05bf6067a2098f",
+      "sha256": "90c811ed484e1a5262fae1d31c1c6079f08bbf722752bb7f1863d96d1af898ee",
       "mode": 420
     },
     "docs/windows_native_demo.md": {
@@ -3395,7 +3399,7 @@
       "mode": 420
     },
     "vercel_demo/runtime.py": {
-      "sha256": "1f16cf6ef8fc41f319b1763090547651a0666920b5670d767d993fb7aaabe6cb",
+      "sha256": "7400cc41c4c50e898b0165e85780e56f357adce4262dad4c0d80936899b23599",
       "mode": 420
     },
     "vercel_demo/settings.py": {
@@ -3403,7 +3407,7 @@
       "mode": 420
     },
     "vercel_demo/wsgi.py": {
-      "sha256": "1f8abee152af999840a6469a23148c45489237d671dbf9be9ab72d396e07b31e",
+      "sha256": "9bdc758a5d535fe19af3e599339cf35fe6818adb49fd3a0788bbcdcabcf318b9",
       "mode": 420
     }
   }

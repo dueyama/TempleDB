@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-14]
+        os: [ubuntu-24.04, macos-15]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -35,6 +35,12 @@ jobs:
         env:
           SMOKE_SCRATCH: ${{ runner.temp }}
         run: .venv/bin/python bin/check_demo_http.py --scratch-root "$SMOKE_SCRATCH"
+      - name: Verify Vercel synthetic isolation and temporary cleanup
+        env:
+          TEMPLEDB_VERCEL_STATE_ROOT: ${{ runner.temp }}/templedb-vercel-check
+        run: |
+          .venv/bin/python -m vercel_demo.build
+          .venv/bin/python bin/check_vercel_demo.py .
   windows-arm64:
     runs-on: windows-11-arm
     timeout-minutes: 25

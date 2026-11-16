@@ -14,7 +14,13 @@ from django.conf import settings  # noqa: E402
 from django.core import signing  # noqa: E402
 from django.db import connections  # noqa: E402
 
-from vercel_demo.runtime import copy_seed, state_root  # noqa: E402
+from vercel_demo.runtime import (  # noqa: E402
+    SANDBOX_TTL,
+    SandboxCapacityError,
+    discard_sandbox,
+    prepare_sandbox,
+    sandbox_lock,
+)
 
 LOCK = threading.Lock()
 COOKIE = "templedb_demo_sandbox"
@@ -25,7 +31,7 @@ def browser_id(environ):
     cookies = SimpleCookie()
     try:
         cookies.load(environ.get("HTTP_COOKIE", ""))
-        value = SIGNER.unsign(cookies[COOKIE].value, max_age=14400)
+        value = SIGNER.unsign(cookies[COOKIE].value, max_age=SANDBOX_TTL)
         if re.fullmatch(r"[a-f0-9]{32}", value):
             return value
     except (KeyError, signing.BadSignature):
@@ -52,14 +58,24 @@ def select_tenant(tenant):
 
 def application(environ, start_response):
     # The lock remains held through streaming and callbacks as well as rendering.
-    with LOCK:
+    with LOCK, sandbox_lock() as root:
         identifier = browser_id(environ)
-        tenant = state_root() / identifier
-        copy_seed(tenant)
+        try:
+            tenant = prepare_sandbox(root, identifier)
+        except SandboxCapacityError:
+            body = "現在デモが混み合っています。時間をおいて再度お試しください。".encode()
+            start_response("503 Service Unavailable", [
+                ("Content-Type", "text/plain; charset=utf-8"), ("Retry-After", "60"),
+                ("Cache-Control", "no-store"), ("Content-Length", str(len(body))),
+            ])
+            yield body
+            return
         select_tenant(tenant)
         token = SIGNER.sign(identifier)
+        logged_out = False
 
         def respond(status, headers, exc_info=None):
+            nonlocal logged_out
             logged_out = (
                 environ.get("PATH_INFO") == "/logout/"
                 and environ.get("REQUEST_METHOD") == "POST"
@@ -70,9 +86,15 @@ def application(environ, start_response):
             headers.append(("Set-Cookie", f"{COOKIE}={value}; Path=/; Secure; HttpOnly; SameSite=Lax"))
             return start_response(status, headers, exc_info)
 
-        response = handler(environ, respond)
+        response = None
         try:
+            response = handler(environ, respond)
             yield from response
         finally:
-            response.close()
-            connections.close_all()
+            try:
+                if response is not None:
+                    response.close()
+            finally:
+                connections.close_all()
+                if logged_out:
+                    discard_sandbox(tenant)

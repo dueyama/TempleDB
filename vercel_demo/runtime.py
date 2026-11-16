@@ -1,16 +1,23 @@
 """Bootstrap only from the synthetic seed bundled by the demo build."""
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import os
+import re
 import shutil
 import sqlite3
 import sys
 import tempfile
+import time
+from contextlib import contextmanager
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED = ROOT / "demo_seed"
+SANDBOX_TTL = 4 * 60 * 60
+MAX_SANDBOXES = 16
+MAX_STATE_BYTES = 128 * 1024 * 1024
 sys.path.insert(0, str(ROOT / "app"))
 
 
@@ -33,30 +40,84 @@ def state_root() -> Path:
     return parent / ("templedb-vercel-" + version)
 
 
+class SandboxCapacityError(Exception):
+    """New visitors must wait rather than evicting another active demo."""
+
+
+@contextmanager
+def sandbox_lock():
+    root = state_root()
+    root.mkdir(parents=True, exist_ok=True)
+    # Also serialize different Python processes sharing this temporary volume.
+    with (root / ".sandbox.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield root
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def tree_bytes(root: Path) -> int:
+    return sum(path.stat().st_size for path in root.rglob("*") if not path.is_symlink() and path.is_file())
+
+
+def discard_sandbox(tenant: Path) -> None:
+    # Never remove the bundled seed, bootstrap, symlinks, or unrelated directories.
+    if re.fullmatch(r"[a-f0-9]{32}", tenant.name) and not tenant.is_symlink():
+        shutil.rmtree(tenant)
+
+
+def prepare_sandbox(root: Path, identifier: str) -> Path:
+    """Call only while holding sandbox_lock, through the entire response."""
+    if not re.fullmatch(r"[a-f0-9]{32}", identifier):
+        raise ValueError("Invalid synthetic sandbox identifier")
+    now = time.time()
+    for tenant in root.iterdir():
+        marker = tenant / ".last_used"
+        if (re.fullmatch(r"[a-f0-9]{32}", tenant.name) and tenant.is_dir()
+                and not tenant.is_symlink() and marker.is_file() and not marker.is_symlink()
+                and now - marker.stat().st_mtime >= SANDBOX_TTL):
+            discard_sandbox(tenant)
+    tenant = root / identifier
+    if tenant.is_symlink():
+        raise RuntimeError("Invalid synthetic sandbox path")
+    if not tenant.exists():
+        count = sum(bool(re.fullmatch(r"[a-f0-9]{32}", path.name)) for path in root.iterdir())
+        if count >= MAX_SANDBOXES or tree_bytes(root) + tree_bytes(SEED) > MAX_STATE_BYTES:
+            raise SandboxCapacityError
+    copy_seed(tenant)
+    (tenant / ".last_used").touch()
+    return tenant
+
+
 def copy_seed(target: Path) -> None:
     validate_seed(SEED)
     if not target.exists():
         target.parent.mkdir(parents=True, exist_ok=True)
         staged = Path(tempfile.mkdtemp(prefix=target.name + "-initializing-", dir=target.parent))
-        shutil.copytree(SEED, staged, dirs_exist_ok=True)
-        # Hidden build files may be omitted by the platform's bundle globbing.
-        (staged / ".env").write_text("# Synthetic demo only; no credentials.\n")
-        # Export markers are generated caches; their build-host paths are not portable.
-        with sqlite3.connect(staged / "data/runtime/demo.sqlite3") as connection:
-            for key, source_id, snapshot_id in connection.execute(
-                "SELECT e.id, s.source_id, e.snapshot_id FROM imports_exportsnapshot e "
-                "JOIN imports_legacysource s ON e.source_id=s.id"
-            ).fetchall():
-                snapshot = target / "data/generated/legacy_exports" / source_id / snapshot_id
-                connection.execute(
-                    "UPDATE imports_exportsnapshot SET export_dir=?, manifest_path=?, log_path=? WHERE id=?",
-                    (str(snapshot), str(snapshot / "manifest.json"), str(snapshot / "export.log"), key),
-                )
-        validate_seed(staged)
         try:
-            staged.rename(target)
-        except FileExistsError:
-            pass  # Another worker completed the same synthetic sandbox first.
+            shutil.copytree(SEED, staged, dirs_exist_ok=True)
+            # Hidden build files may be omitted by the platform's bundle globbing.
+            (staged / ".env").write_text("# Synthetic demo only; no credentials.\n")
+            # Export markers are generated caches; build-host paths are not portable.
+            with sqlite3.connect(staged / "data/runtime/demo.sqlite3") as connection:
+                for key, source_id, snapshot_id in connection.execute(
+                    "SELECT e.id, s.source_id, e.snapshot_id FROM imports_exportsnapshot e "
+                    "JOIN imports_legacysource s ON e.source_id=s.id"
+                ).fetchall():
+                    snapshot = target / "data/generated/legacy_exports" / source_id / snapshot_id
+                    connection.execute(
+                        "UPDATE imports_exportsnapshot SET export_dir=?, manifest_path=?, log_path=? WHERE id=?",
+                        (str(snapshot), str(snapshot / "manifest.json"), str(snapshot / "export.log"), key),
+                    )
+            validate_seed(staged)
+            try:
+                staged.rename(target)
+            except FileExistsError:
+                pass  # Another worker completed the same synthetic bootstrap first.
+        finally:
+            if staged.exists():
+                shutil.rmtree(staged)
     validate_seed(target)
 
 
