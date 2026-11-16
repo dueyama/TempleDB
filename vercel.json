@@ -4,7 +4,7 @@
   "functions": {
     "vercel_demo/wsgi.py": {
       "maxDuration": 60,
-      "includeFiles": ["app/**", "demo_seed/**", "datasets/**"],
+      "includeFiles": "{app/**,demo_seed/**,datasets/**}",
       "excludeFiles": "app/staticfiles/**"
     }
   }
