@@ -1,0 +1,11 @@
+{
+  "framework": "django",
+  "buildCommand": "python -m vercel_demo.build",
+  "functions": {
+    "vercel_demo/wsgi.py": {
+      "maxDuration": 60,
+      "includeFiles": ["app/**", "demo_seed/**", "datasets/**"],
+      "excludeFiles": "app/staticfiles/**"
+    }
+  }
+}

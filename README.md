@@ -30,9 +30,11 @@ CodexなどのAIコーディング支援ツールと一緒に、仕組みを確�
 実際の個人情報を用意せず、架空の戸主・家族・法要を使って操作を試せます。
 基本のデモに、GoogleやOpenAIのAPIキーは必要ありません。
 
-このリポジトリを取得し、Codexなどでフォルダを開いて、次のように依頼してください。
+Codexなど、端末でファイル操作やコマンド実行ができるAIに、次の文章をそのまま渡してください。
+リポジトリの取得からデモの起動まで、まとめて依頼できます。
 
-> START_HERE.mdとAGENTS.mdを読み、架空データのデモを動かしてください。
+> https://github.com/dueyama/TempleDB を、この端末の新しい作業フォルダに取得してください。
+> 取得したSTART_HERE.mdとAGENTS.mdを読み、架空データのデモを動かしてください。
 > この端末で何を準備するか、実行前に説明してください。
 
 macOS / Linux / WSL2の基本操作は次のとおりです。Python 3.13以上を使用します。
@@ -51,6 +53,9 @@ Python自体の導入やOS全体の設定変更は、別途確認して進めま
 
 Windows 11 ARM64には、PowerShellで動かす専用のデモ入口があります。
 詳しい手順は[START_HERE.md](START_HERE.md)と[Windowsの説明](docs/windows_native_demo.md)を参照してください。
+
+GitHubとVercelを連携して架空データの試用デモを置く場合は、[Vercelデモの説明](docs/vercel_demo.md)を参照してください。
+Vercel版の編集内容は一時保存です。
 
 ## お寺に合わせて育てる
 

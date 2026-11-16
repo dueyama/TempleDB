@@ -14,6 +14,10 @@
       "sha256": "3c0a7f75cb8d5034542248db2d7b323a62201519215d59fcbe6c50b1e58ee098",
       "mode": 420
     },
+    ".vercelignore": {
+      "sha256": "679ec869c79906bddf11b1ca34fc11aa1f61c1435c3ccb5c378ca54146f17773",
+      "mode": 420
+    },
     "AGENTS.md": {
       "sha256": "4f031689ed90ba100a6fbbcf9a1b542979e40af6593c8eda5310358148cba079",
       "mode": 420
@@ -43,7 +47,7 @@
       "mode": 420
     },
     "README.md": {
-      "sha256": "b7bbdbec4e9812c6204bca525470528b88c74bad73f64bd9405f1c2652f728a3",
+      "sha256": "c858fbc7404b949186d8dacc9e70eb8284a312566f8072caba94953204e9793f",
       "mode": 420
     },
     "SECURITY.md": {
@@ -2515,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "bdb0159fd9738824d17c883aff3bde4631bd563509f61738722457fe3d34b6ac",
+      "sha256": "f938b6f9a0475a9a54377885c14bfd910201cc1e756b74ca006d79aae616124e",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
@@ -3302,6 +3306,10 @@
       "sha256": "b04832b8d10a2bd75755c196f9a68915a98622a1b314df5310ea8071a84e96b4",
       "mode": 420
     },
+    "docs/vercel_demo.md": {
+      "sha256": "b6ac78ebeb740d1bc233ec7275e5719ef377270b6906a1b43685935a64daf1d7",
+      "mode": 420
+    },
     "docs/windows_native_demo.md": {
       "sha256": "dcef13d4bd11339c1825abd136a8a50f4a25a34e4ca910ec58037bc527a2837b",
       "mode": 420
@@ -3326,8 +3334,20 @@
       "sha256": "0e7aa8551e372718ec8be68489a13d1795d1c46bacfb111a5dc9ae508ebd1952",
       "mode": 420
     },
+    "manage.py": {
+      "sha256": "94e1951138bfdd252456038bd8a47503ef272d556917289353ad18606afb1c16",
+      "mode": 420
+    },
     "private/inbox/README.md": {
       "sha256": "a6e33e6063e344d96981a63d63baa478bd2c043e98160770283a496b0fb7a914",
+      "mode": 420
+    },
+    "pyproject.toml": {
+      "sha256": "cb21d87649192dcfec5c5ec132012a9fbe119093e8a94a2b199f6ad5050ea184",
+      "mode": 420
+    },
+    "requirements.txt": {
+      "sha256": "f8a33e47d2d3d993faca3f5caf4ca18c80dd479085ab9379917b99be5476dc0d",
       "mode": 420
     },
     "systemd/env.product-staging-safety.in": {
@@ -3356,6 +3376,34 @@
     },
     "systemd/templedb-sqlite-demo.service.in": {
       "sha256": "ab9696a2e06cfb75c630a96e97178cb495a005d85eb4083ff0dd233b9d46a020",
+      "mode": 420
+    },
+    "vercel.json": {
+      "sha256": "479f015c743ba7d45c9c081a4a1427d32950578ac5048dcdb7d8287cf4524b0c",
+      "mode": 420
+    },
+    "vercel_demo/__init__.py": {
+      "sha256": "95006cc42db2dfaf394df72c62139a2fa25dc60ab693098cbca433f8c0b847da",
+      "mode": 420
+    },
+    "vercel_demo/banner.py": {
+      "sha256": "aebc957fa89eb9b8f0e3cdfb1b08728b1fbbcd6dbd0c754fb694b29cabcbf40b",
+      "mode": 420
+    },
+    "vercel_demo/build.py": {
+      "sha256": "da097183536c71cf2988f6e44a229c6bef8446d0f7175d16eae8617440cc518d",
+      "mode": 420
+    },
+    "vercel_demo/runtime.py": {
+      "sha256": "1f16cf6ef8fc41f319b1763090547651a0666920b5670d767d993fb7aaabe6cb",
+      "mode": 420
+    },
+    "vercel_demo/settings.py": {
+      "sha256": "0d3615b5ddca09f19f83d3c1cc2e179295c9fa7cd3dfb458463e03ec59304984",
+      "mode": 420
+    },
+    "vercel_demo/wsgi.py": {
+      "sha256": "80ad18d4882629232af7f247cfb69613bf356a9d3fffa7cefb7704497e06b543",
       "mode": 420
     }
   }
