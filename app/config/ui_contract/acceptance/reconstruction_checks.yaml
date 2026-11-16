@@ -1,0 +1,72 @@
+contract_type: acceptance_checks
+version: 2
+checks:
+  - screen_id: home
+    must_show:
+      - 寺務ホーム
+      - 今日の法要
+      - 近日の法要
+      - 戸主ブラウザ
+      - 法要台帳へ
+    must_preserve:
+      - grouped operational navigation, not a marketing hero
+      - empty service summaries do not block operational navigation
+  - screen_id: household_browser
+    must_show:
+      - 戸主ブラウザ
+      - 台帳検索
+      - 年忌候補期間
+      - 新しい家を作成
+      - 五十音 browsing controls
+    must_preserve:
+      - desktop list/detail split
+      - detail partial as selected-household focus
+      - person search checkbox behavior
+  - screen_id: household_detail
+    must_show:
+      - household identity and ledger id
+      - current people section
+      - memorial people section
+      - related service/payment actions when available
+    must_preserve:
+      - 法名/戒名 label comes from tenant policy
+      - rare actions are collapsed
+  - screen_id: record_edit
+    must_show:
+      - DB edit
+      - change note field when editable
+      - 保存
+      - 戻る
+    must_preserve:
+      - soft delete uses danger styling and confirmation
+      - restore appears for deleted records
+      - time-machine values do not save until user saves form
+  - screen_id: service_ledger
+    must_show:
+      - 法要台帳
+      - 検索
+      - 今後1年の予定済み法要
+      - 未予定の近い法要候補
+      - 故人を選んで法要を追加
+    must_preserve:
+      - three operational buckets on desktop
+      - target person cards link to service creation
+  - screen_id: settings_home
+    must_show:
+      - 設定
+      - バックアップ
+      - データベース関係図
+      - TempleDBスターターパッケージ
+      - AI引き継ぎパッケージ
+    must_preserve:
+      - starter package is built by the fixed reviewed demo factory and offers one archive for immediate demo or Codex-assisted clean product setup
+      - starter download is superuser-only and uses a POST form with CSRF protection
+      - starter card is hidden in demo runtime or when the private factory is absent, and direct POST is rejected
+      - starter generation does not inherit production database or credential environment variables and never displays raw builder stderr
+      - clean product setup creates a separate product database instead of converting the synthetic demo database
+      - superuser-only handoff download
+      - handoff download uses a POST form with CSRF protection
+      - handoff does not export individual operational database rows
+      - handoff warns that tracked source/history may contain operational PII and is only for trusted internal recipients
+      - handoff is not presented as database restore or private migration-data export
+      - existing settings cards and links remain present

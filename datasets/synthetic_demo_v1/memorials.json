@@ -1,0 +1,1394 @@
+[
+  {
+    "person_id": "SD0001-90",
+    "death_date": "2025-07-14",
+    "kaimyo": "釋明信",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0001-91",
+    "death_date": "1990-07-21",
+    "kaimyo": "釋明信",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0002-90",
+    "death_date": "2001-08-19",
+    "kaimyo": "釋正信",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0002-91",
+    "death_date": "1960-09-01",
+    "kaimyo": "釋恵照",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0003-90",
+    "death_date": "1961-11-01",
+    "kaimyo": "釋智光",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0004-90",
+    "death_date": "2019-07-23",
+    "kaimyo": "釋恵照",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0004-91",
+    "death_date": "1987-10-14",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 74
+  },
+  {
+    "person_id": "SD0005-90",
+    "death_date": "2022-08-28",
+    "kaimyo": "釋智光",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0006-90",
+    "death_date": "1968-05-12",
+    "kaimyo": "釋静徳",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0006-91",
+    "death_date": "2013-03-27",
+    "kaimyo": "釋浄心",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0007-90",
+    "death_date": "2007-11-25",
+    "kaimyo": "釋明信",
+    "age_at_death": 73
+  },
+  {
+    "person_id": "SD0007-91",
+    "death_date": "2010-07-18",
+    "kaimyo": "釋照信",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0008-90",
+    "death_date": "2016-02-20",
+    "kaimyo": "釋智光",
+    "age_at_death": 70
+  },
+  {
+    "person_id": "SD0009-90",
+    "death_date": "1959-01-23",
+    "kaimyo": "釋正信",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0009-91",
+    "death_date": "2004-08-03",
+    "kaimyo": "釋静徳",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0010-90",
+    "death_date": "1946-12-10",
+    "kaimyo": "釋法泉",
+    "age_at_death": 72
+  },
+  {
+    "person_id": "SD0011-90",
+    "death_date": "2013-12-25",
+    "kaimyo": "釋妙光",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0012-90",
+    "death_date": "2008-09-12",
+    "kaimyo": "釋正信",
+    "age_at_death": 66
+  },
+  {
+    "person_id": "SD0013-90",
+    "death_date": "2023-12-27",
+    "kaimyo": "釋正信",
+    "age_at_death": 97
+  },
+  {
+    "person_id": "SD0013-91",
+    "death_date": "2022-04-11",
+    "kaimyo": "釋静徳",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0014-90",
+    "death_date": "2013-01-16",
+    "kaimyo": "釋恵照",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0014-91",
+    "death_date": "2023-05-26",
+    "kaimyo": "釋静徳",
+    "age_at_death": 90
+  },
+  {
+    "person_id": "SD0015-90",
+    "death_date": "2024-08-15",
+    "kaimyo": "釋恵照",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0016-90",
+    "death_date": "2026-01-21",
+    "kaimyo": "釋法泉",
+    "age_at_death": 83
+  },
+  {
+    "person_id": "SD0016-91",
+    "death_date": "1957-10-06",
+    "kaimyo": "釋慈照",
+    "age_at_death": 69
+  },
+  {
+    "person_id": "SD0016-92",
+    "death_date": "2023-12-07",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0017-90",
+    "death_date": "2011-12-04",
+    "kaimyo": "釋照信",
+    "age_at_death": 98
+  },
+  {
+    "person_id": "SD0017-91",
+    "death_date": "2024-12-19",
+    "kaimyo": "釋照信",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0018-90",
+    "death_date": "2025-12-25",
+    "kaimyo": "釋妙光",
+    "age_at_death": 80
+  },
+  {
+    "person_id": "SD0018-91",
+    "death_date": "2010-01-01",
+    "kaimyo": "釋明信",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0019-90",
+    "death_date": "2025-06-19",
+    "kaimyo": "釋慈照",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0020-90",
+    "death_date": "2015-04-24",
+    "kaimyo": "釋清風",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0021-90",
+    "death_date": "1955-12-25",
+    "kaimyo": "釋智光",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0022-90",
+    "death_date": "2007-02-01",
+    "kaimyo": "釋静徳",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0023-90",
+    "death_date": "2019-10-26",
+    "kaimyo": "釋妙光",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0024-90",
+    "death_date": "2024-01-22",
+    "kaimyo": "釋明信",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0025-90",
+    "death_date": "2004-11-02",
+    "kaimyo": "釋正信",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0026-90",
+    "death_date": "1971-04-28",
+    "kaimyo": "釋妙光",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0027-90",
+    "death_date": "2008-07-18",
+    "kaimyo": "釋浄心",
+    "age_at_death": 66
+  },
+  {
+    "person_id": "SD0028-90",
+    "death_date": "1957-08-07",
+    "kaimyo": "釋慈照",
+    "age_at_death": 95
+  },
+  {
+    "person_id": "SD0028-91",
+    "death_date": "2010-01-06",
+    "kaimyo": "釋照信",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0028-92",
+    "death_date": "1984-12-13",
+    "kaimyo": "釋妙光",
+    "age_at_death": 98
+  },
+  {
+    "person_id": "SD0029-90",
+    "death_date": "2004-09-05",
+    "kaimyo": "釋智光",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0030-90",
+    "death_date": "1987-02-05",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0030-91",
+    "death_date": "2025-12-22",
+    "kaimyo": "釋恵照",
+    "age_at_death": 94
+  },
+  {
+    "person_id": "SD0030-92",
+    "death_date": "2019-10-06",
+    "kaimyo": "釋法泉",
+    "age_at_death": 95
+  },
+  {
+    "person_id": "SD0031-90",
+    "death_date": "2016-12-20",
+    "kaimyo": "釋明信",
+    "age_at_death": 80
+  },
+  {
+    "person_id": "SD0031-91",
+    "death_date": "2010-03-02",
+    "kaimyo": "釋明信",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0032-90",
+    "death_date": "1948-06-22",
+    "kaimyo": "釋正信",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0033-90",
+    "death_date": "2023-02-13",
+    "kaimyo": "釋清風",
+    "age_at_death": 96
+  },
+  {
+    "person_id": "SD0034-90",
+    "death_date": "1994-03-09",
+    "kaimyo": "釋智光",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0035-90",
+    "death_date": "1991-08-07",
+    "kaimyo": "釋清風",
+    "age_at_death": 41
+  },
+  {
+    "person_id": "SD0035-91",
+    "death_date": "2026-02-21",
+    "kaimyo": "釋法泉",
+    "age_at_death": 70
+  },
+  {
+    "person_id": "SD0035-92",
+    "death_date": "2021-01-05",
+    "kaimyo": "釋智光",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0036-90",
+    "death_date": "2013-08-19",
+    "kaimyo": "釋照信",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0037-90",
+    "death_date": "2025-10-11",
+    "kaimyo": "釋明信",
+    "age_at_death": 94
+  },
+  {
+    "person_id": "SD0038-90",
+    "death_date": "1955-03-11",
+    "kaimyo": "釋法泉",
+    "age_at_death": 99
+  },
+  {
+    "person_id": "SD0038-91",
+    "death_date": "2025-08-17",
+    "kaimyo": "釋恵照",
+    "age_at_death": 83
+  },
+  {
+    "person_id": "SD0039-90",
+    "death_date": "1986-10-17",
+    "kaimyo": "釋恵照",
+    "age_at_death": 97
+  },
+  {
+    "person_id": "SD0039-91",
+    "death_date": "1970-07-12",
+    "kaimyo": "釋妙光",
+    "age_at_death": 54
+  },
+  {
+    "person_id": "SD0040-90",
+    "death_date": "2005-06-01",
+    "kaimyo": "釋静徳",
+    "age_at_death": 94
+  },
+  {
+    "person_id": "SD0040-91",
+    "death_date": "2009-10-06",
+    "kaimyo": "釋恵照",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0040-92",
+    "death_date": "1997-10-03",
+    "kaimyo": "釋恵照",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0041-90",
+    "death_date": "2005-06-12",
+    "kaimyo": "釋法泉",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0041-91",
+    "death_date": "2024-08-17",
+    "kaimyo": "釋明信",
+    "age_at_death": 37
+  },
+  {
+    "person_id": "SD0042-90",
+    "death_date": "2022-02-01",
+    "kaimyo": "釋清風",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0042-91",
+    "death_date": "1990-04-10",
+    "kaimyo": "釋照信",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0042-92",
+    "death_date": "2019-02-10",
+    "kaimyo": "釋法泉",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0043-90",
+    "death_date": "2019-05-16",
+    "kaimyo": "釋明信",
+    "age_at_death": 80
+  },
+  {
+    "person_id": "SD0044-90",
+    "death_date": "1988-04-22",
+    "kaimyo": "釋正信",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0044-91",
+    "death_date": "1960-06-14",
+    "kaimyo": "釋浄心",
+    "age_at_death": 83
+  },
+  {
+    "person_id": "SD0045-90",
+    "death_date": "2025-01-04",
+    "kaimyo": "釋正信",
+    "age_at_death": 80
+  },
+  {
+    "person_id": "SD0045-91",
+    "death_date": "2010-03-18",
+    "kaimyo": "釋恵照",
+    "age_at_death": 97
+  },
+  {
+    "person_id": "SD0046-90",
+    "death_date": "1988-06-26",
+    "kaimyo": "釋智光",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0047-90",
+    "death_date": "2024-07-22",
+    "kaimyo": "釋恵照",
+    "age_at_death": 70
+  },
+  {
+    "person_id": "SD0048-90",
+    "death_date": "2024-02-03",
+    "kaimyo": "釋照信",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0049-90",
+    "death_date": "1991-06-10",
+    "kaimyo": "釋智光",
+    "age_at_death": 100
+  },
+  {
+    "person_id": "SD0050-90",
+    "death_date": "2023-08-25",
+    "kaimyo": "釋清風",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0050-91",
+    "death_date": "2009-11-21",
+    "kaimyo": "釋恵照",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0051-90",
+    "death_date": "1959-12-17",
+    "kaimyo": "釋照信",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0052-90",
+    "death_date": "2024-02-17",
+    "kaimyo": "釋正信",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0053-90",
+    "death_date": "2021-01-14",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0054-90",
+    "death_date": "2013-12-13",
+    "kaimyo": "釋静徳",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0055-90",
+    "death_date": "1980-07-18",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0055-91",
+    "death_date": "2025-01-03",
+    "kaimyo": "釋照信",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0056-90",
+    "death_date": "2019-08-20",
+    "kaimyo": "釋智光",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0057-90",
+    "death_date": "2016-06-28",
+    "kaimyo": "釋静徳",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0058-90",
+    "death_date": "1961-01-12",
+    "kaimyo": "釋法泉",
+    "age_at_death": 49
+  },
+  {
+    "person_id": "SD0058-91",
+    "death_date": "2019-11-28",
+    "kaimyo": "釋清風",
+    "age_at_death": 57
+  },
+  {
+    "person_id": "SD0059-90",
+    "death_date": "2010-04-16",
+    "kaimyo": "釋法泉",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0060-90",
+    "death_date": "1995-10-22",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0061-90",
+    "death_date": "2007-01-24",
+    "kaimyo": "釋浄心",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0061-91",
+    "death_date": "2023-08-22",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0062-90",
+    "death_date": "2023-01-08",
+    "kaimyo": "釋明信",
+    "age_at_death": 98
+  },
+  {
+    "person_id": "SD0063-90",
+    "death_date": "1968-03-08",
+    "kaimyo": "釋法泉",
+    "age_at_death": 37
+  },
+  {
+    "person_id": "SD0063-91",
+    "death_date": "2004-05-04",
+    "kaimyo": "釋明信",
+    "age_at_death": 90
+  },
+  {
+    "person_id": "SD0064-90",
+    "death_date": "2024-10-07",
+    "kaimyo": "釋明信",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0065-90",
+    "death_date": "1957-08-09",
+    "kaimyo": "釋慈照",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0066-90",
+    "death_date": "2013-08-05",
+    "kaimyo": "釋恵照",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0067-90",
+    "death_date": "2019-01-17",
+    "kaimyo": "釋清風",
+    "age_at_death": 35
+  },
+  {
+    "person_id": "SD0068-90",
+    "death_date": "1996-03-13",
+    "kaimyo": "釋浄心",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0069-90",
+    "death_date": "2023-10-11",
+    "kaimyo": "釋慈照",
+    "age_at_death": 96
+  },
+  {
+    "person_id": "SD0070-90",
+    "death_date": "1985-09-10",
+    "kaimyo": "釋正信",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0070-91",
+    "death_date": "2001-11-20",
+    "kaimyo": "釋恵照",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0071-90",
+    "death_date": "1982-11-19",
+    "kaimyo": "釋慈照",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0071-91",
+    "death_date": "2021-09-07",
+    "kaimyo": "釋静徳",
+    "age_at_death": 99
+  },
+  {
+    "person_id": "SD0072-90",
+    "death_date": "2023-02-11",
+    "kaimyo": "釋正信",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0072-91",
+    "death_date": "2021-12-06",
+    "kaimyo": "釋恵照",
+    "age_at_death": 95
+  },
+  {
+    "person_id": "SD0073-90",
+    "death_date": "2025-08-04",
+    "kaimyo": "釋恵照",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0074-90",
+    "death_date": "1975-12-06",
+    "kaimyo": "釋恵照",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0074-91",
+    "death_date": "2023-02-17",
+    "kaimyo": "釋清風",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0075-90",
+    "death_date": "2024-05-25",
+    "kaimyo": "釋恵照",
+    "age_at_death": 83
+  },
+  {
+    "person_id": "SD0076-90",
+    "death_date": "2022-12-23",
+    "kaimyo": "釋清風",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0077-90",
+    "death_date": "1979-02-11",
+    "kaimyo": "釋妙光",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0078-90",
+    "death_date": "2026-01-26",
+    "kaimyo": "釋清風",
+    "age_at_death": 66
+  },
+  {
+    "person_id": "SD0079-90",
+    "death_date": "2022-05-16",
+    "kaimyo": "釋静徳",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0080-90",
+    "death_date": "1998-11-18",
+    "kaimyo": "釋法泉",
+    "age_at_death": 90
+  },
+  {
+    "person_id": "SD0080-91",
+    "death_date": "1978-06-17",
+    "kaimyo": "釋法泉",
+    "age_at_death": 63
+  },
+  {
+    "person_id": "SD0081-90",
+    "death_date": "1981-08-11",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0081-91",
+    "death_date": "2023-07-08",
+    "kaimyo": "釋恵照",
+    "age_at_death": 72
+  },
+  {
+    "person_id": "SD0082-90",
+    "death_date": "2022-01-19",
+    "kaimyo": "釋明信",
+    "age_at_death": 65
+  },
+  {
+    "person_id": "SD0082-91",
+    "death_date": "2024-12-28",
+    "kaimyo": "釋恵照",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0082-92",
+    "death_date": "1956-09-12",
+    "kaimyo": "釋浄心",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0083-90",
+    "death_date": "2025-07-11",
+    "kaimyo": "釋浄心",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0084-90",
+    "death_date": "1958-10-18",
+    "kaimyo": "釋浄心",
+    "age_at_death": 67
+  },
+  {
+    "person_id": "SD0085-90",
+    "death_date": "2023-11-15",
+    "kaimyo": "釋照信",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0086-90",
+    "death_date": "2004-01-01",
+    "kaimyo": "釋法泉",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0086-91",
+    "death_date": "2007-08-01",
+    "kaimyo": "釋照信",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0087-90",
+    "death_date": "2004-08-04",
+    "kaimyo": "釋智光",
+    "age_at_death": 80
+  },
+  {
+    "person_id": "SD0087-91",
+    "death_date": "2021-03-12",
+    "kaimyo": "釋智光",
+    "age_at_death": 83
+  },
+  {
+    "person_id": "SD0088-90",
+    "death_date": "2007-03-07",
+    "kaimyo": "釋正信",
+    "age_at_death": 100
+  },
+  {
+    "person_id": "SD0088-91",
+    "death_date": "2021-03-17",
+    "kaimyo": "釋妙光",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0089-90",
+    "death_date": "2002-03-26",
+    "kaimyo": "釋正信",
+    "age_at_death": 50
+  },
+  {
+    "person_id": "SD0090-90",
+    "death_date": "2019-12-23",
+    "kaimyo": "釋慈照",
+    "age_at_death": 65
+  },
+  {
+    "person_id": "SD0091-90",
+    "death_date": "2008-08-21",
+    "kaimyo": "釋智光",
+    "age_at_death": 83
+  },
+  {
+    "person_id": "SD0091-91",
+    "death_date": "2023-04-13",
+    "kaimyo": "釋正信",
+    "age_at_death": 58
+  },
+  {
+    "person_id": "SD0091-92",
+    "death_date": "1956-01-18",
+    "kaimyo": "釋浄心",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0092-90",
+    "death_date": "2022-02-03",
+    "kaimyo": "釋恵照",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0093-90",
+    "death_date": "1995-09-21",
+    "kaimyo": "釋浄心",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0093-91",
+    "death_date": "2014-06-12",
+    "kaimyo": "釋静徳",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0094-90",
+    "death_date": "2022-11-04",
+    "kaimyo": "釋清風",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0095-90",
+    "death_date": "2023-11-18",
+    "kaimyo": "釋慈照",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0096-90",
+    "death_date": "1998-06-14",
+    "kaimyo": "釋妙光",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0097-90",
+    "death_date": "2021-06-24",
+    "kaimyo": "釋正信",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0097-91",
+    "death_date": "1978-10-02",
+    "kaimyo": "釋照信",
+    "age_at_death": 35
+  },
+  {
+    "person_id": "SD0098-90",
+    "death_date": "1985-09-24",
+    "kaimyo": "釋慈照",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0098-91",
+    "death_date": "2025-05-21",
+    "kaimyo": "釋智光",
+    "age_at_death": 74
+  },
+  {
+    "person_id": "SD0099-90",
+    "death_date": "1975-05-21",
+    "kaimyo": "釋法泉",
+    "age_at_death": 72
+  },
+  {
+    "person_id": "SD0100-90",
+    "death_date": "1951-08-22",
+    "kaimyo": "釋慈照",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0100-91",
+    "death_date": "2010-11-15",
+    "kaimyo": "釋正信",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0100-92",
+    "death_date": "2025-09-28",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 50
+  },
+  {
+    "person_id": "SD0101-90",
+    "death_date": "2018-06-19",
+    "kaimyo": "釋照信",
+    "age_at_death": 100
+  },
+  {
+    "person_id": "SD0101-91",
+    "death_date": "1992-05-20",
+    "kaimyo": "釋清風",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0102-90",
+    "death_date": "1960-11-12",
+    "kaimyo": "釋照信",
+    "age_at_death": 51
+  },
+  {
+    "person_id": "SD0103-90",
+    "death_date": "1986-12-19",
+    "kaimyo": "釋智光",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0104-90",
+    "death_date": "2010-06-18",
+    "kaimyo": "釋恵照",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0105-90",
+    "death_date": "2025-08-26",
+    "kaimyo": "釋智光",
+    "age_at_death": 99
+  },
+  {
+    "person_id": "SD0106-90",
+    "death_date": "1965-07-09",
+    "kaimyo": "釋静徳",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0107-90",
+    "death_date": "2023-05-05",
+    "kaimyo": "釋静徳",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0107-91",
+    "death_date": "2016-08-17",
+    "kaimyo": "釋慈照",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0107-92",
+    "death_date": "1963-03-03",
+    "kaimyo": "釋妙光",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0108-90",
+    "death_date": "1956-03-09",
+    "kaimyo": "釋明信",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0108-91",
+    "death_date": "2023-05-03",
+    "kaimyo": "釋妙光",
+    "age_at_death": 65
+  },
+  {
+    "person_id": "SD0109-90",
+    "death_date": "2021-01-05",
+    "kaimyo": "釋照信",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0109-91",
+    "death_date": "1970-11-14",
+    "kaimyo": "釋妙光",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0110-90",
+    "death_date": "1958-07-09",
+    "kaimyo": "釋照信",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0110-91",
+    "death_date": "2019-04-26",
+    "kaimyo": "釋明信",
+    "age_at_death": 101
+  },
+  {
+    "person_id": "SD0111-90",
+    "death_date": "1980-12-24",
+    "kaimyo": "釋明信",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0112-90",
+    "death_date": "2021-06-21",
+    "kaimyo": "釋照信",
+    "age_at_death": 35
+  },
+  {
+    "person_id": "SD0113-90",
+    "death_date": "2022-01-14",
+    "kaimyo": "釋清風",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0113-91",
+    "death_date": "1988-02-04",
+    "kaimyo": "釋恵照",
+    "age_at_death": 79
+  },
+  {
+    "person_id": "SD0114-90",
+    "death_date": "2004-09-21",
+    "kaimyo": "釋明信",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0115-90",
+    "death_date": "2025-02-10",
+    "kaimyo": "釋照信",
+    "age_at_death": 43
+  },
+  {
+    "person_id": "SD0116-90",
+    "death_date": "2021-06-23",
+    "kaimyo": "釋慈照",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0117-90",
+    "death_date": "2025-12-11",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0118-90",
+    "death_date": "2023-07-19",
+    "kaimyo": "釋照信",
+    "age_at_death": 39
+  },
+  {
+    "person_id": "SD0118-91",
+    "death_date": "1970-09-07",
+    "kaimyo": "釋妙光",
+    "age_at_death": 90
+  },
+  {
+    "person_id": "SD0119-90",
+    "death_date": "1979-07-16",
+    "kaimyo": "釋明信",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0120-90",
+    "death_date": "1959-10-11",
+    "kaimyo": "釋静徳",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0121-90",
+    "death_date": "2024-12-16",
+    "kaimyo": "釋清風",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0121-91",
+    "death_date": "2025-11-26",
+    "kaimyo": "釋照信",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0122-90",
+    "death_date": "2022-08-15",
+    "kaimyo": "釋明信",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0122-91",
+    "death_date": "2023-04-14",
+    "kaimyo": "釋智光",
+    "age_at_death": 43
+  },
+  {
+    "person_id": "SD0122-92",
+    "death_date": "2019-01-13",
+    "kaimyo": "釋正信",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0123-90",
+    "death_date": "2013-01-08",
+    "kaimyo": "釋正信",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0124-90",
+    "death_date": "1952-01-25",
+    "kaimyo": "釋浄心",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0125-90",
+    "death_date": "2023-01-18",
+    "kaimyo": "釋慈照",
+    "age_at_death": 35
+  },
+  {
+    "person_id": "SD0125-91",
+    "death_date": "1953-12-17",
+    "kaimyo": "釋慈照",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0126-90",
+    "death_date": "2007-08-20",
+    "kaimyo": "釋清風",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0127-90",
+    "death_date": "2001-03-10",
+    "kaimyo": "釋智光",
+    "age_at_death": 65
+  },
+  {
+    "person_id": "SD0128-90",
+    "death_date": "2015-09-19",
+    "kaimyo": "釋法泉",
+    "age_at_death": 88
+  },
+  {
+    "person_id": "SD0129-90",
+    "death_date": "2015-01-28",
+    "kaimyo": "釋智光",
+    "age_at_death": 76
+  },
+  {
+    "person_id": "SD0129-91",
+    "death_date": "2013-04-27",
+    "kaimyo": "釋照信",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0130-90",
+    "death_date": "2022-12-01",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 94
+  },
+  {
+    "person_id": "SD0131-90",
+    "death_date": "2024-04-11",
+    "kaimyo": "釋智光",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0132-90",
+    "death_date": "2011-04-16",
+    "kaimyo": "釋法泉",
+    "age_at_death": 96
+  },
+  {
+    "person_id": "SD0132-91",
+    "death_date": "2019-03-27",
+    "kaimyo": "釋恵照",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0133-90",
+    "death_date": "2024-08-14",
+    "kaimyo": "釋静徳",
+    "age_at_death": 39
+  },
+  {
+    "person_id": "SD0134-90",
+    "death_date": "2019-01-08",
+    "kaimyo": "釋照信",
+    "age_at_death": 74
+  },
+  {
+    "person_id": "SD0135-90",
+    "death_date": "1997-09-13",
+    "kaimyo": "釋明信",
+    "age_at_death": 78
+  },
+  {
+    "person_id": "SD0135-91",
+    "death_date": "1981-09-10",
+    "kaimyo": "釋明信",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0136-90",
+    "death_date": "1970-05-02",
+    "kaimyo": "釋慈照",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0137-90",
+    "death_date": "2013-12-11",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0138-90",
+    "death_date": "1998-11-03",
+    "kaimyo": "釋照信",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0138-91",
+    "death_date": "1972-06-04",
+    "kaimyo": "釋浄心",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0139-90",
+    "death_date": "2022-02-28",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 82
+  },
+  {
+    "person_id": "SD0139-91",
+    "death_date": "1992-12-11",
+    "kaimyo": "釋徳雲",
+    "age_at_death": 54
+  },
+  {
+    "person_id": "SD0140-90",
+    "death_date": "2024-06-25",
+    "kaimyo": "釋明信",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0141-90",
+    "death_date": "2024-01-11",
+    "kaimyo": "釋明信",
+    "age_at_death": 90
+  },
+  {
+    "person_id": "SD0142-90",
+    "death_date": "2023-01-19",
+    "kaimyo": "釋清風",
+    "age_at_death": 92
+  },
+  {
+    "person_id": "SD0143-90",
+    "death_date": "2022-06-08",
+    "kaimyo": "釋慈照",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0144-90",
+    "death_date": "2023-06-02",
+    "kaimyo": "釋法泉",
+    "age_at_death": 42
+  },
+  {
+    "person_id": "SD0144-91",
+    "death_date": "2013-08-21",
+    "kaimyo": "釋法泉",
+    "age_at_death": 93
+  },
+  {
+    "person_id": "SD0145-90",
+    "death_date": "2022-09-13",
+    "kaimyo": "釋照信",
+    "age_at_death": 61
+  },
+  {
+    "person_id": "SD0146-90",
+    "death_date": "2022-01-14",
+    "kaimyo": "釋恵照",
+    "age_at_death": 75
+  },
+  {
+    "person_id": "SD0147-90",
+    "death_date": "1996-02-18",
+    "kaimyo": "釋照信",
+    "age_at_death": 77
+  },
+  {
+    "person_id": "SD0148-90",
+    "death_date": "2004-12-10",
+    "kaimyo": "釋静徳",
+    "age_at_death": 81
+  },
+  {
+    "person_id": "SD0149-90",
+    "death_date": "2023-08-17",
+    "kaimyo": "釋正信",
+    "age_at_death": 68
+  },
+  {
+    "person_id": "SD0150-90",
+    "death_date": "2023-07-20",
+    "kaimyo": "釋明信",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0150-91",
+    "death_date": "2022-12-01",
+    "kaimyo": "釋正信",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0151-90",
+    "death_date": "2016-06-16",
+    "kaimyo": "釋静徳",
+    "age_at_death": 72
+  },
+  {
+    "person_id": "SD0152-90",
+    "death_date": "2023-07-08",
+    "kaimyo": "釋清風",
+    "age_at_death": 91
+  },
+  {
+    "person_id": "SD0153-90",
+    "death_date": "2021-11-19",
+    "kaimyo": "釋静徳",
+    "age_at_death": 85
+  },
+  {
+    "person_id": "SD0154-90",
+    "death_date": "1955-04-23",
+    "kaimyo": "釋正信",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0155-90",
+    "death_date": "2022-12-25",
+    "kaimyo": "釋静徳",
+    "age_at_death": 86
+  },
+  {
+    "person_id": "SD0156-90",
+    "death_date": "2008-10-02",
+    "kaimyo": "釋静徳",
+    "age_at_death": 84
+  },
+  {
+    "person_id": "SD0157-90",
+    "death_date": "2013-01-19",
+    "kaimyo": "釋清風",
+    "age_at_death": 74
+  },
+  {
+    "person_id": "SD0157-91",
+    "death_date": "2022-04-21",
+    "kaimyo": "釋恵照",
+    "age_at_death": 97
+  },
+  {
+    "person_id": "SD0157-92",
+    "death_date": "2025-03-28",
+    "kaimyo": "釋妙光",
+    "age_at_death": 89
+  },
+  {
+    "person_id": "SD0158-90",
+    "death_date": "2019-01-26",
+    "kaimyo": "釋智光",
+    "age_at_death": 94
+  },
+  {
+    "person_id": "SD0159-90",
+    "death_date": "2014-05-20",
+    "kaimyo": "釋恵照",
+    "age_at_death": 87
+  },
+  {
+    "person_id": "SD0160-90",
+    "death_date": "2010-10-18",
+    "kaimyo": "釋正信",
+    "age_at_death": 92
+  }
+]

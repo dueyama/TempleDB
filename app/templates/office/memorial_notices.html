@@ -1,0 +1,497 @@
+{% load office_nav %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ print_heading_labels.memorial_notice }} | TempleDB</title>
+    <style>
+      :root {
+        --ink: #1f1a14;
+        --paper: #fdfbf6;
+        --line: #d7cfbe;
+        --accent: #7a3b1d;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
+        background:
+          radial-gradient(circle at 10% 8%, #f3efe4 0, transparent 42%),
+          radial-gradient(circle at 84% 18%, #e6ecef 0, transparent 36%),
+          linear-gradient(135deg, #ede6da, #f8f5ef 42%, #e9efef);
+      }
+      a { color: inherit; }
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+      .app-shell {
+        display: grid;
+        grid-template-columns: minmax(300px, 380px) 1fr;
+        gap: 24px;
+        padding: 24px;
+        align-items: start;
+      }
+      .control-panel {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 16px 32px rgba(40, 36, 24, 0.08);
+      }
+      .control-panel h1 {
+        margin: 0 0 10px;
+        font-size: 1.5rem;
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      }
+      .helper {
+        margin: 0 0 18px;
+        color: #5f5a50;
+        line-height: 1.7;
+      }
+      .meta-list {
+        display: grid;
+        gap: 10px;
+        margin: 0 0 20px;
+      }
+      .meta-item {
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+      }
+      .meta-item dt {
+        color: #746c60;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .meta-item dd {
+        margin: 0;
+      }
+      .field-grid {
+        display: grid;
+        gap: 12px;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      .field label {
+        color: #6d655a;
+        font-size: 0.84rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .field .field-label {
+        color: #6d655a;
+        font-size: 0.84rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .field input,
+      .field textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: #fffdf9;
+        padding: 10px 12px;
+      }
+      .field textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .field-help {
+        color: #6b655b;
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+      .field-help code {
+        font-size: 0.88em;
+      }
+      .checkbox-field {
+        gap: 8px;
+      }
+      .checkbox-option {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: #2f2a23;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      .checkbox-option input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        flex: 0 0 auto;
+      }
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .button,
+      .ghost-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .button {
+        border: 1px solid var(--accent);
+        background: var(--accent);
+        color: #fffaf0;
+      }
+      .ghost-button {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+      }
+      .global-nav,
+      .office-subnav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .global-nav {
+        margin-bottom: 18px;
+      }
+      .office-subnav {
+        margin: -6px 0 18px;
+      }
+      .global-nav .ghost-button.is-current,
+      .office-subnav .ghost-button.is-current {
+        border-color: var(--accent);
+        background: #f5e6d6;
+      }
+      .notice {
+        margin-top: 16px;
+        color: #6b655b;
+        font-size: 0.92rem;
+        line-height: 1.7;
+      }
+      .warning {
+        margin-top: 12px;
+        border: 1px solid #d6c59b;
+        background: #fff8e8;
+        padding: 10px 12px;
+        color: #66583d;
+      }
+      .preview-frame {
+        background: rgba(255, 255, 255, 0.74);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .preview-scale-shell {
+        position: relative;
+        width: var(--preview-width, auto);
+        height: var(--preview-height, auto);
+        margin: 0 auto;
+      }
+      .preview-scale-shell > .notice-page {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: top left;
+        transform: scale(var(--preview-scale, 1));
+      }
+      .page-stack {
+        display: grid;
+        gap: 18px;
+      }
+      .page-meta {
+        margin: 0 0 8px;
+        color: #6d655a;
+        font-size: 0.88rem;
+      }
+      {% include "office/partials/memorial_notice_styles.html" %}
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      @media print {
+        :root {
+          --ink: #000;
+          --paper: #fff;
+          --line: #000;
+          --accent: #000;
+        }
+        html, body {
+          width: auto;
+          height: auto;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+        body {
+          background: #fff !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        * {
+          box-shadow: none !important;
+          text-shadow: none !important;
+        }
+        .control-panel,
+        .screen-only {
+          display: none !important;
+        }
+        .app-shell {
+          display: block !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .preview-frame {
+          margin: 0 !important;
+          padding: 0 !important;
+          border: none !important;
+          background: #fff !important;
+        }
+        .preview-scale-shell {
+          width: auto !important;
+          height: auto !important;
+        }
+        .preview-scale-shell > .notice-page {
+          position: static !important;
+          transform: none !important;
+        }
+        .page-stack {
+          gap: 0 !important;
+        }
+        .page-meta {
+          display: none !important;
+        }
+        .notice-page {
+          width: 210mm !important;
+          min-width: 210mm !important;
+          max-width: 210mm !important;
+          height: 297mm !important;
+          aspect-ratio: auto !important;
+          margin: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 14mm 14mm 12mm !important;
+          overflow: hidden !important;
+          break-inside: avoid !important;
+          page-break-after: always !important;
+          background: #fff !important;
+        }
+        .notice-page:last-child {
+          page-break-after: auto !important;
+        }
+        .notice-page,
+        .notice-page *,
+        .preview-frame,
+        .preview-frame * {
+          color: #000 !important;
+          border-color: #000 !important;
+        }
+        .notice-table,
+        .notice-table thead th,
+        .empty-state,
+        .warning {
+          background: #fff !important;
+        }
+      }
+      @media (max-width: 1260px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% if request.user.is_authenticated %}
+      {% include "includes/app_quicklinks.html" %}
+    {% endif %}
+    <main class="app-shell">
+      <aside class="control-panel screen-only">
+        {% include "includes/office_nav.html" with current_section="memorials" %}
+        {% include "includes/office_subnav.html" with current_page="memorial_notices" %}
+        <h1>{{ print_heading_labels.memorial_notice }}</h1>
+        <p class="helper">
+          翌年 1 月から 12 月に回忌法要がある家だけを対象に、戸主ごとの案内文書を A4 縦でまとめます。
+          文面はここで調整し、そのまま印刷できます。
+        </p>
+        <dl class="meta-list">
+          <div class="meta-item">
+            <dt>対象年</dt>
+            <dd>{{ target_year }}年</dd>
+          </div>
+          <div class="meta-item">
+            <dt>対象戸数</dt>
+            <dd>{{ household_count }}</dd>
+          </div>
+          <div class="meta-item">
+            <dt>出力ページ数</dt>
+            <dd>{{ page_count }}</dd>
+          </div>
+          <div class="meta-item">
+            <dt>文面保存</dt>
+            <dd>
+              {% if template_saved %}
+                保存済み
+                {% if template_saved_at %}<br><small>{{ template_saved_at|date:"Y-m-d H:i" }}</small>{% endif %}
+              {% else %}
+                未保存
+              {% endif %}
+            </dd>
+          </div>
+        </dl>
+        {% if messages %}
+          <div class="meta-list">
+            {% for message in messages %}
+              <div class="warning">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <form method="post" class="field-grid" data-quicklink-guard-form>
+          {% csrf_token %}
+          <input type="hidden" name="next" value="">
+          <div class="field">
+            <label for="year">案内対象年</label>
+            <input id="year" name="year" value="{{ target_year }}" inputmode="numeric">
+          </div>
+          <div class="field checkbox-field">
+            <span class="field-label">翌年分も参考表示</span>
+            <input type="hidden" name="include_reference_year" value="0">
+            <label class="checkbox-option" for="include_reference_year">
+              <input
+                id="include_reference_year"
+                type="checkbox"
+                name="include_reference_year"
+                value="1"
+                {% if include_reference_year %}checked{% endif %}
+              >
+              翌年分の回忌予定も同じ表の空き行へ入れる
+            </label>
+          </div>
+          <div class="field">
+            <label for="intro_text">前文</label>
+            <div class="field-help">
+              置換記号:
+              {% for token in memorial_notice_template_tokens %}
+                <code>{{ token.token }}</code> → {{ token.example_label }}（{{ token.description }}）{% if not forloop.last %} / {% endif %}
+              {% endfor %}
+            </div>
+            <textarea id="intro_text" name="intro_text">{{ intro_text_input }}</textarea>
+          </div>
+          <div class="field">
+            <label for="outro_text">後文</label>
+            <textarea id="outro_text" name="outro_text">{{ outro_text_input }}</textarea>
+          </div>
+          <div class="field">
+            <label for="signature_text">寺名・住所</label>
+            <textarea id="signature_text" name="signature_text">{{ signature_text_input }}</textarea>
+          </div>
+          <div class="field">
+            <label for="recipient_font_size">宛名サイズ</label>
+            <input id="recipient_font_size" name="recipient_font_size" value="{{ notice_style.recipient_font_size }}" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="body_font_size">前文・後文サイズ</label>
+            <input id="body_font_size" name="body_font_size" value="{{ notice_style.body_font_size }}" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="signature_font_size">寺名・住所サイズ</label>
+            <input id="signature_font_size" name="signature_font_size" value="{{ notice_style.signature_font_size }}" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="table_font_size">表文字サイズ</label>
+            <input id="table_font_size" name="table_font_size" value="{{ notice_style.table_font_size }}" inputmode="decimal">
+          </div>
+          <div class="actions">
+            <button class="button" type="submit" name="action" value="preview">文面を反映</button>
+            <button class="ghost-button" type="submit" name="action" value="save_template" data-quicklink-save>この文面を保存</button>
+            <button
+              class="ghost-button"
+              type="submit"
+              formmethod="get"
+              formaction="{% url 'office:memorial_notices' %}?format=pdf"
+            >
+              PDFを開く
+            </button>
+            <button class="ghost-button" type="button" onclick="window.print()">印刷ダイアログを開く</button>
+          </div>
+        </form>
+        <div class="actions">
+          <a class="ghost-button" href="{% url 'office:memorial_distribution' %}?year={{ target_year }}&amp;include_reference_year={% if include_reference_year %}1{% else %}0{% endif %}">年回表配布準備</a>
+        </div>
+        <p class="notice">
+          一覧の `{{ memorial_notice_table_labels.other_note }}` 欄には、法要台帳で完了記録した内容や取り越しのメモを表示します。
+        </p>
+      </aside>
+
+      <section class="preview-frame" data-preview-scale-root>
+        {% if available %}
+          <div class="page-stack">
+            {% for document in documents %}
+              <div>
+                <p class="page-meta screen-only">
+                  {{ document.household.name }} (#{{ document.household.household_id }})
+                  {% if document.page_count > 1 %} / {{ document.page_number }} / {{ document.page_count }} 枚目{% endif %}
+                </p>
+                <div class="preview-scale-shell" data-preview-scale-shell>
+                  {% include "office/partials/memorial_notice_page.html" %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <h2>まだ出力できません</h2>
+            <p>{{ message }}</p>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+    <script>
+      function syncScaledPrintPreview() {
+        document.querySelectorAll("[data-preview-scale-root]").forEach((frame) => {
+          const frameStyle = window.getComputedStyle(frame);
+          const availableWidth =
+            frame.clientWidth
+            - (parseFloat(frameStyle.paddingLeft) || 0)
+            - (parseFloat(frameStyle.paddingRight) || 0);
+          frame.querySelectorAll("[data-preview-scale-shell]").forEach((shell) => {
+            const page = shell.querySelector("[data-preview-scale-page]");
+            if (!page) {
+              return;
+            }
+            shell.style.removeProperty("--preview-scale");
+            shell.style.removeProperty("--preview-width");
+            shell.style.removeProperty("--preview-height");
+            const naturalWidth = page.offsetWidth;
+            const naturalHeight = page.offsetHeight;
+            if (!naturalWidth || !naturalHeight) {
+              return;
+            }
+            const scale = availableWidth > 0 ? Math.min(1, availableWidth / naturalWidth) : 1;
+            shell.style.setProperty("--preview-scale", String(scale));
+            shell.style.setProperty("--preview-width", `${naturalWidth * scale}px`);
+            shell.style.setProperty("--preview-height", `${naturalHeight * scale}px`);
+          });
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", syncScaledPrintPreview);
+      window.addEventListener("load", syncScaledPrintPreview);
+      window.addEventListener("resize", syncScaledPrintPreview);
+    </script>
+  </body>
+</html>

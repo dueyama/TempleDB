@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ print_heading_labels.service_schedule_print }} | TempleDB{% endblock %}
+{% block body %}
+<section class="panel">
+  <h1>{{ print_heading_labels.service_schedule_print }}</h1>
+  <p>{{ document_title }} / 対象 {{ participant_count }}名</p>
+  <p>PDFを開き、表示したPDFの印刷機能で印刷してください。iPhoneでは共有メニューからプリントできます。</p>
+  <div class="actions">
+    <a class="button" href="{{ pdf_url }}">PDFを開く・印刷</a>
+    <a class="ghost-button" href="{{ browser_print_url }}">ブラウザ印刷</a>
+    <a class="ghost-button" href="{{ next_url }}">戻る</a>
+  </div>
+  <p>PDFの1ページ目</p>
+  <a href="{{ pdf_url }}" aria-label="PDFを開く">
+    <img src="{{ pdf_image_url }}" alt="法要情報PDFの1ページ目" style="display:block;width:100%;max-width:794px;height:auto;margin:16px auto;border:1px solid #bbb;">
+  </a>
+</section>
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}地区定義 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .district-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .district-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .district-actions,
+    .action-row,
+    .summary-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box,
+    .section-card,
+    .district-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+    }
+    .summary-box {
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .section-card {
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .form-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 10px 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .field textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+    .field input[type="checkbox"] {
+      width: auto;
+      min-height: 0;
+      padding: 0;
+    }
+    .district-list {
+      display: grid;
+      gap: 14px;
+    }
+    .district-card {
+      padding: 16px;
+    }
+    .district-card h3 {
+      margin: 0 0 8px;
+    }
+    .card-meta {
+      color: var(--muted);
+      margin: -4px 0 12px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .pair {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="district-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="districts" %}
+    <section class="hero">
+      <div class="district-top">
+        <div>
+          <div class="eyebrow">Settings / Master</div>
+          <h1>地区定義</h1>
+          <p>地区数は固定せず任意に増減できます。地区役員は地区所属の現在帳から選択し、未設定の地区もそのまま扱えます。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <article class="summary-box">
+        <div class="label">有効地区</div>
+        <div class="value">{{ active_districts|length }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">停止中地区</div>
+        <div class="value">{{ inactive_districts|length }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">総数</div>
+        <div class="value">{{ districts|length }}</div>
+      </article>
+    </section>
+
+    <section class="section-card">
+      <div class="eyebrow">Edit</div>
+      <h2>{% if editing_district %}地区を編集{% else %}地区を追加{% endif %}</h2>
+      <p class="muted">
+        地区役員は、{% if latest_district_household_batch %}最新取込履歴 {{ latest_district_household_batch }}{% else %}最新取込履歴未取得{% endif %}
+        のうち、この地区へ割り当て済みの現在帳から選びます。現在の選択肢は {{ officer_choice_count }} 件です。
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        {% if editing_district %}
+          <input type="hidden" name="district_id" value="{{ editing_district.id }}">
+        {% endif %}
+        {% if form.non_field_errors %}
+          <div class="callout">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="form-grid">
+          {% for field in form.visible_fields %}
+            <div class="field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}{{ field.errors }}{% endif %}
+              {% if field.help_text %}<div class="muted">{{ field.help_text }}</div>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="action-row" style="margin-top: 16px;">
+          <button class="button" type="submit" name="action" value="save">保存</button>
+          {% if editing_district %}
+            <a class="ghost-button" href="{% url 'office:districts' %}">新規入力に戻す</a>
+          {% endif %}
+        </div>
+      </form>
+    </section>
+
+    <section class="section-card">
+      <div class="eyebrow">List</div>
+      <h2>地区一覧</h2>
+      <div class="district-list">
+        {% for district in districts %}
+          <article class="district-card">
+            <h3>{{ district.name }}</h3>
+            <div class="card-meta">
+              {% if district.short_name %}略称 {{ district.short_name }} / {% endif %}
+              表示順 {{ district.sort_order }} / {% if district.is_active %}有効{% else %}停止中{% endif %}
+            </div>
+            <dl class="pair-grid">
+              <div class="pair">
+                <dt>地区名</dt>
+                <dd>{{ district.name }}</dd>
+              </div>
+              <div class="pair">
+                <dt>略称</dt>
+                <dd>{{ district.short_name|default:"-" }}</dd>
+              </div>
+              <div class="pair">
+                <dt>地区役員</dt>
+                <dd>
+                  {% if district.current_officer_name %}
+                    {{ district.current_officer_name }}
+                    {% if district.current_officer_household_id %}
+                      <span class="muted">/ 台帳ID {{ district.current_officer_household_id }}</span>
+                    {% endif %}
+                    {% if district.current_officer_person_id %}
+                      <span class="muted">/ 家族ID {{ district.current_officer_person_id }}</span>
+                    {% endif %}
+                  {% else %}
+                    未設定
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="pair">
+                <dt>世帯数</dt>
+                <dd>{{ district.member_household_count|default:0 }}世帯</dd>
+              </div>
+              <div class="pair">
+                <dt>状態</dt>
+                <dd>{% if district.is_active %}有効{% else %}手配り停止中（郵送扱い）{% endif %}</dd>
+              </div>
+              {% if district.notes %}
+                <div class="pair">
+                  <dt>メモ</dt>
+                  <dd>{{ district.notes }}</dd>
+                </div>
+              {% endif %}
+            </dl>
+            <div class="action-row" style="margin-top: 14px;">
+              <a class="ghost-button" href="{% url 'office:districts' %}?edit={{ district.id }}">編集</a>
+              <a class="ghost-button" href="{% url 'office:household_districts' %}?filter_district_id={{ district.id }}">地区メンバー一覧</a>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="district_id" value="{{ district.id }}">
+                <button class="ghost-button" type="submit" name="action" value="toggle_active">
+                  {% if district.is_active %}手配り停止にする{% else %}手配りを有効にする{% endif %}
+                </button>
+              </form>
+            </div>
+          </article>
+        {% empty %}
+          <div class="callout">まだ地区は登録されていません。</div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

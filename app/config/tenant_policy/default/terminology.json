@@ -1,0 +1,58 @@
+{
+  "terms": {
+    "homyo_body": "{kaimyo}本体",
+    "homyo_input_presence": "{kaimyo}入力あり",
+    "homyo_presence": "{kaimyo}あり",
+    "homyo_presence_rate": "{kaimyo}あり率",
+    "homyo_order_issue": "{kaimyo}順序要確認",
+    "kaimyo_search": "{kaimyo}検索"
+  },
+  "copy": {
+    "person_search": {
+      "placeholder": "氏名 / かな / {person_id} / 続柄 / {kaimyo}",
+      "help": "氏名、かな、{person_id}、続柄、{kaimyo}で人を探せます。"
+    },
+    "data_quality": {
+      "search_placeholder": "氏名 / 戸主 / {kaimyo} / 続柄 / {household_id}",
+      "homyo_order_description": "`釋 / 釋尼 / 釈 / 釈尼 / 尼` が先に来たあとで `院 / 庵 / 軒` が出てくるものです。通常の院号{kaimyo}順と違うため、入力順の確認候補として拾っています。",
+      "homyo_order_empty": "{homyo_order_issue}の候補は見つかりませんでした。"
+    },
+    "special_search": {
+      "data_quality_description": "命日不明、性別不明、{homyo_order_issue}、同名候補、import issues をまとめて見ます。",
+      "kaimyo_contains_label": "{kaimyo_search}",
+      "kaimyo_contains_description": "検索文字を含む{kaimyo}の一覧です。{kaimyo}の一部から故人を探せます。",
+      "search_placeholder": "戸主名 / 故人名 / {household_id} / {kaimyo}",
+      "kaimyo_match_status": "{kaimyo}一致"
+    },
+    "special_searches": {
+      "search_placeholder": "戸主名 / 故人名 / {household_id} / {kaimyo}"
+    },
+    "universal_search": {
+      "placeholder": "例: 葬儀のメモ / 田中家の法事 / {kaimyo}で探す"
+    },
+    "household_head_transition": {
+      "memorial_registration_callout": "戸主の往生登録を行います。命日・{kaimyo}・享年を入れ、通常はそのまま葬儀予定も作れます。",
+      "restore_current_callout": "戸主 person を現在帳へ戻します。命日・{kaimyo}などの過去帳情報がある場合は外れます。"
+    },
+    "data_science": {
+      "help_intro": "過去帳の命日・享年・{kaimyo}データから、暦の偏り、年代差、{kaimyo}の文字傾向をワンクリックで見られる read-only 画面です。",
+      "homyo_section_title": "{kaimyo}",
+      "homyo_section_description": "院号{kaimyo}を、院号の有無と{homyo_body}の文字傾向に分けて見ます。",
+      "homyo_character_title": "{homyo_body}によく出る文字",
+      "homyo_character_description": "院号と接頭の <code>釋</code> / <code>釈</code> / <code>釋尼</code> / <code>釈尼</code> / <code>尼</code> を除いた、{homyo_body}の文字出現数です。",
+      "homyo_empty": "表示できる{kaimyo}分析がありません。",
+      "completeness_description": "death-date が解析可能な record に限り、死亡年代ごとに享年・{kaimyo}・性別の入力率を比較します。"
+    }
+  },
+  "search_aliases": {
+    "result_kind": {
+      "person": ["人", "個人", "家族", "故人", "{kaimyo}", "戒名"]
+    },
+    "note_type": {
+      "deceased_note": ["故人メモ", "{kaimyo}メモ", "戒名メモ"]
+    },
+    "special_search": {
+      "kaimyo_contains": ["{kaimyo_search}", "戒名検索"]
+    }
+  }
+}

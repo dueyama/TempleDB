@@ -1,0 +1,20 @@
+<fieldset class="temple-payment">
+  <legend>入金</legend>
+  {{ payment_form.non_field_errors }}
+  {% for hidden in payment_form.hidden_fields %}
+    {{ hidden }}
+    {{ hidden.errors }}
+  {% endfor %}
+  <div class="temple-form-grid">
+    {% for field in payment_form.visible_fields %}
+      <div class="temple-field">
+        {{ field.label_tag }}
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+          <span class="muted">{{ field.help_text }}</span>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</fieldset>

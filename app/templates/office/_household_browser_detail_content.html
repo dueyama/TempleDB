@@ -1,0 +1,844 @@
+{% if detail %}
+  <div class="summary-grid">
+    <div class="summary-box">
+      <div class="label">{{ identifier_labels.household }}</div>
+      <div class="value">{{ detail.summary.household_id }}</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">現在帳</div>
+      <div class="value">{{ detail.summary.current_count }}</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">過去帳</div>
+      <div class="value">{{ detail.summary.memorial_count }}</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">予定</div>
+      <div class="value">{{ detail.summary.event_count }}</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">入金</div>
+      <div class="value">
+        {% if detail.payment_summary %}
+          {% if detail.payment_summary.active_filters %}
+            {{ detail.payment_summary.unfiltered_count|default:0 }}
+          {% else %}
+            {{ detail.payment_summary.count|default:0 }}
+          {% endif %}
+        {% else %}
+          0
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <nav class="detail-nav" aria-label="detail sections">
+    <a href="#{{ section_prefix }}-overview">概要</a>
+    <a href="#{{ section_prefix }}-payments">入金</a>
+    <a href="#{{ section_prefix }}-candidate-results">年忌候補</a>
+    <a href="#{{ section_prefix }}-current-members">現在帳</a>
+    <a href="#{{ section_prefix }}-memorial-members">過去帳</a>
+    <a href="#{{ section_prefix }}-event-history">予定</a>
+    <a href="#{{ section_prefix }}-raw-inspection">raw</a>
+  </nav>
+
+  <section class="detail-section" id="{{ section_prefix }}-overview">
+    <div class="eyebrow">Household core</div>
+    <h2 class="household-name-heading">
+      <span>{{ detail.summary.name }}</span>
+      {% if detail.summary.role_badges %}
+        <span class="household-link-badges">
+          {% for badge in detail.summary.role_badges %}
+            <span class="household-role-badge">{{ badge }}</span>
+          {% endfor %}
+        </span>
+      {% endif %}
+    </h2>
+    {% if detail.head_ledger_status %}
+      <p class="muted" style="margin-top: 0;">
+        戸主の現在帳/過去帳の状態: {{ detail.head_ledger_status.label }}{% if detail.head_ledger_status.person_id %}（{{ identifier_labels.person }} {{ detail.head_ledger_status.person_id }}）{% endif %}
+      </p>
+    {% endif %}
+    {% if data_backend == 'db' %}
+      <div class="card-actions card-actions-tight">
+        <a class="ghost-button" href="{% url 'office:print_household_information' detail.summary.household_id %}?next={{ current_url|urlencode }}">戸主情報印刷</a>
+        {% if detail.head_person_is_virtual %}
+          <a class="ghost-button" href="{% url 'office:replace_virtual_head' detail.summary.household_id %}?next={{ current_url|urlencode }}">実戸主を設定</a>
+        {% endif %}
+        {% if detail.head_other_event_url %}
+        <a class="ghost-button" href="{{ detail.head_other_event_url }}">
+          戸主のその他イベントを追加
+        </a>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% if detail.extinct_action.message %}
+      <div class="callout" style="margin-bottom: 18px;">
+        <div>{{ detail.extinct_action.message }}</div>
+        {% if data_backend == 'db' and detail.extinct_action.show_action %}
+          <div class="card-actions card-actions-tight" style="margin-top: 12px;">
+            <a
+              class="ghost-button"
+              href="{% url 'office:mark_household_extinct' detail.summary.household_id %}?next={{ current_url|urlencode }}"
+            >
+              この家を絶家にする
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% if data_backend == 'db' %}
+      <details class="household-core-actions">
+        <summary>HOUSEHOLD CORE 編集</summary>
+        <div class="household-core-action-list">
+          <a
+            class="ghost-button"
+            href="{% url 'office:edit_household' detail.summary.household_id %}?next={{ current_url|urlencode }}"
+          >
+            戸主レコードを編集
+          </a>
+          <a
+            class="ghost-button"
+            href="{% url 'office:household_head_transition' detail.summary.household_id %}?target=0&next={{ current_url|urlencode }}"
+          >
+            戸主を現在帳に移動
+          </a>
+          <a
+            class="ghost-button"
+            href="{% url 'office:household_head_transition' detail.summary.household_id %}?target=1&next={{ current_url|urlencode }}"
+          >
+            戸主の往生登録
+          </a>
+          <a
+            class="ghost-button"
+            href="{% url 'office:create_household_current_person' detail.summary.household_id %}?next={{ current_url|urlencode }}"
+          >
+            新しい現在帳を追加
+          </a>
+          <a
+            class="ghost-button"
+            href="{% url 'office:create_household_memorial_person' detail.summary.household_id %}?next={{ current_url|urlencode }}"
+          >
+            新しい故人を往生登録
+          </a>
+          <a
+            class="ghost-button"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="{% url 'office:household_memorial_list' detail.summary.household_id %}"
+          >
+            今後の法要一覧印刷
+          </a>
+          <a
+            class="ghost-button"
+            href="{{ detail.new_payment_url }}"
+          >
+            この家の入金を追加
+          </a>
+          {% if detail.extinct_action.show_action %}
+            <a
+              class="ghost-button"
+              href="{% url 'office:mark_household_extinct' detail.summary.household_id %}?next={{ current_url|urlencode }}"
+            >
+              この家を絶家にする
+            </a>
+          {% endif %}
+        </div>
+      </details>
+    {% endif %}
+    {% if detail.postal_delivery_summary %}
+      <div class="postal-summary{% if not detail.postal_delivery_summary.is_head_recipient %} is-warning{% endif %}">
+        <div class="postal-summary-eyebrow">郵送先</div>
+        <div class="postal-summary-addressee">{{ detail.postal_delivery_summary.addressee }}</div>
+        <div class="postal-summary-meta">{{ detail.postal_delivery_summary.recipient_role_label }}</div>
+        {% if detail.postal_delivery_summary.attention_note %}
+          <p class="postal-summary-note">{{ detail.postal_delivery_summary.attention_note }}</p>
+        {% endif %}
+        <div class="postal-summary-address">
+          {% if detail.postal_delivery_summary.postal_code %}
+            <div>
+              {% if detail.postal_delivery_summary.address_link_url %}
+                <a
+                  class="contact-link contact-link-address"
+                  href="{{ detail.postal_delivery_summary.address_link_url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >〒{{ detail.postal_delivery_summary.postal_code }}</a>
+              {% else %}
+                〒{{ detail.postal_delivery_summary.postal_code }}
+              {% endif %}
+            </div>
+          {% endif %}
+          {% for line in detail.postal_delivery_summary.address_lines %}
+            <div>
+              {% if detail.postal_delivery_summary.address_link_url %}
+                <a
+                  class="contact-link contact-link-address"
+                  href="{{ detail.postal_delivery_summary.address_link_url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >{{ line }}</a>
+              {% else %}
+                {{ line }}
+              {% endif %}
+            </div>
+          {% endfor %}
+          {% if detail.postal_delivery_summary.phone %}
+            <div>
+              {% if detail.postal_delivery_summary.phone_link_url %}
+                <a
+                  class="contact-link contact-link-phone"
+                  href="{{ detail.postal_delivery_summary.phone_link_url }}"
+                >電話 {{ detail.postal_delivery_summary.phone }}</a>
+              {% else %}
+                電話 {{ detail.postal_delivery_summary.phone }}
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+    <dl class="pair-grid">
+      {% for item in detail.household_fields %}
+        <div class="pair">
+          <dt>{{ item.label }}</dt>
+          <dd>
+            {% if item.href %}
+              <a
+                class="contact-link{% if item.kind %} contact-link-{{ item.kind }}{% endif %}"
+                href="{{ item.href }}"
+                {% if item.kind == 'address' %}target="_blank" rel="noopener noreferrer"{% endif %}
+              >{{ item.value }}</a>
+            {% else %}
+              {{ item.value }}
+            {% endif %}
+          </dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-payments">
+    <div class="eyebrow">Offering payments</div>
+    <h2>入金</h2>
+    <div class="card-actions card-actions-tight">
+      <a class="ghost-button" href="{{ detail.new_payment_url }}">この家の入金を追加</a>
+    </div>
+    <p class="payment-section-meta">
+      {% if detail.payment_summary.active_filters %}
+        表示 {{ detail.payment_summary.count|default:0 }}件 / {{ detail.payment_summary.total_amount|default:0 }}円
+        （全{{ detail.payment_summary.unfiltered_count|default:0 }}件 / {{ detail.payment_summary.unfiltered_total_amount|default:0 }}円）
+      {% else %}
+        {{ detail.payment_summary.count|default:0 }}件 / {{ detail.payment_summary.total_amount|default:0 }}円
+      {% endif %}
+    </p>
+    {% if detail.payment_summary.active_filters %}
+      <div class="payment-filter-state" aria-label="入金の絞り込み条件">
+        <span>絞り込み</span>
+        {% for filter in detail.payment_summary.active_filters %}
+          <a class="payment-filter-chip" href="{{ filter.clear_url }}#{{ section_prefix }}-payments">
+            {{ filter.label }}: {{ filter.value }} を外す
+          </a>
+        {% endfor %}
+        <a class="payment-filter-clear" href="{{ detail.payment_summary.clear_filter_url }}#{{ section_prefix }}-payments">すべて表示</a>
+      </div>
+    {% endif %}
+    {% if detail.payment_entries %}
+      <div class="payment-table-wrap">
+        <table class="payment-table">
+          <thead>
+            <tr>
+              <th scope="col">入金日</th>
+              <th scope="col">区分</th>
+              <th scope="col">金額</th>
+              <th scope="col">対象者</th>
+              <th scope="col">法要</th>
+              <th scope="col">受領方法</th>
+              <th scope="col">メモ</th>
+              <th scope="col">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in detail.payment_entries %}
+              <tr>
+                <td>{{ item.received_on }}</td>
+                <td>
+                  {% if item.category_filter_url %}
+                    <a class="payment-filter-link" href="{{ item.category_filter_url }}#{{ section_prefix }}-payments">{{ item.category_label }}</a>
+                  {% else %}
+                    {{ item.category_label }}
+                  {% endif %}
+                </td>
+                <td class="amount-cell">{{ item.amount }}円</td>
+                <td>
+                  {% if item.is_temple_event %}納入者: {% endif %}
+                  {% if item.person_filter_url %}
+                    <a class="payment-filter-link" href="{{ item.person_filter_url }}#{{ section_prefix }}-payments">{{ item.person_label }}</a>
+                  {% else %}
+                    {{ item.person_label }}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.is_service_linked %}
+                    <span class="payment-kind-badge">{{ item.service_label }}</span>
+                  {% else %}
+                    <span class="payment-kind-badge">法要外</span>
+                  {% endif %}
+                </td>
+                <td>{{ item.method_label|default:"-" }}</td>
+                <td class="notes-cell">{{ item.notes|default:"-" }}</td>
+                <td>
+                  {% if item.service_edit_url %}
+                    <a class="ghost-button" href="{{ item.service_edit_url }}">{% if item.is_temple_event %}寺予定を開く{% else %}法要を開く{% endif %}</a>
+                  {% elif item.payment_edit_url %}
+                    <a class="ghost-button" href="{{ item.payment_edit_url }}">入金を編集</a>
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {% if detail.payment_summary.active_filters %}
+        <div class="callout">条件に合う入金記録はありません。</div>
+      {% else %}
+        <div class="callout">この家の入金記録はありません。</div>
+      {% endif %}
+    {% endif %}
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-candidate-results">
+    {% if detail.rinju_records %}
+      {% include "office/_household_rinju_records.html" %}
+    {% endif %}
+    <div class="eyebrow">On-demand memorial candidates</div>
+    <div class="help-heading-row">
+      <h2>期間内に該当する葬儀・中陰・年忌・初盆</h2>
+      <div class="help-popover" data-help-popover>
+        <button
+          class="help-popover-button help-popover-button-compact"
+          type="button"
+          aria-controls="{{ section_prefix }}-candidate-results-help"
+          aria-expanded="false"
+          aria-label="年忌候補の説明"
+          data-help-popover-button
+        >?</button>
+        <div
+          class="help-popover-panel"
+          id="{{ section_prefix }}-candidate-results-help"
+          hidden
+          data-help-popover-panel
+        >
+          <p>
+            {{ detail.candidate_period.from }} から {{ detail.candidate_period.to }} を対象に、
+            命日と <code>MTC001_回忌</code> をもとにその場で計算しています。
+          </p>
+          <p>葬儀は命日を候補日として表示します。中陰は命日から忌日を計算し、初盆は <code>8/13</code> 起点の暫定ルールです。</p>
+        </div>
+      </div>
+    </div>
+    <div class="card-stack">
+      {% for item in detail.on_demand_candidates %}
+        <article class="record-card">
+          <h3>{{ item.label }} <span class="muted">{{ item.target_date }}</span></h3>
+          <div class="card-meta">
+            {{ item.person_name }}{% if item.relationship %} / {{ item.relationship }}{% endif %}
+            {% if item.kaimyo %} / {{ item.kaimyo }}{% endif %}
+          </div>
+          <dl class="pair-grid">
+            <div class="pair">
+              <dt>種別</dt>
+              <dd>{{ item.candidate_type }}</dd>
+            </div>
+            <div class="pair">
+              <dt>対象日</dt>
+              <dd>
+                {% if data_backend == 'db' and item.is_actionable %}
+                  {% if item.has_schedule %}
+                    <a
+                      class="ghost-button"
+                      href="{% url 'office:edit_service_schedule' detail.summary.household_id item.schedule_event_id %}?source_table={{ item.schedule_source_table|urlencode }}&next={{ current_url|urlencode }}"
+                    >
+                      {{ item.target_date }}
+                    </a>
+                    <span class="muted">{{ item.schedule_status_label|default:"予定登録済み" }}</span>
+                  {% else %}
+                    <a
+                      class="ghost-button"
+                      href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?service_label={{ item.label|urlencode }}&target_date={{ item.target_date|urlencode }}&category={{ item.schedule_category|urlencode }}&next={{ current_url|urlencode }}"
+                    >
+                      {{ item.target_date }}
+                    </a>
+                    {% if item.can_record_with_funeral %}
+                      <a
+                        class="ghost-button"
+                        href="{% url 'office:record_candidate_with_funeral' item.household_id item.person_id %}?service_label={{ item.label|urlencode }}&target_date={{ item.target_date|urlencode }}&candidate_type={{ item.candidate_type|urlencode }}&next={{ current_url|urlencode }}"
+                      >
+                        葬儀と一緒に記録
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                {% else %}
+                  {{ item.target_date }}
+                {% endif %}
+              </dd>
+            </div>
+            <div class="pair">
+              <dt>故人</dt>
+              <dd>{{ item.person_name }}</dd>
+            </div>
+            {% if item.relationship %}
+              <div class="pair">
+                <dt>続柄</dt>
+                <dd>{{ item.relationship }}</dd>
+              </div>
+            {% endif %}
+            {% if item.kaimyo %}
+              <div class="pair">
+                <dt>{{ deceased_labels.kaimyo }}</dt>
+                <dd>{{ item.kaimyo }}</dd>
+              </div>
+            {% endif %}
+            {% if item.death_date %}
+              <div class="pair">
+                <dt>命日</dt>
+                <dd>{{ item.death_date }}</dd>
+              </div>
+            {% endif %}
+            <div class="pair">
+              <dt>計算メモ</dt>
+              <dd>{{ item.note }}</dd>
+            </div>
+          </dl>
+        </article>
+      {% empty %}
+        <div class="callout">この期間に該当する葬儀・年忌・初盆候補はありません。</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-current-members">
+    <div class="eyebrow">Current ledger candidates</div>
+    <h2>現在帳</h2>
+    {% if data_backend == 'db' %}
+      <div class="card-actions card-actions-tight">
+        <a
+          class="ghost-button"
+          href="{% url 'office:create_household_current_person' detail.summary.household_id %}?next={{ current_url|urlencode }}"
+        >
+          新しい現在帳を追加
+        </a>
+      </div>
+    {% endif %}
+    <div class="card-stack">
+      {% for item in detail.current_members %}
+        <article class="record-card">
+          <h3 class="member-card-name">{{ item.name }}</h3>
+          <div class="card-meta">{{ item.relationship }}</div>
+          {% if data_backend == 'db' %}
+            <details class="card-action-menu">
+              <summary>操作</summary>
+              <div class="card-action-menu-list">
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:edit_person' detail.summary.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                >
+                  家族レコードを編集
+                </a>
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:person_memorial_transition' detail.summary.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                >
+                  往生登録
+                </a>
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:create_service_schedule' detail.summary.household_id item.person_id %}?service_label=%E8%91%AC%E5%84%80&category=other&next={{ current_url|urlencode }}"
+                  >
+                    この人の葬儀を追加
+                  </a>
+                <a
+                  class="ghost-button"
+                  href="{{ item.new_payment_url }}"
+                >
+                  この人の入金を追加
+                </a>
+              </div>
+            </details>
+          {% endif %}
+          <dl class="pair-grid">
+            <div class="pair">
+              <dt>{{ identifier_labels.person }}</dt>
+              <dd>{{ item.person_id }}</dd>
+            </div>
+            {% for field in item.display_fields %}
+              {% if field.label != '家族ID' %}
+                <div class="pair">
+                  <dt>{{ field.label }}</dt>
+                  <dd>{{ field.value }}</dd>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </dl>
+        </article>
+      {% empty %}
+        <div class="callout">現在帳の家族レコードはありません。</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-memorial-members">
+    <div class="eyebrow">Memorial ledger candidates</div>
+    <h2>過去帳</h2>
+    <div class="card-stack">
+      {% for item in detail.memorial_members %}
+        <article class="record-card"{% if item.person_id %} data-memorial-person-card="{{ item.person_id }}" tabindex="-1"{% endif %}>
+          <h3 class="member-card-name">{{ item.name }}</h3>
+          <div class="card-meta">
+            {% if item.relationship %}{{ item.relationship }}{% endif %}
+            {% if item.death_date %}{% if item.relationship %} / {% endif %}命日 {{ item.death_date_display|default:item.death_date }}{% endif %}
+          </div>
+          <details class="card-action-menu">
+            <summary>操作</summary>
+            <div class="card-action-menu-list">
+              {% if data_backend == 'db' %}
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:edit_person' detail.summary.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                >
+                  家族レコードを編集
+                </a>
+                {% if item.funeral_has_schedule %}
+                  <a
+                    class="ghost-button"
+                    href="{% url 'office:edit_service_schedule' item.household_id item.funeral_schedule_event_id %}?source_table={{ item.funeral_schedule_source_table|urlencode }}&next={{ current_url|urlencode }}"
+                  >
+                    この人の葬儀を開く
+                  </a>
+                  {% if item.funeral_schedule_status_label %}
+                    <span class="inline-status">{{ item.funeral_schedule_status_label }}</span>
+                  {% endif %}
+                {% elif item.funeral_is_actionable %}
+                  <a
+                    class="ghost-button"
+                    href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?service_label=%E8%91%AC%E5%84%80&category=other&next={{ current_url|urlencode }}"
+                  >
+                    この人の葬儀を追加
+                  </a>
+                {% endif %}
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                >
+                  この故人で法要追加
+                </a>
+                <a
+                  class="ghost-button"
+                  href="{{ item.new_payment_url }}"
+                >
+                  この人の入金を追加
+                </a>
+              {% endif %}
+              <a
+                class="button"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="{% url 'office:memorial_sheet' item.household_id item.person_id %}"
+              >
+                年忌表
+              </a>
+            </div>
+          </details>
+          <dl class="pair-grid">
+            <div class="pair">
+              <dt>{{ identifier_labels.person }}</dt>
+              <dd>{{ item.person_id }}</dd>
+            </div>
+            {% for field in item.display_fields %}
+              {% if field.label != '家族ID' %}
+                {% if data_backend != 'db' or field.label != '年回案内不要' %}
+                  <div class="pair">
+                    <dt>{{ field.label }}</dt>
+                    <dd>{{ field.value }}</dd>
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </dl>
+          {% if item.calculated_memorials or item.calculated_hatsubon %}
+            <div class="content">
+              <h4>この人の計算回忌</h4>
+              <dl class="pair-grid">
+                {% for memorial in item.calculated_memorials %}
+                  <div class="pair">
+                    <dt>{{ memorial.label }}</dt>
+                    <dd>
+                      {% if data_backend == 'db' and memorial.is_actionable %}
+                        {% if memorial.has_schedule %}
+                          <a
+                            class="ghost-button"
+                            href="{% url 'office:edit_service_schedule' detail.summary.household_id memorial.schedule_event_id %}?source_table={{ memorial.schedule_source_table|urlencode }}&next={{ current_url|urlencode }}"
+                          >
+                            {{ memorial.target_date }}
+                          </a>
+                          <span class="inline-status">{{ memorial.schedule_status_label|default:"予定登録済み" }}</span>
+                        {% else %}
+                          <a
+                            class="ghost-button"
+                            href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?service_label={{ memorial.label|urlencode }}&target_date={{ memorial.target_date|urlencode }}&category={{ memorial.schedule_category|urlencode }}&next={{ current_url|urlencode }}"
+                          >
+                            {{ memorial.target_date }}
+                          </a>
+                        {% endif %}
+                      {% else %}
+                        {{ memorial.target_date }}
+                      {% endif %}
+                      {% if memorial.in_range %}<span class="ok">期間内</span>{% endif %}
+                    </dd>
+                  </div>
+                {% endfor %}
+                {% if item.calculated_hatsubon %}
+                  <div class="pair">
+                    <dt>{{ item.calculated_hatsubon.label }}</dt>
+                    <dd>
+                      {% if data_backend == 'db' and item.calculated_hatsubon.is_actionable %}
+                        {% if item.calculated_hatsubon.has_schedule %}
+                          <a
+                            class="ghost-button"
+                            href="{% url 'office:edit_service_schedule' detail.summary.household_id item.calculated_hatsubon.schedule_event_id %}?source_table={{ item.calculated_hatsubon.schedule_source_table|urlencode }}&next={{ current_url|urlencode }}"
+                          >
+                            {{ item.calculated_hatsubon.target_date }}
+                          </a>
+                          <span class="inline-status">{{ item.calculated_hatsubon.schedule_status_label|default:"予定登録済み" }}</span>
+                        {% else %}
+                          <a
+                            class="ghost-button"
+                            href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?service_label={{ item.calculated_hatsubon.label|urlencode }}&target_date={{ item.calculated_hatsubon.target_date|urlencode }}&category={{ item.calculated_hatsubon.schedule_category|urlencode }}&next={{ current_url|urlencode }}"
+                          >
+                            {{ item.calculated_hatsubon.target_date }}
+                          </a>
+                        {% endif %}
+                      {% else %}
+                        {{ item.calculated_hatsubon.target_date }}
+                      {% endif %}
+                      {% if item.calculated_hatsubon.in_range %}<span class="ok">期間内</span>{% endif %}
+                      <span class="muted">{{ item.calculated_hatsubon.note }}</span>
+                    </dd>
+                  </div>
+                {% endif %}
+              </dl>
+            </div>
+          {% endif %}
+          {% if data_backend == 'db' %}
+            <div class="muted" style="margin-top: 14px;">案内制御</div>
+            <form
+              method="post"
+              action="{% url 'office:toggle_person_memorial_notice_opt_out' item.household_id item.person_id %}"
+              style="margin: 8px 0 0;"
+            >
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ current_url }}">
+              <label style="display: inline-flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input
+                  type="checkbox"
+                  name="enabled"
+                  value="on"
+                  {% if item.memorial_notice_opt_out %}checked{% endif %}
+                  onchange="this.form.submit()"
+                >
+                <span>年回案内不要</span>
+              </label>
+            </form>
+          {% endif %}
+        </article>
+      {% empty %}
+        <div class="callout">過去帳の家族レコードはありません。</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-event-history">
+    <div class="eyebrow">Household event history</div>
+    <h2>この家のイベント一覧</h2>
+    <details class="event-history-panel">
+      <summary>イベント一覧（{{ detail.event_history_count|default:0 }}件）</summary>
+      <div class="event-history-list">
+        {% for item in detail.event_history_entries %}
+          <article class="record-card">
+            <h3>{{ item.title }}</h3>
+            <div class="card-meta">
+              {% if item.date and item.date_label %}{{ item.date_label }} {{ item.date }}{% endif %}
+              {% if item.status_label %}
+                {% if item.date and item.date_label %} / {% endif %}{{ item.status_label }}
+              {% endif %}
+              {% if item.subject_name %}
+                {% if item.date and item.date_label or item.status_label %} / {% endif %}{{ item.subject_name }}
+              {% endif %}
+            </div>
+            {% if item.edit_url %}
+              <div class="card-actions card-actions-tight">
+                <a class="ghost-button" href="{{ item.edit_url }}">予定レコードを編集</a>
+              </div>
+            {% endif %}
+            <dl class="pair-grid">
+              <div class="pair">
+                <dt>{{ identifier_labels.service_event }}</dt>
+                <dd>{{ item.event_id|default:"-" }}</dd>
+              </div>
+              <div class="pair">
+                <dt>状態</dt>
+                <dd>{{ item.status_label|default:"-" }}</dd>
+              </div>
+              <div class="pair">
+                <dt>{% if item.is_temple_event %}相手先{% else %}対象{% endif %}</dt>
+                <dd>{{ item.subject_name|default:"-" }}</dd>
+              </div>
+              <div class="pair">
+                <dt>メモ</dt>
+                <dd>{{ item.note|default:"-" }}</dd>
+              </div>
+            </dl>
+          </article>
+        {% empty %}
+          <div class="callout">この家のイベント履歴はありません。</div>
+        {% endfor %}
+      </div>
+    </details>
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-related-events">
+    <div class="eyebrow">Related events</div>
+    <h2>予定・生成テーブル</h2>
+    <p class="muted">
+      通常確認では閉じたままにし、元の予定レコード構造を調べたいときだけ開く前提です。
+    </p>
+    <details class="event-history-panel">
+      <summary>予定・生成テーブル（{{ detail.summary.event_count|default:0 }}件）</summary>
+      <div class="card-stack" style="margin-top: 14px;">
+        {% for item in detail.events %}
+          <article class="record-card">
+            <h3>{{ item.source_table }} <span class="muted">{{ identifier_labels.service_event }} {{ item.event_id }}</span></h3>
+            <div class="card-meta">
+              {% if item.schedule_type %}{{ item.schedule_type }}{% endif %}
+              {% if item.scheduled_date %}{% if item.schedule_type %} / {% endif %}{{ item.scheduled_date }}{% endif %}
+              {% if item.subject_name %}{% if item.schedule_type or item.scheduled_date %} / {% endif %}{{ item.subject_name }}{% endif %}
+            </div>
+            {% if data_backend == 'db' %}
+              <div class="card-actions card-actions-tight">
+                <a
+                  class="ghost-button"
+                  {% if item.event_scope == 'temple' and item.schedule_pk %}
+                    href="{% url 'office:edit_temple_event' item.schedule_pk %}?next={{ current_url|urlencode }}"
+                  {% else %}
+                    href="{% url 'office:edit_service_schedule' detail.summary.household_id item.event_id %}?source_table={{ item.source_table|urlencode }}&next={{ current_url|urlencode }}"
+                  {% endif %}
+                >
+                  予定レコードを編集
+                </a>
+              </div>
+            {% endif %}
+            <dl class="pair-grid">
+              {% for field in item.display_fields %}
+                <div class="pair">
+                  <dt>{{ field.label }}</dt>
+                  <dd>{{ field.value }}</dd>
+                </div>
+              {% endfor %}
+            </dl>
+          </article>
+        {% empty %}
+          <div class="callout">この家に紐づく予定レコードはありません。</div>
+        {% endfor %}
+      </div>
+    </details>
+  </section>
+
+  <section class="detail-section" id="{{ section_prefix }}-raw-inspection">
+    <div class="eyebrow">Inspection</div>
+    <h2>調査用 raw データ</h2>
+    <p class="muted">
+      通常の戸主確認では後回しにし、構造調査や元列確認が必要なときだけ開く前提の領域です。
+    </p>
+    <details class="raw-inspection-panel">
+      <summary>元列・raw_record を開く</summary>
+      <div class="inspection-stack">
+        <details class="inspection-block">
+          <summary>UTB001_戸主 の非空カラム</summary>
+          <dl class="pair-grid">
+            {% for item in detail.raw_household_fields %}
+              <div class="pair">
+                <dt>{{ item.label }}</dt>
+                <dd>{{ item.value }}</dd>
+              </div>
+            {% endfor %}
+          </dl>
+        </details>
+
+        {% if detail.current_members %}
+          <div class="inspection-block">
+            <h3>現在帳の raw 家族レコード</h3>
+            {% for item in detail.current_members %}
+              <details>
+                <summary>{{ item.name }}</summary>
+                <dl class="pair-grid">
+                  {% for field in item.raw_fields %}
+                    <div class="pair">
+                      <dt>{{ field.label }}</dt>
+                      <dd>{{ field.value }}</dd>
+                    </div>
+                  {% endfor %}
+                </dl>
+              </details>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if detail.memorial_members %}
+          <div class="inspection-block">
+            <h3>過去帳の raw 家族レコード</h3>
+            {% for item in detail.memorial_members %}
+              <details>
+                <summary>{{ item.name }}</summary>
+                <dl class="pair-grid">
+                  {% for field in item.raw_fields %}
+                    <div class="pair">
+                      <dt>{{ field.label }}</dt>
+                      <dd>{{ field.value }}</dd>
+                    </div>
+                  {% endfor %}
+                </dl>
+              </details>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if detail.events %}
+          <div class="inspection-block">
+            <h3>予定・生成テーブルの raw レコード</h3>
+            {% for item in detail.events %}
+              <details>
+                <summary>{{ item.source_table }} <span class="muted">#{{ item.event_id }}</span></summary>
+                <dl class="pair-grid">
+                  {% for field in item.raw_fields %}
+                    <div class="pair">
+                      <dt>{{ field.label }}</dt>
+                      <dd>{{ field.value }}</dd>
+                    </div>
+                  {% endfor %}
+                </dl>
+              </details>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </details>
+  </section>
+{% else %}
+  <section class="panel">
+    <h2>戸主を選んでください</h2>
+    <p class="muted">{{ empty_detail_message }}</p>
+  </section>
+{% endif %}

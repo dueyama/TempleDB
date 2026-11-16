@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}寺務ホーム | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .home-shell {
+      display: grid;
+      gap: 24px;
+    }
+    .recovery-health-warning {
+      min-width: 0;
+      border: 1px solid #a96a25;
+      border-left-width: 4px;
+      background: #fff5df;
+      color: #563c20;
+      padding: 16px 18px;
+      overflow-wrap: anywhere;
+    }
+    .recovery-health-warning h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .recovery-health-warning ul {
+      margin: 10px 0;
+      padding-left: 1.3em;
+    }
+    .recovery-health-warning li + li {
+      margin-top: 6px;
+    }
+    .recovery-health-checked,
+    .recovery-health-note {
+      margin: 6px 0 0;
+      font-size: .82rem;
+    }
+    .home-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .schedule-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .home-card {
+      border: 1px solid var(--line);
+      background: var(--panel-bg);
+      padding: 22px;
+      box-shadow: var(--shadow-card);
+    }
+    .home-card h2 {
+      margin: 0;
+    }
+    .home-card-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .home-card-head .eyebrow {
+      margin-bottom: 6px;
+    }
+    .home-card-link {
+      color: var(--accent);
+      font-size: .88rem;
+      font-weight: 700;
+      line-height: 1.4;
+      text-decoration: underline;
+      text-underline-offset: .14em;
+      white-space: nowrap;
+    }
+{% include "office/_service_ledger_card_styles.html" %}
+    .home-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .home-actions.inline {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .home-action-groups {
+      display: grid;
+      gap: 14px;
+    }
+    .home-action-group {
+      display: grid;
+      gap: 8px;
+    }
+    .home-action-group-label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .memorial-calendar-card {
+      border: 1px solid var(--line);
+      background: var(--panel-bg);
+      padding: 14px;
+      box-shadow: var(--shadow-card);
+    }
+    .memorial-calendar-card-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .memorial-calendar-wrap {
+      overflow-x: hidden;
+    }
+    .memorial-calendar-grid {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+    .memorial-calendar-head,
+    .memorial-calendar-body {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .memorial-calendar-head {
+      color: var(--muted);
+      font-size: .64rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .memorial-calendar-day {
+      min-height: 56px;
+      border: 1px solid var(--line);
+      padding: 5px 30px 16px 4px;
+      display: grid;
+      align-content: start;
+      gap: 3px;
+      background: var(--card-bg);
+      position: relative;
+    }
+    .memorial-calendar-day.has-scheduled-services {
+      border-color: rgba(50, 116, 130, 0.48);
+      background: rgba(222, 241, 241, 0.82);
+    }
+    .memorial-calendar-day-empty {
+      background: var(--panel-bg-subtle);
+      border-style: dashed;
+      min-height: 56px;
+    }
+    .memorial-calendar-date {
+      font-weight: 700;
+      line-height: 1;
+      font-size: .8rem;
+    }
+    .memorial-calendar-rokuyo {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      font-size: .62rem;
+      line-height: 1;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .memorial-calendar-badges {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .memorial-calendar-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      background: var(--panel-bg-strong);
+      color: var(--accent);
+      font-size: .68rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      text-decoration: none;
+    }
+    .memorial-calendar-badge:hover,
+    .memorial-calendar-badge:focus-visible {
+      border-color: var(--accent);
+      background: var(--current-bg);
+      outline: none;
+    }
+    .memorial-calendar-badge-service {
+      border-color: rgba(50, 116, 130, 0.38);
+      background: rgba(227, 246, 246, 0.96);
+      color: #255f69;
+    }
+    .memorial-calendar-badge-service:hover,
+    .memorial-calendar-badge-service:focus-visible {
+      border-color: #255f69;
+      background: rgba(208, 237, 237, 0.98);
+    }
+    .memorial-calendar-unavailable {
+      border: 1px dashed var(--line);
+      background: var(--panel-bg-subtle);
+      padding: 14px 16px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .table-sub-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: .8rem;
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: .14em;
+      white-space: nowrap;
+    }
+    .day-modal {
+      width: min(960px, 92vw);
+      max-height: 86vh;
+      border: 1px solid var(--line);
+      padding: 0;
+      background: var(--field-bg);
+      color: inherit;
+    }
+    .day-modal::backdrop {
+      background: rgba(31, 35, 40, 0.36);
+    }
+    .day-modal-shell {
+      padding: 18px 18px 14px;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+    .day-modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+    }
+    .day-modal-head h3 {
+      margin: 4px 0 6px;
+      font-size: 1.2rem;
+    }
+    @media (max-width: 980px) {
+      .schedule-grid,
+      .home-grid {
+        grid-template-columns: 1fr;
+      }
+      .home-card h2 {
+        font-size: 1.05rem;
+        line-height: 1.45;
+      }
+    }
+    @media (max-width: 640px) {
+      .home-actions.inline {
+        grid-template-columns: 1fr;
+      }
+      .memorial-calendar-card {
+        padding: 10px;
+      }
+      .memorial-calendar-head {
+        font-size: .56rem;
+      }
+      .memorial-calendar-day {
+        min-height: 48px;
+        padding: 4px 26px 14px 3px;
+        gap: 2px;
+      }
+      .memorial-calendar-day-empty {
+        min-height: 48px;
+      }
+      .memorial-calendar-date {
+        font-size: .72rem;
+      }
+      .memorial-calendar-rokuyo {
+        font-size: .58rem;
+      }
+      .memorial-calendar-badge {
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        font-size: .62rem;
+      }
+      .day-modal-head h3 {
+        font-size: 1.05rem;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="home-shell" data-home-refresh-date="{{ home_refresh_date }}" data-home-refresh-timezone="{{ home_refresh_timezone }}">
+    {% include "includes/office_nav.html" with current_section="home" %}
+
+    <section class="hero">
+      <div class="eyebrow">Temple Office</div>
+      <h1>寺務ホーム</h1>
+    </section>
+
+    {% include "office/_recovery_health_warning.html" %}
+    {% if home_completion_errors %}
+      <div class="callout" role="alert">
+        保存できませんでした。
+        <ul>{% for error in home_completion_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      </div>
+    {% endif %}
+
+    {% url 'office:service_ledger' as service_ledger_url %}
+    <section class="schedule-grid">
+      {% include "office/_service_ledger_section.html" with section_class="featured" eyebrow="Scheduled actual events / today" title="今日の法要" title_count=home_schedule.today_count entries=home_schedule.today_events empty_message="予定はありません。" current_url=current_url show_completed_on=False show_relative_days=False target_date_label="命日基準日" section_action_url=service_ledger_url section_action_label="法要台帳へ" section_action_class="home-card-link" show_person_action=True %}
+
+      {% include "office/_service_ledger_section.html" with section_class="featured" eyebrow="Scheduled actual events / next week" title="近日の法要" entries=home_schedule.next_events empty_message="直近の予定はありません。" current_url=current_url show_completed_on=False show_relative_days=True target_date_label="命日基準日" section_action_url=service_ledger_url section_action_label="法要台帳へ" section_action_class="home-card-link" show_person_action=True %}
+
+      {% include "office/_service_ledger_section.html" with section_class="featured" eyebrow="Past 6 months overdue" title="予定日を過ぎた未完了法要" title_count=home_schedule.overdue_count entries=home_schedule.overdue_events empty_message="過去半年に予定日を過ぎた未完了法要はありません。" current_url=current_url show_completed_on=False show_relative_days=False target_date_label="命日基準日" section_action_url=service_ledger_url section_action_label="法要台帳へ" section_action_class="home-card-link" show_person_action=True %}
+    </section>
+
+    <section class="memorial-calendar-card" id="memorial-calendar">
+      <div class="memorial-calendar-card-head">
+        <div>
+          <h2>命日カレンダー</h2>
+          {% if home_memorial_calendar.span_label %}
+            <p class="muted">今後30日 {{ home_memorial_calendar.span_label }} の命日を確認します。</p>
+          {% endif %}
+        </div>
+      </div>
+      {% if home_memorial_calendar.available %}
+        <div class="memorial-calendar-wrap">
+          <div class="memorial-calendar-grid">
+            <div class="memorial-calendar-head">
+              <div>日</div>
+              <div>月</div>
+              <div>火</div>
+              <div>水</div>
+              <div>木</div>
+              <div>金</div>
+              <div>土</div>
+            </div>
+            <div class="memorial-calendar-body">
+              {% for week in home_memorial_calendar.calendar_weeks %}
+                {% for cell in week %}
+                  {% if cell.is_empty %}
+                    <div class="memorial-calendar-day memorial-calendar-day-empty" aria-hidden="true"></div>
+                  {% else %}
+                    <div class="memorial-calendar-day{% if cell.has_scheduled_service_records %} has-scheduled-services{% endif %}">
+                      <span class="memorial-calendar-date">
+                        {% if cell.show_month_label %}
+                          {{ cell.month_number }}/{{ cell.day_number }}
+                        {% else %}
+                          {{ cell.day_number }}
+                        {% endif %}
+                      </span>
+                      {% if cell.has_anniversary_records or cell.has_scheduled_service_records %}
+                        <div class="memorial-calendar-badges">
+                          {% if cell.has_scheduled_service_records %}
+                            <a
+                              class="memorial-calendar-badge memorial-calendar-badge-service"
+                              href="#{{ cell.scheduled_service_modal_id }}"
+                              title="{{ cell.month_number }}/{{ cell.day_number }} の予定済み法要{% if cell.has_temple_events %}・寺の予定{% endif %} {{ cell.scheduled_service_count }}件"
+                              data-day-modal-trigger="{{ cell.scheduled_service_modal_id }}"
+                            >
+                              {{ cell.scheduled_service_count }}
+                            </a>
+                          {% endif %}
+                          {% if cell.has_anniversary_records %}
+                            <button
+                              type="button"
+                              class="memorial-calendar-badge memorial-calendar-badge-anniversary"
+                              title="{{ cell.month_number }}/{{ cell.day_number }} の命日 {{ cell.anniversary_count }}件"
+                              data-day-modal-trigger="{{ cell.anniversary_modal_id }}"
+                            >
+                              {{ cell.anniversary_count }}
+                            </button>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                      {% if cell.rokuyo_short_label %}
+                        <span class="memorial-calendar-rokuyo" title="{{ cell.rokuyo_label }}" aria-label="{{ cell.rokuyo_label }}">{{ cell.rokuyo_short_label }}</span>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% for detail in home_memorial_calendar.anniversary_details %}
+          <dialog id="{{ detail.modal_id }}" class="day-modal">
+            <div class="day-modal-shell">
+              <div class="day-modal-head">
+                <div>
+                  <div class="eyebrow">Calendar</div>
+                  <h3>{{ detail.label }} の命日一覧</h3>
+                  <p class="muted">年はそのまま残して、新しい命日順に並べています。件数: {{ detail.count }}</p>
+                </div>
+                <form method="dialog">
+                  <button type="submit" class="ghost-button">閉じる</button>
+                </form>
+              </div>
+              <div class="table-wrap">
+                <table class="compact">
+                  <thead>
+                    <tr>
+                      <th>命日</th>
+                      <th>氏名</th>
+                      <th>性別</th>
+                      <th>享年</th>
+                      <th>戸主</th>
+                      <th>{{ identifier_labels.person }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in detail.rows %}
+                      <tr>
+                        <td>{{ row.death_date }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.gender }}</td>
+                        <td>
+                          {% if row.age_at_death %}
+                            {{ row.age_at_death }}
+                          {% else %}
+                            -
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{ row.household_name }}
+                          {% if row.household_id %}
+                            <br>
+                            <a class="table-sub-link" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">
+                              {{ identifier_labels.household }} {{ row.household_id }} を開く
+                            </a>
+                          {% endif %}
+                        </td>
+                        <td>{{ row.person_id }}</td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="6" class="muted">該当する命日はありません。</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </dialog>
+        {% endfor %}
+        {% for detail in home_memorial_calendar.scheduled_service_details %}
+          <dialog id="{{ detail.modal_id }}" class="day-modal">
+            <div class="day-modal-shell">
+              <div class="day-modal-head">
+                <div>
+                  <div class="eyebrow">Scheduled services</div>
+                  <h3>{{ detail.label }} の予定済み法要{% if detail.has_temple_events %}・寺の予定{% endif %}</h3>
+                  <p class="muted">その日に予定日が入っている法要{% if detail.has_temple_events %}と寺の予定{% endif %}です。件数: {{ detail.count }}</p>
+                </div>
+                <form method="dialog">
+                  <button type="submit" class="ghost-button">閉じる</button>
+                </form>
+              </div>
+              <div class="table-wrap">
+                <table class="compact">
+                  <thead>
+                    <tr>
+                      <th>予定</th>
+                      <th>対象</th>
+                      <th>戸主</th>
+                      <th>場所</th>
+                      <th>状態</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in detail.rows %}
+                      <tr>
+                        <td>
+                          {{ row.service_label }}
+                          {% if row.category_label %}
+                            <br><span class="badge">{{ row.category_label }}</span>
+                          {% endif %}
+                          {% if row.scheduled_time %}
+                            <br><span class="muted">{{ row.scheduled_time }}</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if row.is_temple_event %}
+                            相手先: {{ row.person_name|default:"-" }}
+                          {% elif row.person_name %}
+                            {{ row.person_name }}
+                          {% else %}
+                            対象未設定
+                          {% endif %}
+                          {% if row.person_id %}
+                            <br><span class="muted">{{ identifier_labels.person }} {{ row.person_id }}</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{ row.household_name|default:"-" }}
+                          {% if row.household_id %}
+                            <br>
+                            <a class="table-sub-link" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">
+                              {{ identifier_labels.household }} {{ row.household_id }} を開く
+                            </a>
+                          {% endif %}
+                        </td>
+                        <td>{{ row.location|default:"-" }}</td>
+                        <td>
+                          {{ row.status_label }}
+                          {% if row.notes %}
+                            <br><span class="muted">{{ row.notes }}</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if row.can_open %}
+                            {% if row.is_temple_event %}
+                              <a
+                                class="table-sub-link"
+                                href="{% url 'office:edit_temple_event' row.temple_event_id %}?next={{ current_url|urlencode }}"
+                              >
+                                寺の予定を開く
+                              </a>
+                            {% else %}
+                            <a
+                              class="table-sub-link"
+                              href="{% url 'office:edit_service_schedule' row.household_id row.event_id %}?source_table={{ row.source_table|urlencode }}&next={{ current_url|urlencode }}"
+                            >
+                              法要予定を開く
+                            </a>
+                            {% for linked in row.combined_entries %}
+                              <a class="table-sub-link" href="{% url 'office:edit_service_schedule' linked.household_id linked.event_id %}?source_table={{ linked.source_table|urlencode }}&next={{ current_url|urlencode }}">{{ linked.service_label }}を編集</a>
+                            {% endfor %}
+                            {% endif %}
+                          {% else %}
+                            <span class="muted">編集リンクなし</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="6" class="muted">該当する予定済み法要はありません。</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </dialog>
+        {% endfor %}
+      {% else %}
+        <div class="memorial-calendar-unavailable">
+          {{ home_memorial_calendar.message|default:"命日カレンダーの対象データがありません。" }}
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="home-grid">
+      <article class="home-card">
+        <div class="eyebrow">Households</div>
+        <h2>戸主・家族</h2>
+        <div class="home-action-groups">
+          <div class="home-action-group">
+            <div class="home-actions">
+              <a class="button" href="{% url 'office:household_browser' %}">戸主ブラウザ</a>
+            </div>
+          </div>
+          <div class="home-action-group">
+            <div class="home-actions inline">
+              <a class="ghost-button" href="{% url 'office:person_search' %}">人検索</a>
+              <a class="ghost-button" href="{% url 'office:special_searches' %}">特殊検索</a>
+            </div>
+          </div>
+          <div class="home-action-group">
+            <div class="home-actions">
+              <a class="ghost-button" href="{% url 'office:data_quality' %}">データ問題点</a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="home-card">
+        <div class="eyebrow">Memorials</div>
+        <h2>法要・回忌</h2>
+        <div class="home-actions inline">
+          <a class="button" href="{% url 'office:service_ledger' %}">法要台帳</a>
+          <a class="ghost-button" href="{% url 'office:temple_events' %}">寺の予定</a>
+          <a class="ghost-button" href="{% url 'office:memorial_notices' %}">{{ print_heading_labels.memorial_notice }}</a>
+          <a class="ghost-button" href="{% url 'office:special_searches' %}?search=recent_deaths">ご往生一覧</a>
+        </div>
+      </article>
+
+      <article class="home-card">
+        <div class="eyebrow">Operations</div>
+        <h2>設定</h2>
+        <div class="home-actions inline">
+          <a class="button" href="{% url 'office:settings_home' %}">設定</a>
+          <a class="ghost-button" href="{% url 'office:annual_membership_fees' %}">護持会費</a>
+          <a class="ghost-button" href="{% url 'office:districts' %}">地区定義</a>
+          <a class="ghost-button" href="{% url 'office:accounting' %}">会計</a>
+        </div>
+      </article>
+
+      <article class="home-card">
+        <div class="eyebrow">Print & Delivery</div>
+        <h2>配布物・印刷</h2>
+        <div class="home-actions inline">
+          <a class="button" href="{% url 'office:print_hub' %}">配布・名簿</a>
+          <a class="ghost-button" href="{% url 'office:postal_labels' %}">郵送ラベル</a>
+          <a class="ghost-button" href="{% url 'office:district_member_sheets' %}">地区メンバー一覧メモ</a>
+          <a class="ghost-button" href="{% url 'office:district_officer_roster' %}">{{ role_document_labels.district_officer_roster }}</a>
+          <a class="ghost-button" href="{% url 'office:monto_sodai_roster' %}">{{ role_document_labels.monto_sodai_roster }}</a>
+        </div>
+      </article>
+
+      <article class="home-card">
+        <div class="eyebrow">Analytics</div>
+        <h2>統計・分析</h2>
+        <div class="home-actions">
+          <a class="button" href="{% url 'office:data_science' %}">統計・分析</a>
+          <a class="ghost-button" href="{% url 'office:record_history' %}">変更履歴</a>
+        </div>
+      </article>
+
+    </section>
+  </div>
+  <script src="{% static 'office/home_day_refresh.js' %}" defer></script>
+  <script>
+    (() => {
+      const syncDayModalScrollLock = () => {
+        document.body.classList.toggle(
+          "day-modal-open",
+          document.querySelector("dialog.day-modal[open]") !== null,
+        );
+      };
+      document.querySelectorAll("dialog.day-modal").forEach((dialog) => {
+        dialog.addEventListener("close", syncDayModalScrollLock);
+      });
+
+      document.addEventListener("click", (event) => {
+        const trigger = event.target.closest("[data-day-modal-trigger]");
+        if (!trigger) {
+          return;
+        }
+        event.preventDefault();
+        const dialog = document.getElementById(trigger.dataset.dayModalTrigger);
+        if (dialog && typeof dialog.showModal === "function") {
+          dialog.showModal();
+          syncDayModalScrollLock();
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        const dialog = event.target.closest("dialog.day-modal");
+        if (!dialog) {
+          return;
+        }
+        if (event.target === dialog) {
+          dialog.close();
+        }
+      });
+      window.addEventListener("pageshow", syncDayModalScrollLock);
+    })();
+  </script>
+{% endblock %}

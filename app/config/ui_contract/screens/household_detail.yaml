@@ -1,0 +1,146 @@
+contract_type: screen
+version: 2
+dsl_version: 2
+screen_id: household_detail
+title: 戸主ブラウザ詳細
+route_name: household_browser
+route_path: /households/?household_id=:household_id&focus=detail
+template: office/_household_browser_detail_content.html
+purpose: Detail region for one household, showing core household state, linked people, memorial data, schedules, payments, delivery status, and contextual actions.
+primary_models:
+  - imports.Household
+  - imports.Person
+  - imports.DeceasedProfile
+  - imports.HouseholdProfile
+  - imports.ServiceSchedule
+  - imports.OfferingPayment
+layout:
+  density: high_information_detail
+  structure:
+    - household_core_card
+    - contact_and_delivery_sections
+    - current_people_cards
+    - memorial_people_cards
+    - service_and_payment_sections
+  disclosure: Rare or risky actions are collapsed in related-action menus.
+regions:
+  - region_id: household_core
+    role: household head, ledger id, address, contact, delivery, and status
+    priority: primary
+  - region_id: current_people
+    role: living/current family records and person edit entry points
+    priority: primary
+  - region_id: memorial_people
+    role: deceased profiles, 法名/戒名 label policy, memorial notices, and service candidates
+    priority: primary
+  - region_id: service_history
+    role: linked service schedules and payment context
+    priority: secondary
+actions:
+  - action_id: edit_household
+    label: この家を編集
+    intent: open household core edit form
+    method: GET
+    route_name: edit_household
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: edit_person
+    label: 人を編集
+    intent: open a person record edit form
+    method: GET
+    route_name: edit_person
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: create_service_schedule
+    label: 法要追加
+    intent: create a service schedule for a selected memorial person
+    method: GET
+    route_name: create_service_schedule
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: toggle_memorial_notice_opt_out
+    label: 回忌案内の送付対象を切り替え
+    intent: change whether a memorial person receives notice output
+    method: POST
+    route_name: toggle_person_memorial_notice_opt_out
+    mutating: true
+    risk_level: medium
+    confirmation: inline
+    result: Updates opt-out state and records the change in audit history.
+states:
+  - state_id: no_selection
+    trigger: no household_id selected
+    presentation: show instruction to pick a household from the list
+  - state_id: deleted_or_extinct
+    trigger: household is deleted or extinct
+    presentation: keep record visible with status callout and restrict risky actions
+data_bindings:
+  - source: detail.household
+    target: household_core
+  - source: detail.current_people
+    target: current_people
+  - source: detail.memorial_people
+    target: memorial_people
+  - source: deceased_labels.kaimyo
+    target: memorial_people.kaimyo_label
+workflow_refs:
+  - household_record_lifecycle
+  - service_schedule_lifecycle
+semantic_tree:
+  node_id: household_detail.region
+  kind: detail
+  role: selected household detail inside household browser
+  priority: primary
+  children:
+    - node_id: household_detail.core
+      kind: card
+      component: entity_card
+      role: household core identity, address, delivery, and status
+      actions:
+        - edit_household
+    - node_id: household_detail.current_people
+      kind: card_stack
+      component: entity_card
+      role: current family/person records
+      actions:
+        - edit_person
+    - node_id: household_detail.memorial_people
+      kind: card_stack
+      component: entity_card
+      role: deceased records, memorial labels, and service candidate actions
+      actions:
+        - edit_person
+        - create_service_schedule
+        - toggle_memorial_notice_opt_out
+    - node_id: household_detail.service_history
+      kind: section
+      role: schedules, payments, and related record links
+visual_signature:
+  density: detail-heavy, many linked records visible without opening separate pages
+  rhythm: household core first, people sections next, service/payment context below
+  information_priority:
+    - household identity and head remain visible before linked record lists
+    - deceased person cards expose 法名/戒名 policy label and service actions
+  disclosure:
+    - rare household/person actions stay collapsed
+    - destructive or opt-out operations are visually separated
+  responsive_behavior: detail sections stack; action bars wrap without losing labels
+state_matrix:
+  - state_id: selected
+    required_nodes:
+      - household_detail.core
+      - household_detail.current_people
+      - household_detail.memorial_people
+  - state_id: no_selection
+    fallback_text: 左の一覧からクリック
+  - state_id: deleted_or_extinct
+    required_nodes:
+      - household_detail.core
+    required_behavior: status callout appears before risky actions
+evidence:
+  source_map_ref: source_map.json#/screens/household_detail
+  template_paths:
+    - source/templates/office/_household_browser_detail_content.html

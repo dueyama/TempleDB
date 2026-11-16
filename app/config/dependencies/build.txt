@@ -1,0 +1,9 @@
+# Installer/build tools from the live Pi environment, observed 2026-09-22.
+# Install these explicitly before editable installation with --no-build-isolation.
+pip==26.2.1
+# Existing Mac-only optional torch 2.11.0 requires setuptools<82.
+# Preserve it without changing the shared application runtime baseline.
+setuptools==81.0.0; sys_platform == 'darwin'
+setuptools==84.0.0; sys_platform != 'darwin'
+wheel==0.48.0
+packaging==26.3

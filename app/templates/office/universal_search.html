@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}万能検索 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .search-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .search-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .section-card,
+    .result-card,
+    .summary-box,
+    .plan-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .section-card,
+    .plan-card,
+    .result-card {
+      padding: 18px;
+    }
+    .search-form {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(0, 1.8fr) repeat(3, minmax(140px, 1fr)) auto auto;
+      align-items: end;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .field.check {
+      align-self: center;
+      padding-bottom: 2px;
+    }
+    .field.check label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: .95rem;
+      color: inherit;
+    }
+    .field.check input {
+      width: auto;
+      min-height: 0;
+    }
+    .ghost-button,
+    .tag-button,
+    .tag-badge,
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+      gap: 6px;
+    }
+    .tag-badge,
+    .meta-badge {
+      min-height: 30px;
+      padding: 0 10px;
+      font-size: .9rem;
+    }
+    .meta-badge.accent {
+      border-color: var(--accent);
+      background: rgba(122,59,29,.12);
+    }
+    .meta-badge.subtle {
+      color: var(--muted);
+    }
+    .search-actions,
+    .search-shortcuts,
+    .badge-row,
+    .entry-actions,
+    .plan-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box {
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .result-list {
+      display: grid;
+      gap: 14px;
+    }
+    .result-card h3 {
+      margin: 0 0 8px;
+    }
+    .muted-line,
+    .card-meta {
+      margin: 0;
+      color: var(--muted);
+    }
+    .plan-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .plan-block {
+      display: grid;
+      gap: 8px;
+    }
+    .plan-label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin: 14px 0;
+    }
+    .pair {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .result-text {
+      margin: 0 0 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .empty-card {
+      border: 1px dashed var(--line);
+      background: rgba(255,250,240,.68);
+      padding: 28px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+    @media (max-width: 1160px) {
+      .search-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 760px) {
+      .search-form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  {% include "includes/office_nav.html" with current_section="households" %}
+  {% include "includes/office_subnav.html" with current_page="universal_search" %}
+  <section class="hero">
+    <div class="search-top">
+      <div>
+        <div class="hero-heading-row">
+          <h1>万能検索</h1>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button"
+              type="button"
+              aria-controls="universal-search-help"
+              aria-expanded="false"
+              aria-label="万能検索の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="universal-search-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>戸主・人・法要予定・各種メモを横断して探す画面です。</p>
+              <p>文字一致に加えて、AI で検索文をタグや種別へ分解する意味検索も使えます。</p>
+              {% if include_history %}
+                <p>全取込履歴を検索中です。</p>
+              {% elif visible_batch_snapshot_id %}
+                <p>現行取込履歴: <code>{{ visible_batch_snapshot_id }}</code></p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="search-shortcuts">
+          <a class="ghost-button" href="{% url 'office:person_search' %}">人検索へ</a>
+        </div>
+      </div>
+      <form method="post" class="search-actions">
+        {% csrf_token %}
+        <input type="hidden" name="q" value="{{ query }}">
+        <input type="hidden" name="tag" value="{{ selected_tag_slug }}">
+        <input type="hidden" name="note_type" value="{{ selected_note_type }}">
+        <input type="hidden" name="kind" value="{{ selected_result_kind }}">
+        <input type="hidden" name="mode" value="{{ selected_search_mode }}">
+        {% if include_history %}
+          <input type="hidden" name="history" value="1">
+        {% endif %}
+        <a class="ghost-button" href="{% url 'office:memo_tag_catalog' %}">タグ一覧</a>
+        <button class="button" type="submit">
+          {% if ai_available %}自動タグ更新{% else %}キーワードタグ更新{% endif %}
+        </button>
+      </form>
+    </div>
+  </section>
+
+  {% if not available %}
+    <section class="panel">
+      <h2>まだ表示できません</h2>
+      <p class="muted">{{ message }}</p>
+    </section>
+  {% else %}
+    <div class="search-shell">
+      <section class="section-card">
+        <form method="get" class="search-form">
+          <div class="field">
+            <label for="q">search</label>
+            <input id="q" name="q" value="{{ query }}" placeholder="{{ tenant_copy.universal_search.placeholder }}">
+          </div>
+          <div class="field">
+            <label for="mode">mode</label>
+            <select id="mode" name="mode">
+              {% for mode in search_modes %}
+                <option value="{{ mode.key }}"{% if mode.selected %} selected{% endif %}>{{ mode.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="kind">result</label>
+            <select id="kind" name="kind">
+              <option value="">すべて</option>
+              {% for option in result_kind_options %}
+                <option value="{{ option.key }}"{% if option.selected %} selected{% endif %}>{{ option.label }} ({{ option.count }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="note_type">memo kind</label>
+            <select id="note_type" name="note_type">
+              <option value="">すべて</option>
+              {% for option in note_type_options %}
+                <option value="{{ option.key }}"{% if option.selected %} selected{% endif %}>{{ option.label }} ({{ option.count }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field check">
+            <label for="history">
+              <input id="history" type="checkbox" name="history" value="1"{% if include_history %} checked{% endif %}>
+              履歴も含む
+            </label>
+          </div>
+          <button class="button" type="submit">検索</button>
+          <a class="ghost-button" href="{% url 'office:universal_search' %}">クリア</a>
+        </form>
+        <div class="badge-row" style="margin-top: 12px;">
+          {% if include_history %}
+            <span class="meta-badge">全取込履歴を検索中</span>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <article class="summary-box">
+          <div class="label">結果件数</div>
+          <div class="value">{{ result_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">検索対象総数</div>
+          <div class="value">{{ total_entry_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">メモ件数</div>
+          <div class="value">{{ memo_entry_count }}</div>
+        </article>
+      </section>
+
+      {% if query and ai_plan %}
+        <section class="plan-card">
+          <div class="search-top">
+            <div>
+              <h2 style="margin: 0;">検索文の分解</h2>
+              <p class="muted-line">
+                {% if ai_plan.used_ai %}
+                  AI で検索文を分解しました{% if ai_plan.model %} ({{ ai_plan.model }}){% endif %}。
+                {% else %}
+                  AI が使えないため、画面側の簡易分解で補助しています。
+                {% endif %}
+              </p>
+            </div>
+            <div class="badge-row">
+              {% if selected_search_mode == "smart" %}
+                <span class="meta-badge accent">AI意味検索</span>
+              {% else %}
+                <span class="meta-badge subtle">文字検索</span>
+              {% endif %}
+            </div>
+          </div>
+          {% if ai_plan.intent_summary %}
+            <p class="result-text">{{ ai_plan.intent_summary }}</p>
+          {% endif %}
+          <div class="plan-grid">
+            {% if ai_plan_result_labels %}
+              <div class="plan-block">
+                <div class="plan-label">結果種別</div>
+                <div class="plan-row">
+                  {% for kind in ai_plan_result_labels %}
+                    <span class="meta-badge">{{ kind }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+            {% if ai_plan_note_type_labels %}
+              <div class="plan-block">
+                <div class="plan-label">メモ種別ヒント</div>
+                <div class="plan-row">
+                  {% for note_type in ai_plan_note_type_labels %}
+                    <span class="meta-badge">{{ note_type }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+            {% if ai_plan.keywords %}
+              <div class="plan-block">
+                <div class="plan-label">キーワード候補</div>
+                <div class="plan-row">
+                  {% for keyword in ai_plan.keywords %}
+                    <span class="meta-badge subtle">{{ keyword }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="section-card">
+        {% if needs_search %}
+          <div class="empty-card">
+            検索語か絞り込みを入れると結果を表示します。
+          </div>
+        {% elif truncated_result_count %}
+          <p class="muted-line" style="margin-bottom: 14px;">
+            結果が {{ result_count }} 件あるため、最新 {{ rendered_result_count }} 件だけ表示しています。
+          </p>
+        {% endif %}
+        {% if results %}
+          <div class="result-list">
+            {% for entry in results %}
+              <article class="result-card">
+                <div class="search-top">
+                  <div>
+                    <div class="badge-row" style="margin-bottom: 8px;">
+                      <span class="meta-badge accent">{{ entry.kind_label }}</span>
+                      {% if entry.note_label %}
+                        <span class="meta-badge">{{ entry.note_label }}</span>
+                      {% endif %}
+                      {% if entry.search_score %}
+                        <span class="meta-badge subtle">score {{ entry.search_score }}</span>
+                      {% endif %}
+                      {% if include_history and entry.batch_snapshot_id %}
+                        <span class="meta-badge subtle">{{ entry.batch_snapshot_id }}</span>
+                      {% endif %}
+                    </div>
+                    <h3>{{ entry.title }}</h3>
+                    <p class="card-meta">{{ entry.updated_label }} 更新</p>
+                  </div>
+                  <div class="entry-actions">
+                    <a class="button" href="{{ entry.action_url }}">{{ entry.action_label }}</a>
+                  </div>
+                </div>
+
+                {% if entry.excerpt %}
+                  <p class="result-text">{{ entry.excerpt }}</p>
+                {% endif %}
+
+                <dl class="pair-grid">
+                  <div class="pair">
+                    <dt>戸主</dt>
+                    <dd>{% if entry.household_name %}{{ entry.household_name }}{% else %}-{% endif %}</dd>
+                  </div>
+                  <div class="pair">
+                    <dt>人</dt>
+                    <dd>{% if entry.person_name %}{{ entry.person_name }}{% else %}-{% endif %}</dd>
+                  </div>
+                  <div class="pair">
+                    <dt>ID</dt>
+                    <dd>
+                      {% if entry.household_id %}戸主 {{ entry.household_id }}{% endif %}
+                      {% if entry.person_id %}{% if entry.household_id %} / {% endif %}人 {{ entry.person_id }}{% endif %}
+                      {% if entry.schedule_id %}{% if entry.household_id or entry.person_id %} / {% endif %}予定 {{ entry.schedule_id }}{% endif %}
+                      {% if not entry.household_id and not entry.person_id and not entry.schedule_id %}-{% endif %}
+                    </dd>
+                  </div>
+                </dl>
+
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-card">
+            {% if needs_search %}
+              検索語か絞り込みを入れてください。
+            {% else %}
+              条件に合う結果はありません。
+            {% endif %}
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+
+{% block title %}{% if view_mode == "review" %}護持会費 受領チェック読取{% else %}護持会費 受領チェックシート印刷{% endif %} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .check-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .check-tools,
+    .check-summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .check-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .scan-card {
+      display: grid;
+      gap: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .scan-form {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(150px, auto) auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .scan-form.confirm {
+      grid-template-columns: minmax(150px, auto) auto;
+      justify-content: start;
+    }
+    .scan-form label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .scan-form input[type="file"],
+    .scan-form input[type="date"] {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 8px 10px;
+      color: inherit;
+    }
+    .scan-result-table {
+      grid-column: 1 / -1;
+      width: 100%;
+      border-collapse: collapse;
+      background: #fffdf8;
+    }
+    .scan-result-table th,
+    .scan-result-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .scan-result-table th {
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .scan-result-heading {
+      display: grid;
+      gap: 4px;
+    }
+    .scan-result-heading .sub {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .scan-result-details {
+      grid-column: 1 / -1;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.58);
+      padding: 10px 12px;
+    }
+    .scan-result-details summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .scan-result-details .scan-result-table {
+      margin-top: 10px;
+    }
+    .summary-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .preview-stack {
+      display: grid;
+      gap: 24px;
+      overflow-x: auto;
+    }
+    .check-sheet {
+      --sheet-padding-x: 12mm;
+      --sheet-padding-y: 12mm;
+      position: relative;
+      width: 420mm;
+      min-height: 297mm;
+      padding: 12mm;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(68, 50, 33, 0.08);
+    }
+    .registration-marker {
+      position: absolute;
+      width: 4.5mm;
+      height: 4.5mm;
+      background: #000;
+      pointer-events: none;
+    }
+    .registration-marker.top-left {
+      top: calc(6mm - var(--sheet-padding-y));
+      left: calc(6mm - var(--sheet-padding-x));
+    }
+    .registration-marker.top-right {
+      top: calc(6mm - var(--sheet-padding-y));
+      right: calc(6mm - var(--sheet-padding-x));
+    }
+    .registration-marker.bottom-left {
+      bottom: calc(6mm - var(--sheet-padding-y));
+      left: calc(6mm - var(--sheet-padding-x));
+    }
+    .registration-marker.bottom-right {
+      right: calc(6mm - var(--sheet-padding-x));
+      bottom: calc(6mm - var(--sheet-padding-y));
+    }
+    .check-sheet-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12mm;
+      align-items: end;
+      border-bottom: .5mm solid #222;
+      padding-bottom: 4mm;
+      margin-bottom: 5mm;
+    }
+    .check-sheet-title {
+      margin: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      font-size: 9mm;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+    .check-sheet-meta {
+      display: flex;
+      gap: 8mm;
+      align-items: baseline;
+      color: #222;
+      font-size: 4mm;
+      white-space: nowrap;
+    }
+    .check-district-list {
+      column-gap: 7mm;
+    }
+    .check-columns-2 {
+      columns: 2;
+    }
+    .check-columns-3 {
+      columns: 3;
+    }
+    .check-columns-4 {
+      columns: 4;
+    }
+    .check-columns-5 {
+      columns: 5;
+    }
+    .check-district-block {
+      break-inside: avoid;
+      margin: 0 0 3.8mm;
+    }
+    .check-district-title {
+      margin: 0 0 1.6mm;
+      padding-bottom: .8mm;
+      border-bottom: .4mm solid #222;
+      font-size: 4.4mm;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+    .check-row {
+      min-width: 0;
+      min-height: 7mm;
+      display: grid;
+      grid-template-columns: 7mm minmax(0, 1fr);
+      gap: 2.4mm;
+      align-items: center;
+      border-bottom: .25mm solid #999;
+      break-inside: avoid;
+    }
+    .check-box {
+      width: 5.2mm;
+      height: 5.2mm;
+      border: .45mm solid #111;
+      background: #fff;
+    }
+    .check-name {
+      min-width: 0;
+      font-size: 4mm;
+      line-height: 1.3;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .check-district-list.is-compact .check-district-block {
+      margin-bottom: 2.8mm;
+    }
+    .check-district-list.is-compact .check-district-title {
+      font-size: 3.8mm;
+      margin-bottom: 1.1mm;
+    }
+    .check-district-list.is-compact .check-row {
+      min-height: 5.8mm;
+      gap: 1.8mm;
+    }
+    .check-district-list.is-compact .check-name {
+      font-size: 3.4mm;
+    }
+    .check-district-list.is-tight {
+      column-gap: 5mm;
+    }
+    .check-district-list.is-tight .check-district-block {
+      margin-bottom: 2mm;
+    }
+    .check-district-list.is-tight .check-district-title {
+      font-size: 3.2mm;
+      margin-bottom: .8mm;
+      padding-bottom: .5mm;
+    }
+    .check-district-list.is-tight .check-row {
+      min-height: 4.8mm;
+      grid-template-columns: 5.8mm minmax(0, 1fr);
+      gap: 1.4mm;
+    }
+    .check-district-list.is-tight .check-box {
+      width: 4.5mm;
+      height: 4.5mm;
+      border-width: .35mm;
+    }
+    .check-district-list.is-tight .check-name {
+      font-size: 2.9mm;
+      line-height: 1.2;
+    }
+    @page {
+      size: A3 landscape;
+      margin: 0;
+    }
+    @media print {
+      body {
+        background: #fff;
+      }
+      .shell {
+        max-width: none;
+        padding: 0;
+      }
+      .session-bar,
+      .global-nav,
+      .office-subnav,
+      .hero,
+      .check-tools,
+      .check-summary,
+      .scan-card,
+      .flash-list {
+        display: none !important;
+      }
+      .check-shell,
+      .preview-stack {
+        gap: 0;
+        overflow: visible;
+      }
+      .check-sheet {
+        --sheet-padding-x: 12mm;
+        --sheet-padding-y: 10mm;
+        width: 420mm;
+        height: 297mm;
+        min-height: 0;
+        padding: 10mm 12mm;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+        overflow: hidden;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="check-shell">
+    {% include "includes/office_nav.html" with current_section="accounting" %}
+    {% include "includes/office_subnav.html" with current_page="annual_membership_fees" %}
+    <section class="hero">
+      <div class="eyebrow">Membership Fees / Check Sheet</div>
+      {% if view_mode == "review" %}
+        <h1>{{ year }}年 護持会費 受領チェック読取</h1>
+        <p>記入済みチェックシートを読み取り、候補を確認して受領済みに反映します。読取に使った原本も履歴として保存します。</p>
+      {% else %}
+        <h1>{{ year }}年 護持会費 受領チェックシート印刷</h1>
+        <p>A3 横、全地区を1ページにまとめます。地区名の下に手配り対象を並べ、名前の横の四角に紙でチェックできます。</p>
+      {% endif %}
+    </section>
+
+    {% if available %}
+      <section class="check-tools">
+        {% if view_mode == "review" %}
+          <a class="button" href="{{ print_url }}">チェックシートを印刷</a>
+        {% else %}
+          <button class="button" type="button" onclick="window.print()">印刷する</button>
+          <a class="ghost-button" href="{{ review_url }}">受領チェックを読み取る</a>
+        {% endif %}
+        <a class="ghost-button" href="{{ fees_url }}">護持会費へ戻る</a>
+        <a class="ghost-button" href="{% url 'office:household_districts' %}">戸主地区・送付区分</a>
+      </section>
+
+      <section class="check-summary">
+        <article class="summary-box">
+          <div class="label">地区数</div>
+          <div class="value">{{ district_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">対象戸数</div>
+          <div class="value">{{ member_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">対象年</div>
+          <div class="value">{{ year }}年</div>
+        </article>
+      </section>
+
+      {% if view_mode == "review" %}
+        <section class="scan-card">
+        <div>
+          <div class="eyebrow">Scan</div>
+          <h2>スキャン読取</h2>
+        </div>
+        <form class="scan-form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="scan_upload">
+          <input type="hidden" name="year" value="{{ year }}">
+          <label>
+            スキャン画像またはPDF
+            <input type="file" name="scan_file" accept="image/*,application/pdf" required>
+          </label>
+          <label>
+            受領日
+            <input type="date" name="received_on" value="{{ received_on_default|date:'Y-m-d' }}">
+          </label>
+          <button class="button" type="submit">読み取る</button>
+        </form>
+        {% if scan_result %}
+          <div class="scan-result-heading">
+            <div>読取候補: {{ scan_result.checked_count }}件 / {{ scan_result.total_count }}件</div>
+            <div class="sub">未チェック候補: {{ scan_result.unchecked_count }}件</div>
+            {% if scan_record %}
+              <div class="sub">
+                原本を保存しました。
+                <a href="{% url 'office:annual_membership_fee_check_sheet_scan_detail' scan_record.id %}">原本を見る</a>
+              </div>
+            {% endif %}
+          </div>
+          {% if scan_record.status == "confirmed" %}
+            <div class="callout">この原本はすでに受領へ反映済みです。</div>
+          {% elif scan_result.checked_rows or scan_result.unchecked_rows %}
+            <form class="scan-form confirm" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="confirm_scan">
+              <input type="hidden" name="year" value="{{ year }}">
+              <input type="hidden" name="scan_id" value="{{ scan_record.id }}">
+              <input type="hidden" name="received_on" value="{{ received_on_default|date:'Y-m-d' }}">
+              <button class="button" type="submit">チェックあり候補を受領にする</button>
+              <a class="ghost-button" href="{{ current_url }}">やり直す</a>
+              {% if scan_result.unchecked_rows %}
+                <table class="scan-result-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">受領に含める</th>
+                      <th scope="col">地区</th>
+                      <th scope="col">名前</th>
+                      <th scope="col">濃さ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in scan_result.unchecked_rows %}
+                      <tr>
+                        <td>
+                          <input type="checkbox" name="household_id" value="{{ row.household_id }}">
+                        </td>
+                        <td>{{ row.district_name }}</td>
+                        <td>{{ row.head_name }}</td>
+                        <td>{{ row.score_percent }}%</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% endif %}
+              {% if scan_result.checked_rows %}
+                <details class="scan-result-details">
+                  <summary>受領候補 {{ scan_result.checked_count }}件を確認</summary>
+                  <table class="scan-result-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">反映</th>
+                        <th scope="col">地区</th>
+                        <th scope="col">名前</th>
+                        <th scope="col">濃さ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for row in scan_result.checked_rows %}
+                        <tr>
+                          <td>
+                            <input type="checkbox" name="household_id" value="{{ row.household_id }}" checked>
+                          </td>
+                          <td>{{ row.district_name }}</td>
+                          <td>{{ row.head_name }}</td>
+                          <td>{{ row.score_percent }}%</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </details>
+              {% endif %}
+            </form>
+          {% else %}
+            <div class="callout">チェックあり候補は見つかりませんでした。</div>
+          {% endif %}
+        {% endif %}
+        </section>
+      {% endif %}
+
+      {% if view_mode == "print" %}
+        <div class="preview-stack">
+          <section class="check-sheet" aria-label="護持会費受領チェックシート">
+          <span class="registration-marker top-left" aria-hidden="true"></span>
+          <span class="registration-marker top-right" aria-hidden="true"></span>
+          <span class="registration-marker bottom-left" aria-hidden="true"></span>
+          <span class="registration-marker bottom-right" aria-hidden="true"></span>
+          <header class="check-sheet-header">
+            <h2 class="check-sheet-title">{{ year }}年 護持会費</h2>
+            <div class="check-sheet-meta">
+              <span>受領チェックシート</span>
+              <span>{{ district_count }}地区 / {{ member_count }}件</span>
+            </div>
+          </header>
+          <div class="check-district-list check-columns-{{ column_count }} is-{{ density }}">
+            {% for group in district_groups %}
+              <section class="check-district-block">
+                <h3 class="check-district-title">{{ group.name }}</h3>
+                {% for row in group.rows %}
+                  <div class="check-row">
+                    <span class="check-box" aria-hidden="true"></span>
+                    <span class="check-name">{{ row.head_name }}</span>
+                  </div>
+                {% endfor %}
+              </section>
+            {% endfor %}
+          </div>
+          </section>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="callout">
+        {{ year }}年で、手配り対象の護持会費はまだありません。
+      </div>
+    {% endif %}
+
+    {% if scan_history %}
+      <section class="scan-card">
+        <div>
+          <div class="eyebrow">Saved originals</div>
+          <h2>保存済みチェックシート原本</h2>
+          <p>読取に使用した原本を、受領反映の記録と一緒に保存しています。</p>
+        </div>
+        <table class="scan-result-table">
+          <thead>
+            <tr>
+              <th scope="col">読取日時</th>
+              <th scope="col">原本</th>
+              <th scope="col">状態</th>
+              <th scope="col">読取結果</th>
+              <th scope="col">受領反映</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for scan in scan_history %}
+              <tr>
+                <td>{{ scan.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                  <a href="{% url 'office:annual_membership_fee_check_sheet_scan_detail' scan.id %}">{{ scan.original_filename }}</a>
+                </td>
+                <td>{{ scan.get_status_display }}</td>
+                <td>{{ scan.result_payload.checked_count }}件 / {{ scan.result_payload.total_count }}件</td>
+                <td>
+                  {% if scan.confirmed_at %}
+                    {{ scan.confirmed_at|date:"Y-m-d H:i" }}
+                    {% if scan.confirmed_payload.saved_count %}
+                      （{{ scan.confirmed_payload.saved_count }}件）
+                    {% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

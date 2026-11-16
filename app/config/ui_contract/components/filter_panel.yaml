@@ -1,0 +1,15 @@
+contract_type: component
+version: 2
+component_id: filter_panel
+purpose: Compact query controls that update visible results without mutating canonical data.
+structure:
+  - short heading or eyebrow
+  - optional help popover
+  - labeled inputs or selects
+  - submit button and clear/reset link
+usage:
+  - household_browser.filter_bar
+  - service_ledger.search_filter
+rules:
+  - Preserve submitted values after GET filtering.
+  - Put advanced explanation in help popovers, not always-open text.

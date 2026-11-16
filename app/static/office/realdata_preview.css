@@ -1,0 +1,138 @@
+/* This stylesheet is loaded only for the disposable real-data preview. */
+@media screen {
+  body[data-realdata-preview="true"] {
+    --bg: #e7f1fa;
+    --panel: #f4f9ff;
+    --ink: #17324d;
+    --muted: #496780;
+    --line: #b2cbe0;
+    --accent: #155b97;
+    --accent-soft: #bad7f0;
+    --body-bg: linear-gradient(180deg, #cfe4f5 0%, #edf5fc 45%, #e0eef9 100%);
+    --panel-bg: #f5faff;
+    --panel-bg-strong: #f5faff;
+    --panel-bg-subtle: #eff7fd;
+    --card-bg: #f3f9ff;
+    --card-bg-strong: #fafdff;
+    --field-bg: #fafdff;
+    --button-text: #fff;
+    --ghost-bg: #eff7fd;
+    --current-bg: #d9ebf9;
+    --current-bg-soft: #e4f1fb;
+    --hover-bg: #e6f2fc;
+    --search-summary-bg: linear-gradient(180deg, #f6fbff, #e4f1fb);
+    --hero-bg: linear-gradient(135deg, #f1f8fe, #dbeafa);
+    --shadow-color: rgba(23, 64, 98, .08);
+    --focus-ring: rgba(21, 91, 151, .4);
+    --code-bg: rgba(21, 91, 151, .08);
+    --table-head-bg: #e7f2fa;
+    --table-line: rgba(21, 91, 151, .2);
+    background: var(--body-bg);
+  }
+
+  body[data-realdata-preview="true"] .realdata-preview-header {
+    position: sticky;
+    top: 0;
+    z-index: 150;
+  }
+
+  body[data-realdata-preview="true"] .app-quicklinks {
+    position: static;
+    border-color: var(--line);
+    background: #e8f3fc;
+  }
+
+  body[data-realdata-preview="true"] :is(.button, .move-button):not(.danger-button, :disabled, [aria-disabled="true"]) {
+    border-color: #15548a;
+    background: linear-gradient(180deg, #2f78b5, #155b97);
+  }
+
+  body[data-realdata-preview="true"] :is(.ghost-button, .app-quicklinks-toggle, .schema-toolbar button):not(.danger-button, :disabled, [aria-disabled="true"]) {
+    border-color: var(--line);
+    background: #f1f8fe;
+  }
+
+  body[data-realdata-preview="true"] .ghost-button.is-current {
+    border-color: var(--accent);
+    background: var(--current-bg);
+  }
+}
+
+.realdata-preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 9px 18px;
+  background: #124c80;
+  color: #fff;
+  font-family: "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.realdata-preview-badge {
+  padding: 2px 9px;
+  border: 1px solid #b5d9f6;
+  border-radius: 4px;
+  background: #fff;
+  color: #124c80;
+  white-space: nowrap;
+}
+
+.realdata-preview-note {
+  font-size: 12px;
+}
+
+.realdata-preview-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  font-size: 11px;
+}
+
+.realdata-preview-controls button {
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px solid #b5d9f6;
+  border-radius: 4px;
+  background: #fff;
+  color: #124c80;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media print {
+  /* A small fixed mark does not change the dimensions of existing print sheets. */
+  body[data-realdata-preview="true"] .realdata-preview-header {
+    position: fixed;
+    inset: 2mm 2mm auto auto;
+    z-index: 10000;
+  }
+
+  body[data-realdata-preview="true"] .realdata-preview-banner {
+    display: block;
+    padding: 0;
+    background: white;
+    color: black;
+    font-size: 8pt;
+    line-height: 1.2;
+  }
+
+  body[data-realdata-preview="true"] .realdata-preview-badge {
+    display: block;
+    border: 1px solid black;
+    border-radius: 0;
+    padding: 1mm 2mm;
+    background: white;
+    color: black;
+  }
+
+  body[data-realdata-preview="true"] :is(.realdata-preview-snapshot, .realdata-preview-note, .realdata-preview-controls) {
+    display: none;
+  }
+}

@@ -1,0 +1,125 @@
+contract_type: screen
+version: 2
+dsl_version: 2
+screen_id: home
+title: 寺務ホーム
+route_name: home
+route_path: /
+template: office/home.html
+purpose: Daily operations dashboard for jumping into household, search, service, settings, print, and analytics work.
+primary_models:
+  - imports.Household
+  - imports.Person
+  - imports.ServiceSchedule
+layout:
+  density: compact_dashboard
+  structure:
+    - hero
+    - today_and_near_service_cards
+    - maintenance_status_card
+    - grouped_navigation_cards
+  responsive: Cards collapse from multi-column grids into single-column stacks.
+regions:
+  - region_id: hero
+    role: orient user to TempleDB operations and current runtime status
+    priority: primary
+  - region_id: service_summary
+    role: show 今日の法要 and 近日の法要 with links into 法要台帳
+    priority: primary
+  - region_id: memorial_calendar
+    role: show upcoming memorial anniversaries and scheduled services from the database
+    priority: secondary
+  - region_id: navigation_groups
+    role: expose grouped entry points for 戸主・家族, 法要, 設定, 印刷, and analytics
+    priority: primary
+actions:
+  - action_id: open_household_browser
+    label: 戸主ブラウザ
+    intent: start household and family lookup
+    method: GET
+    route_name: household_browser
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: open_service_ledger
+    label: 法要台帳へ
+    intent: inspect and manage service schedules
+    method: GET
+    route_name: service_ledger
+    mutating: false
+    risk_level: none
+    confirmation: none
+states:
+  - state_id: no_schedule
+    trigger: no today or near service entries
+    presentation: keep card visible and show empty message
+  - state_id: no_memorial_calendar_data
+    trigger: no latest succeeded import batch exists
+    presentation: keep card visible and show empty message
+data_bindings:
+  - source: home_schedule.today_events
+    target: service_summary.today
+  - source: home_schedule.next_events
+    target: service_summary.near_future
+  - source: home_memorial_calendar.calendar_weeks
+    target: memorial_calendar.calendar
+workflow_refs:
+  - service_schedule_lifecycle
+  - household_record_lifecycle
+semantic_tree:
+  node_id: home.page
+  kind: page
+  role: daily operations dashboard
+  priority: primary
+  children:
+    - node_id: home.hero
+      kind: hero
+      role: identify TempleDB and current operational context
+      priority: primary
+    - node_id: home.service_summary
+      kind: grid
+      role: today and near service cards
+      priority: primary
+      component: entity_card
+      actions:
+        - open_service_ledger
+    - node_id: home.memorial_calendar
+      kind: panel
+      role: upcoming memorial anniversaries and scheduled service calendar
+      priority: secondary
+    - node_id: home.navigation_groups
+      kind: grid
+      role: grouped operational entry points
+      priority: primary
+      actions:
+        - open_household_browser
+        - open_service_ledger
+visual_signature:
+  density: compact dashboard with many work entry points above the fold
+  rhythm: hero followed by service cards and grouped action cards
+  information_priority:
+    - 今日の法要 and 近日の法要 before secondary navigation
+    - grouped operational links remain visible without search
+  disclosure:
+    - memorial and scheduled service details open only when a date badge is selected
+    - runtime warnings do not replace main navigation
+  responsive_behavior: multi-column cards collapse to one column while preserving order
+state_matrix:
+  - state_id: normal
+    required_nodes:
+      - home.hero
+      - home.service_summary
+      - home.navigation_groups
+  - state_id: no_schedule
+    required_nodes:
+      - home.hero
+      - home.service_summary
+      - home.navigation_groups
+    forbidden_behavior: blocking household/service/settings navigation
+evidence:
+  source_map_ref: source_map.json#/screens/home
+  template_paths:
+    - source/templates/base.html
+    - source/templates/office/home.html
+    - source/templates/office/_service_ledger_section.html
+    - source/templates/office/_service_ledger_card_styles.html

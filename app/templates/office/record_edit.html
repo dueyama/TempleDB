@@ -1,0 +1,995 @@
+{% extends "base.html" %}
+{% load imports_extras static %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .edit-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .edit-layout {
+      display: grid;
+      gap: 22px;
+      grid-template-columns: minmax(0, 1.5fr) minmax(280px, .9fr);
+      align-items: start;
+    }
+    .edit-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.94);
+      padding: 22px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .edit-card h2,
+    .edit-card h3 {
+      margin-top: 0;
+    }
+    .edit-form {
+      display: grid;
+      gap: 18px;
+    }
+    .field-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .field-row {
+      display: grid;
+      gap: 8px;
+    }
+    .field-row label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field-row input,
+    .field-row select,
+    .field-row textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 10px 12px;
+      color: inherit;
+    }
+    .field-row textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    .field-row input:disabled,
+    .field-row select:disabled,
+    .field-row textarea:disabled {
+      background: rgba(244, 239, 228, 0.92);
+      color: #6a5a4d;
+      cursor: default;
+    }
+    .field-row input[type="checkbox"] {
+      width: auto;
+      min-height: 0;
+      padding: 0;
+    }
+    .inline-field-pair {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) minmax(180px, 220px);
+      align-items: start;
+    }
+    .inline-field-pair .field-row {
+      gap: 6px;
+    }
+    .inline-field-pair .mini-label {
+      color: var(--muted);
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field-row ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .field-row ul li label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: inherit;
+      font-size: .95rem;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .errorlist {
+      margin: 0;
+      padding-left: 18px;
+      color: #9f4d3d;
+    }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .edit-action-menu {
+      flex: 1 1 220px;
+      min-width: 220px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+    }
+    .edit-action-menu summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+      margin: 0;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: var(--accent);
+      list-style: none;
+    }
+    .edit-action-menu summary::-webkit-details-marker {
+      display: none;
+    }
+    .edit-action-menu summary::after {
+      content: "+";
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .edit-action-menu[open] summary::after {
+      content: "-";
+    }
+    .edit-action-menu[open] summary {
+      border-bottom: 1px solid var(--line);
+    }
+    .edit-action-menu-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px 16px;
+    }
+    .edit-action-menu-list > * {
+      min-width: 0;
+    }
+    .edit-action-menu-list .ghost-button {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .subsection-card {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.55);
+    }
+    .subsection-card h3 {
+      margin: 0;
+    }
+    .payment-row {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,253,248,.92);
+    }
+    .payment-rows {
+      display: grid;
+      gap: 12px;
+    }
+    .payment-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .payment-delete {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .92rem;
+    }
+    .summary-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .summary-chip {
+      flex: 1 1 220px;
+      min-width: 0;
+      max-width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.6);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .danger-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid #9f4d3d;
+      background: #fff0ea;
+      color: #7a2d1e;
+      cursor: pointer;
+    }
+    .deleted-callout {
+      margin: 0 0 16px;
+      border: 1px solid #c98a79;
+      background: #fff3ee;
+      padding: 14px 16px;
+    }
+    .deleted-callout strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .history-list {
+      display: grid;
+      gap: 14px;
+    }
+    .history-item {
+      border: 1px solid var(--line);
+      background: #fffcf6;
+      padding: 14px 16px;
+    }
+    .history-item h3 {
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+    .history-meta {
+      color: var(--muted);
+      margin: -2px 0 10px;
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+    .history-item p {
+      margin: 10px 0 0;
+    }
+    .history-diff {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .history-diff-row {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .history-diff-row strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .history-snapshot {
+      margin-top: 12px;
+    }
+    .history-collapse {
+      margin-top: 12px;
+    }
+    .history-collapse summary {
+      cursor: pointer;
+      color: var(--accent);
+    }
+    .history-collapse[open] summary {
+      margin-bottom: 12px;
+    }
+    .history-snapshot summary {
+      cursor: pointer;
+      color: var(--accent);
+    }
+    .snapshot-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .snapshot-block {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 12px;
+    }
+    .snapshot-block pre {
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: var(--font-mono);
+      font-size: .84rem;
+    }
+    .time-machine-tools {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 18px;
+      padding: 14px 16px;
+      border: 1px dashed var(--line);
+      background: rgba(255,250,240,.72);
+    }
+    .time-machine-tools strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .time-machine-field {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+    }
+    .time-machine-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .time-machine-chip {
+      display: grid;
+      gap: 4px;
+    }
+    .time-machine-chip button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      cursor: pointer;
+      color: inherit;
+      font: inherit;
+    }
+    .time-machine-chip small {
+      color: var(--muted);
+      font-size: .76rem;
+    }
+    .edit-shell.time-machine-active .edit-card {
+      border-color: #8eaad3;
+      background: rgba(238, 246, 255, 0.95);
+      box-shadow: 0 10px 30px rgba(70, 104, 163, 0.10);
+    }
+    .edit-shell.time-machine-active .time-machine-tools {
+      border-color: #6d93cb;
+      background: rgba(220, 235, 255, 0.9);
+    }
+    .edit-shell.time-machine-active .history-item,
+    .edit-shell.time-machine-active .snapshot-block {
+      border-color: #9bb6dc;
+      background: rgba(247, 251, 255, 0.96);
+    }
+    .edit-shell.time-machine-active .field-row input,
+    .edit-shell.time-machine-active .field-row select,
+    .edit-shell.time-machine-active .field-row textarea,
+    .edit-shell.time-machine-active .time-machine-chip button,
+    .edit-shell.time-machine-active .ghost-button {
+      border-color: #9bb6dc;
+      background: #f7fbff;
+    }
+    .edit-shell.time-machine-active .time-machine-field {
+      border-top-color: #9bb6dc;
+    }
+    @media (max-width: 920px) {
+      .edit-layout {
+        grid-template-columns: 1fr;
+      }
+      .inline-field-pair {
+        grid-template-columns: 1fr;
+      }
+      .payment-grid {
+        grid-template-columns: 1fr;
+      }
+      .edit-action-menu {
+        flex-basis: 100%;
+        min-width: 0;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="edit-shell{% if time_machine_mode %} time-machine-active{% endif %}">
+    <section class="hero">
+      <h1>{{ title }}</h1>
+      <p>{{ subtitle }}</p>
+    </section>
+
+    <div class="edit-layout">
+      <section class="edit-card">
+        <h2>{% if read_only_mode %}閲覧{% else %}編集{% endif %}</h2>
+        {% if warning_message %}
+          <p class="muted">{{ warning_message }}</p>
+        {% endif %}
+        {% if read_only_mode %}
+          <div class="callout" style="margin-bottom: 18px;">
+            完了済みの法要は既定で閲覧専用です。修正が必要なときだけ「編集する」から編集モードへ切り替えてください。
+          </div>
+        {% endif %}
+        {% if head_person_is_virtual %}
+          <div class="callout" style="margin-bottom: 18px;">
+            現在の戸主は仮戸主です。この画面では仮戸主の氏名・かな・性別は変更できません。
+            実在の戸主が決まったら「実戸主を設定」から置き換えてください。
+            {% if replace_virtual_head_url %}
+              <div class="action-row" style="margin-top: 12px;">
+                <a class="ghost-button" href="{{ replace_virtual_head_url }}">実戸主を設定</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% if household_extinct_message %}
+          <div class="callout" style="margin-bottom: 18px;">
+            <div>{{ household_extinct_message }}</div>
+            {% if mark_household_extinct_url %}
+              <div class="action-row" style="margin-top: 12px;">
+                <a class="ghost-button" href="{{ mark_household_extinct_url }}">この家を絶家にする</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% if not read_only_mode and supports_time_machine is not False %}
+          <div class="time-machine-tools">
+            <div>
+              <div class="help-heading-row">
+                <strong>タイムマシンモード</strong>
+                <div class="help-popover" data-help-popover>
+                  <button
+                    class="help-popover-button help-popover-button-compact"
+                    type="button"
+                    aria-controls="record-edit-time-machine-help"
+                    aria-expanded="false"
+                    aria-label="タイムマシンモードの説明"
+                    data-help-popover-button
+                  >?</button>
+                  <div
+                    class="help-popover-panel"
+                    id="record-edit-time-machine-help"
+                    hidden
+                    data-help-popover-panel
+                  >
+                    <p>各フィールドの過去値を選んで部分的に戻せます。保存するまでは反映されません。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="action-row">
+              <a class="ghost-button" href="{{ time_machine_toggle_url }}">
+                {% if time_machine_mode %}タイムマシンを閉じる{% else %}タイムマシンモードを開く{% endif %}
+              </a>
+            </div>
+          </div>
+        {% endif %}
+        {% if record_deleted %}
+          <div class="deleted-callout">
+            <strong>このレコードは削除済みです。</strong>
+            <div>
+              {% if deleted_meta.deleted_at %}{{ deleted_meta.deleted_at|date:"Y-m-d H:i:s" }}{% endif %}
+              {% if deleted_meta.deleted_by %} / {{ deleted_meta.deleted_by }}{% endif %}
+            </div>
+            {% if deleted_meta.deletion_note %}
+              <div style="margin-top: 8px;">{{ deleted_meta.deletion_note }}</div>
+            {% endif %}
+            <div class="muted" style="margin-top: 8px;">復元すると再び一覧や問題点画面に表示されます。</div>
+          </div>
+        {% endif %}
+      <form method="post" class="edit-form" data-quicklink-guard-form>
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next_url }}">
+          {% if preserve_edit_mode %}
+            <input type="hidden" name="_edit_mode" value="1">
+          {% endif %}
+          {% if time_machine_mode %}
+            <input type="hidden" name="time_machine" value="1">
+          {% endif %}
+          {% if extra_hidden_fields %}
+            {% for key, value in extra_hidden_fields.items %}
+              <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endfor %}
+          {% endif %}
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+          {% if form.non_field_errors %}
+            <div class="callout">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+          <div class="field-grid">
+            {% for field in form.visible_fields %}
+              {% if field.name == "relationship_choice" %}
+              {% elif field.name == "relationship_label" and form.relationship_choice %}
+                {% with tm_options=time_machine_field_options|get_item:field.name %}
+                <div class="field-row">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  <div class="inline-field-pair">
+                    <div class="field-row">
+                      {{ field }}
+                    </div>
+                    <div class="field-row">
+                      <div class="mini-label">{{ form.relationship_choice.label }}</div>
+                      {{ form.relationship_choice }}
+                    </div>
+                  </div>
+                  {% if field.errors %}
+                    {{ field.errors }}
+                  {% endif %}
+                  {% if form.relationship_choice.errors %}
+                    {{ form.relationship_choice.errors }}
+                  {% endif %}
+                  {% if field.help_text %}
+                    <div class="muted">{{ field.help_text }}</div>
+                  {% endif %}
+                  {% if time_machine_mode and tm_options %}
+                    <div class="time-machine-field">
+                      <div class="mini-label">過去の値から戻す</div>
+                      <div class="time-machine-list">
+                        {% for option in tm_options %}
+                          <div class="time-machine-chip">
+                            <input type="hidden" value="{{ option.value }}">
+                            <button
+                              type="button"
+                              data-time-machine-apply
+                              data-time-machine-input="{{ field.id_for_label }}"
+                              data-time-machine-kind="{{ option.kind }}"
+                            >
+                              {{ option.label }}
+                            </button>
+                            <small>{{ option.applied_at }}</small>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+                {% endwith %}
+              {% else %}
+                {% with tm_options=time_machine_field_options|get_item:field.name %}
+                <div class="field-row">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}
+                    {{ field.errors }}
+                  {% endif %}
+                  {% if field.help_text %}
+                    <div class="muted">{{ field.help_text }}</div>
+                  {% endif %}
+                  {% if time_machine_mode and tm_options %}
+                    <div class="time-machine-field">
+                      <div class="mini-label">過去の値から戻す</div>
+                      <div class="time-machine-list">
+                        {% for option in tm_options %}
+                          <div class="time-machine-chip">
+                            <input type="hidden" value="{{ option.value }}">
+                            <button
+                              type="button"
+                              data-time-machine-apply
+                              data-time-machine-input="{{ field.id_for_label }}"
+                              data-time-machine-kind="{{ option.kind }}"
+                            >
+                              {{ option.label }}
+                            </button>
+                            <small>{{ option.applied_at }}</small>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+                {% endwith %}
+              {% endif %}
+            {% endfor %}
+            {% if not read_only_mode %}
+              <div class="field-row">
+                <label for="change_note">変更メモ</label>
+                <textarea id="change_note" name="change_note" rows="4" placeholder="何を直したかを任意で残せます">{{ change_note }}</textarea>
+              </div>
+            {% endif %}
+          </div>
+          {% if payment_formset %}
+            <section class="subsection-card">
+              <div>
+                <div class="help-heading-row">
+                  <h3>法要入金</h3>
+                  <div class="help-popover" data-help-popover>
+                    <button
+                      class="help-popover-button help-popover-button-compact"
+                      type="button"
+                      aria-controls="record-edit-payment-help"
+                      aria-expanded="false"
+                      aria-label="法要入金の説明"
+                      data-help-popover-button
+                    >?</button>
+                    <div
+                      class="help-popover-panel"
+                      id="record-edit-payment-help"
+                      hidden
+                      data-help-popover-panel
+                    >
+                      <p>お布施や永代経などをこの法要に紐づけて記録します。同じ区分を複数行入れて構いません。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {{ payment_formset.management_form }}
+              {% if payment_formset.non_form_errors %}
+                <div class="callout">{{ payment_formset.non_form_errors }}</div>
+              {% endif %}
+              <div class="payment-rows" data-payment-rows>
+                {% for payment_form in payment_formset.forms %}
+                  <div class="payment-row">
+                    {% for hidden in payment_form.hidden_fields %}
+                      {{ hidden }}
+                    {% endfor %}
+                    <div class="payment-grid">
+                      {% for payment_field in payment_form.visible_fields %}
+                        {% if payment_field.name != "DELETE" %}
+                          <div class="field-row">
+                            <label for="{{ payment_field.id_for_label }}">{{ payment_field.label }}</label>
+                            {{ payment_field }}
+                            {% if payment_field.errors %}
+                              {{ payment_field.errors }}
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    {% if payment_form.DELETE and not read_only_mode %}
+                      <label class="payment-delete">
+                        {{ payment_form.DELETE }}
+                        <span>この入金行を削除</span>
+                      </label>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+              {% if not read_only_mode %}
+                <div class="action-row">
+                  <button type="button" class="ghost-button" data-add-payment-row>入金行を追加</button>
+                </div>
+                <template id="payment-empty-form-template">
+                  <div class="payment-row">
+                    {% for hidden in payment_formset.empty_form.hidden_fields %}
+                      {{ hidden }}
+                    {% endfor %}
+                    <div class="payment-grid">
+                      {% for payment_field in payment_formset.empty_form.visible_fields %}
+                        {% if payment_field.name != "DELETE" %}
+                          <div class="field-row">
+                            <label for="{{ payment_field.id_for_label }}">{{ payment_field.label }}</label>
+                            {{ payment_field }}
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    {% if payment_formset.empty_form.DELETE %}
+                      <label class="payment-delete">
+                        {{ payment_formset.empty_form.DELETE }}
+                        <span>この入金行を削除</span>
+                      </label>
+                    {% endif %}
+                  </div>
+                </template>
+              {% endif %}
+            </section>
+          {% endif %}
+          <div class="action-row">
+            {% if record_deleted %}
+              <button class="button" type="submit" name="action" value="restore">復元</button>
+            {% elif read_only_mode %}
+              <a class="button" href="{{ enable_edit_url }}">編集する</a>
+              {% if print_url %}
+                <a class="ghost-button" href="{{ print_url }}">情報印刷</a>
+              {% endif %}
+            {% else %}
+              <button class="button" type="submit" name="action" value="save" data-quicklink-save>{{ submit_label|default:"保存" }}</button>
+              {% if replace_virtual_head_url or head_person_edit_url or show_complete_save_action or show_reset_schedule_action or print_url or move_memorial_person_url %}
+                <details class="edit-action-menu">
+                  <summary>関連操作</summary>
+                  <div class="edit-action-menu-list">
+                    {% if replace_virtual_head_url %}
+                      <a class="ghost-button" href="{{ replace_virtual_head_url }}">実戸主を設定</a>
+                    {% endif %}
+                    {% if head_person_edit_url %}
+                      <a class="ghost-button" href="{{ head_person_edit_url }}">この戸主を人として編集</a>
+                    {% endif %}
+                    {% if show_complete_save_action %}
+                      <button class="ghost-button" type="submit" name="action" value="complete_save">完了保存</button>
+                    {% endif %}
+                    {% if show_reset_schedule_action %}
+                      <button
+                        class="ghost-button"
+                        type="submit"
+                        name="action"
+                        value="reset_schedule"
+                        onclick="return confirm('この法要予定を未設定に戻します。よろしいですか？');"
+                      >
+                        この法要予定をリセット
+                      </button>
+                    {% endif %}
+                    {% if print_url %}
+                      <a class="ghost-button" href="{{ print_url }}">情報印刷</a>
+                    {% endif %}
+                    {% if move_memorial_person_url %}
+                      <a class="ghost-button" href="{{ move_memorial_person_url }}">この故人を別の家へ移す</a>
+                    {% endif %}
+                  </div>
+                </details>
+              {% endif %}
+              {% if can_delete %}
+                <button
+                  class="danger-button"
+                  type="submit"
+                  name="action"
+                  value="delete"
+                  onclick="return confirm('{{ delete_confirm_text|default:"このレコードを削除済みにします。よろしいですか？"|escapejs }}');"
+                >
+                  {{ delete_button_label|default:"削除" }}
+                </button>
+              {% endif %}
+            {% endif %}
+            <a class="ghost-button" href="{{ next_url }}">{{ return_label|default:"戻る" }}</a>
+          </div>
+        </form>
+      </section>
+
+      <aside class="edit-card">
+        {% if linked_schedule_members %}
+          <div class="eyebrow">Linked Service</div>
+          <div class="help-heading-row">
+            <h2>一緒に勤める対象</h2>
+            <div class="help-popover" data-help-popover>
+              <button
+                class="help-popover-button help-popover-button-compact"
+                type="button"
+                aria-controls="record-edit-linked-service-help"
+                aria-expanded="false"
+                aria-label="一緒に勤める対象の説明"
+                data-help-popover-button
+              >?</button>
+              <div
+                class="help-popover-panel"
+                id="record-edit-linked-service-help"
+                hidden
+                data-help-popover-panel
+              >
+                <p>この法要リンクに入っている対象です。完了や日時変更はまとめて反映できます。</p>
+              </div>
+            </div>
+          </div>
+          <div class="history-list" style="margin-bottom: 22px;">
+            {% for item in linked_schedule_members %}
+              <article class="history-item">
+                <h3>
+                  {{ item.person_name }}
+                  {% if item.is_current %}<span class="muted"> (編集中)</span>{% endif %}
+                </h3>
+                <div class="history-meta">
+                  {{ item.service_label }}
+                  {% if item.target_date %} / 基準日 {{ item.target_date }}{% endif %}
+                  {% if item.scheduled_date %} / 予定 {{ item.scheduled_date }}{% endif %}
+                  / {{ item.status_label }}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if payment_summary %}
+          <div class="eyebrow">Payments</div>
+          <h2>入金サマリ</h2>
+          <div class="summary-chips" style="margin-bottom: 22px;">
+            {% for item in payment_summary %}
+              <div class="summary-chip">
+                <strong>{{ item.label }}</strong><br>
+                {{ item.total }}円 / {{ item.count }}件
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if google_calendar_sync_status %}
+          <div class="eyebrow">Google Calendar</div>
+          <h2>同期状態</h2>
+          <div class="summary-chips" style="margin-bottom: 14px;">
+            <div class="summary-chip">
+              <strong>{{ google_calendar_sync_status.status_label }}</strong><br>
+              sync_key: {{ google_calendar_sync_status.sync_key }}
+            </div>
+            <div class="summary-chip">
+              <strong>Calendar ID</strong><br>
+              {{ google_calendar_sync_status.calendar_id|default:"未設定" }}
+            </div>
+            <div class="summary-chip">
+              <strong>最終同期</strong><br>
+              {% if google_calendar_sync_status.last_synced_at %}
+                {{ google_calendar_sync_status.last_synced_at|date:"Y-m-d H:i" }}
+              {% else %}
+                まだありません
+              {% endif %}
+            </div>
+          </div>
+          <div class="history-item" style="margin-bottom: 22px;">
+            <div class="history-meta">
+              Service Account:
+              {% if google_calendar_sync_status.client_email %}
+                {{ google_calendar_sync_status.client_email }}
+              {% else %}
+                未検出
+              {% endif %}
+            </div>
+            {% if google_calendar_sync_status.google_event_id %}
+              <p style="margin-top: 8px; word-break: break-all;"><code>{{ google_calendar_sync_status.google_event_id }}</code></p>
+            {% endif %}
+            {% if google_calendar_sync_status.last_error_message %}
+              <p style="margin-top: 8px;">{{ google_calendar_sync_status.last_error_message }}</p>
+            {% elif google_calendar_sync_status.service_account_error %}
+              <p style="margin-top: 8px;">{{ google_calendar_sync_status.service_account_error }}</p>
+            {% endif %}
+            <div class="action-row" style="margin-top: 12px;">
+              {% if google_calendar_can_resync %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="resync_google_calendar">
+                  <input type="hidden" name="next" value="{{ next_url }}">
+                  {% if extra_hidden_fields %}
+                    {% for key, value in extra_hidden_fields.items %}
+                      <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endfor %}
+                  {% endif %}
+                  <button class="ghost-button" type="submit">再同期</button>
+                </form>
+              {% endif %}
+              {% if google_calendar_settings_url %}
+                <a class="ghost-button" href="{{ google_calendar_settings_url }}">設定を開く</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+        <div class="eyebrow">History</div>
+        <div class="help-heading-row">
+          <h2>このレコードの履歴</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="record-edit-history-help"
+              aria-expanded="false"
+              aria-label="このレコードの履歴の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="record-edit-history-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>変更内容は履歴として保存され、ここでは最近の変更概要を表示します。</p>
+            </div>
+          </div>
+        </div>
+        {% if history_entries %}
+          <details class="history-collapse">
+            <summary>履歴を開く（{{ history_entries|length }}件）</summary>
+            <div class="history-list">
+              {% for entry in history_entries %}
+                <article class="history-item">
+                  <h3>{{ entry.log.record_label }}</h3>
+                  <div class="history-meta">
+                    {{ entry.log.created_at|date:"Y-m-d H:i:s" }}
+                    {% if entry.log.editor_label %} / {{ entry.log.editor_label }}{% endif %}
+                  </div>
+                  <div class="history-diff">
+                    {% for change in entry.field_changes %}
+                      <div class="history-diff-row">
+                        <strong>{{ change.label }}</strong>
+                        <div class="muted">前: {{ change.before }}</div>
+                        <div>後: {{ change.after }}</div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                  {% if entry.log.change_note %}
+                    <p>{{ entry.log.change_note }}</p>
+                  {% endif %}
+                  <details class="history-snapshot">
+                    <summary>全体 snapshot を確認</summary>
+                    <div class="snapshot-grid">
+                      <div class="snapshot-block">
+                        <strong>Before</strong>
+                        <pre>{{ entry.before_json }}</pre>
+                      </div>
+                      <div class="snapshot-block">
+                        <strong>After</strong>
+                        <pre>{{ entry.after_json }}</pre>
+                      </div>
+                    </div>
+                  </details>
+                </article>
+              {% endfor %}
+            </div>
+          </details>
+        {% else %}
+          <div class="callout">まだ編集履歴はありません。</div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+  {% if form.relationship_choice %}
+    <script>
+      (function () {
+        const textInput = document.getElementById("{{ form.relationship_label.id_for_label }}");
+        const picker = document.getElementById("{{ form.relationship_choice.id_for_label }}");
+        const anchorName = "{{ relationship_anchor_name|default:''|escapejs }}";
+        const compactAnchorName = anchorName.replace(/[\s　]+/g, "");
+        if (!textInput || !picker) return;
+        picker.addEventListener("change", function () {
+          if (!picker.value) return;
+          if (picker.value.includes("の") || !compactAnchorName) {
+            textInput.value = picker.value;
+          } else {
+            textInput.value = compactAnchorName + "の" + picker.value;
+          }
+          picker.selectedIndex = 0;
+          textInput.focus();
+        });
+      })();
+    </script>
+  {% endif %}
+  {% if service_schedule_title_autofill %}
+    <script data-service-schedule-title-autofill>
+      (function () {
+        const categoryInput = document.getElementById("id_category");
+        const titleInput = document.getElementById("id_service_label");
+        if (!categoryInput || !titleInput || titleInput.type === "hidden") return;
+
+        const fixedTitles = {
+          bon: "盆",
+          otokoshi: "お取越し",
+        };
+        let previousCategory = categoryInput.value;
+        let manualTitle = titleInput.value;
+
+        categoryInput.addEventListener("change", function () {
+          const fixedTitle = fixedTitles[categoryInput.value];
+          if (fixedTitle) {
+            if (!fixedTitles[previousCategory]) {
+              manualTitle = titleInput.value;
+            }
+            titleInput.value = fixedTitle;
+          } else if (
+            fixedTitles[previousCategory]
+            && titleInput.value === fixedTitles[previousCategory]
+          ) {
+            titleInput.value = manualTitle;
+          }
+          previousCategory = categoryInput.value;
+        });
+      })();
+    </script>
+  {% endif %}
+  <script>
+    (function () {
+      const buttons = document.querySelectorAll("[data-time-machine-apply]");
+      if (!buttons.length) return;
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          const targetId = button.getAttribute("data-time-machine-input");
+          const kind = button.getAttribute("data-time-machine-kind") || "text";
+          const target = document.getElementById(targetId);
+          const hidden = button.parentElement.querySelector('input[type="hidden"]');
+          if (!target || !hidden) return;
+          const value = hidden.value;
+          if (kind === "checkbox") {
+            target.checked = value === "true";
+          } else {
+            target.value = value;
+          }
+          target.dispatchEvent(new Event("input", { bubbles: true }));
+          target.dispatchEvent(new Event("change", { bubbles: true }));
+          if (typeof target.focus === "function") {
+            target.focus();
+          }
+        });
+      });
+    })();
+  </script>
+  <script src="{% static 'office/service_payment_rows.js' %}"></script>
+  <script src="{% static 'office/service_link_horizon.js' %}"></script>
+{% endblock %}

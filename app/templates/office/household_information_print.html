@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}戸主情報印刷 | TempleDB{% endblock %}
+{% block extra_head %}
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  .household-sheet { box-sizing: border-box; width: 210mm; max-width: 100%; margin: 20px auto; padding: 12mm; background: #fff; color: #111; border: 1px solid #bbb; font-family: sans-serif; }
+  .household-sheet h2 { font-size: 22pt; margin: 0 0 3mm; }
+  .household-sheet .sheet-meta { font-size: 9pt; margin-bottom: 7mm; }
+  .household-sheet table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 11pt; line-height: 1.55; }
+  .household-sheet th, .household-sheet td { border: 0.5pt solid #111; padding: 3mm; vertical-align: top; text-align: left; overflow-wrap: anywhere; }
+  .household-sheet th { width: 34mm; font-size: 10pt; }
+  .household-sheet tr { break-inside: avoid; }
+  @media print {
+    body { background: #fff !important; color: #111; padding: 0 !important; }
+    .app-quicklinks, .screen-only, .flash-list, .analytics-loading-overlay { display: none !important; }
+    .shell { width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+    .household-sheet { width: 186mm; max-width: none; border: 0; padding: 0; margin: 0; }
+  }
+</style>
+{% endblock %}
+{% block body %}
+<section class="panel screen-only">
+  <h1>戸主情報印刷</h1>
+  <div class="actions">
+    <button class="button" type="button" onclick="window.print()">印刷ダイアログを開く</button>
+    <a class="ghost-button" href="{{ pdf_preview_url }}">PDFで印刷</a>
+    <a class="ghost-button" href="{{ next_url }}">戻る</a>
+  </div>
+</section>
+<article class="household-sheet">
+  <h2>戸主情報</h2>
+  <div class="sheet-meta">台帳ID {{ household_uid }} / 出力日 {{ print_date|date:"Y-m-d" }}</div>
+  <table>
+    <tbody>
+      {% for row in information_rows %}
+      <tr><th scope="row">{{ row.label }}</th><td>{{ row.value|linebreaksbr }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</article>
+{% endblock %}

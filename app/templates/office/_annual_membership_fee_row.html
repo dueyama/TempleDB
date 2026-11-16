@@ -1,0 +1,146 @@
+<form method="post" class="fee-row{% if row.is_paid %} is-paid{% endif %}" data-fee-row>
+  {% csrf_token %}
+  <input type="hidden" name="year" value="{{ year }}">
+  {% if payment_status %}<input type="hidden" name="payment_status" value="{{ payment_status }}">{% endif %}
+  <input type="hidden" name="action" value="save_row">
+  <input type="hidden" name="household_id" value="{{ row.household_id }}">
+  <div class="fee-main">
+    <div class="fee-head">
+      <strong>{{ row.head_name }}</strong>
+      {% if row.head_name_kana %}<div class="muted">{{ row.head_name_kana }}</div>{% endif %}
+      <div class="fee-meta">
+        <span>台帳ID {{ row.household_id }}</span>
+        {% if row.district_name %}<span>{{ row.district_name }}</span>{% endif %}
+        <span>{{ row.delivery_label }}</span>
+        <a
+          class="ghost-button"
+          href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}"
+          style="min-height: 32px; padding: 0 10px;"
+        >
+          台帳へ
+        </a>
+      </div>
+      {% if row.address and not row.district_name %}
+        <div class="muted">{{ row.address }}</div>
+      {% endif %}
+      <div class="fee-meta">
+        {% if row.phone %}<span>{{ row.phone }}</span>{% endif %}
+        <span class="fee-default-amount" data-fee-default>通常額 {{ row.default_amount }}円</span>
+        {% if row.saved_amount %}
+          <span class="fee-status">
+            <strong>保存済み</strong>:
+            {{ row.saved_amount }}円
+            {% if row.saved_received_on %} / {{ row.saved_received_on }}{% endif %}
+          </span>
+        {% endif %}
+      </div>
+      {% if row.is_billable %}
+        <div class="fee-note-inline">
+          <label for="{{ row.form.note.id_for_label }}">{{ row.form.note.label }}</label>
+          <div>
+            {{ row.form.note }}
+            {% if row.form.note.errors %}{{ row.form.note.errors }}{% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="fee-form">
+      {% for hidden in row.form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+      {% if row.is_billable %}
+        {% if row.postal_scan_candidates %}
+          <div class="postal-scan-candidates">
+            {% for candidate in row.postal_scan_candidates %}
+              <div class="postal-scan-candidate">
+                {% if candidate.has_crop %}
+                  <img
+                    src="{% url 'office:annual_membership_fee_postal_scan_file' candidate.id 'crop' %}"
+                    alt="郵便振込 名前欄"
+                  >
+                {% else %}
+                  <span class="callout">切り抜き未作成</span>
+                {% endif %}
+                <div class="postal-scan-candidate-body">
+                  <div class="muted">
+                    {{ candidate.original_filename }}
+                    / {{ candidate.page_number }}枚目
+                    {% if candidate.statement_date %}/ {{ candidate.statement_date }}{% endif %}
+                    / 一致度 {{ candidate.score }}点
+                    {% if candidate.match_reasons %}/ {{ candidate.match_reasons|join:"・" }}{% endif %}
+                  </div>
+                  {% if candidate.receipt_details.paid_amount %}
+                    <div class="muted">
+                      払込金額 {{ candidate.receipt_details.paid_amount }}円
+                      / 口座徴収料金 {{ candidate.receipt_details.collection_fee|default:0 }}円
+                      / 実入金 {{ candidate.receipt_details.net_amount }}円
+                    </div>
+                  {% endif %}
+                  <div class="row-actions">
+                    <a
+                      class="ghost-button"
+                      href="{% url 'office:annual_membership_fee_postal_scan_file' candidate.id 'pdf' %}"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      PDF
+                    </a>
+                    <button
+                      class="button"
+                      type="submit"
+                      name="row_action"
+                      value="confirm_postal_scan:{{ candidate.id }}"
+                    >
+                      この振込を確認して受領
+                    </button>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="fee-toolbar">
+          <div class="fee-toolbar-top">
+            <div class="field-row fee-received-field">
+              <label for="{{ row.form.received_on.id_for_label }}">{{ row.form.received_on.label }}</label>
+              {{ row.form.received_on }}
+              {% if row.form.received_on.errors %}{{ row.form.received_on.errors }}{% endif %}
+            </div>
+            <div class="fee-toolbar-actions">
+              {% if row.is_paid %}
+                <button class="ghost-button" type="submit" name="row_action" value="clear">受領取消</button>
+              {% endif %}
+              <button class="button" type="submit" name="row_action" value="receive">
+                {% if row.is_paid %}受領内容を更新{% else %}受領{% endif %}
+              </button>
+            </div>
+          </div>
+          <div class="fee-toolbar-bottom">
+            <label class="fee-exception-toggle" for="{{ row.form.is_exception.id_for_label }}">
+              {{ row.form.is_exception }}
+              <span>その他</span>
+            </label>
+            <div class="fee-exception-amount-inline">
+              <label for="{{ row.form.amount_override.id_for_label }}">{{ row.form.amount_override.label }}</label>
+              <div>
+                {{ row.form.amount_override }}
+                {% if row.form.amount_override.errors %}{{ row.form.amount_override.errors }}{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="callout">{{ row.billing_note }}</div>
+        {% if row.is_paid %}
+          <div class="row-actions">
+            <button class="ghost-button" type="submit" name="row_action" value="clear">受領取消</button>
+          </div>
+        {% endif %}
+      {% endif %}
+      {% if row.form.non_field_errors %}
+        <div class="callout">{{ row.form.non_field_errors }}</div>
+      {% endif %}
+    </div>
+  </div>
+</form>

@@ -1,0 +1,18 @@
+{% load office_nav %}
+{% build_office_subnav current_page as subnav_groups %}
+{% if subnav_groups %}
+  <nav class="office-subnav" aria-label="同系統ページ">
+    {% for group in subnav_groups %}
+      <div class="office-subnav-group">
+        {% if group.heading %}
+          <div class="office-subnav-heading">{{ group.heading }}</div>
+        {% endif %}
+        <div class="office-subnav-links">
+          {% for link in group.links %}
+            <a class="ghost-button{% if link.is_current %} is-current{% endif %}" href="{{ link.url }}"{% if link.is_current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </nav>
+{% endif %}

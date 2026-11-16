@@ -1,0 +1,42 @@
+[
+  {
+    "code": "memorial",
+    "label": "年忌",
+    "seq": 1
+  },
+  {
+    "code": "chuin",
+    "label": "中陰",
+    "seq": 2
+  },
+  {
+    "code": "hatsubon",
+    "label": "初盆",
+    "seq": 3
+  },
+  {
+    "code": "funeral",
+    "label": "葬儀",
+    "seq": 4
+  },
+  {
+    "code": "bon",
+    "label": "盆",
+    "seq": 5
+  },
+  {
+    "code": "otokoshi",
+    "label": "お取越し",
+    "seq": 6
+  },
+  {
+    "code": "visit",
+    "label": "訪問",
+    "seq": 7
+  },
+  {
+    "code": "other",
+    "label": "その他",
+    "seq": 8
+  }
+]

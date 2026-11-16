@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}取込・照合 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .data-import-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .data-import-grid,
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .data-import-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    .data-import-card,
+    .summary-box {
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      padding: 18px;
+      box-shadow: var(--shadow-card);
+    }
+    .data-import-card {
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
+    .data-import-card h2,
+    .data-import-card p {
+      margin: 0;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 0.98rem;
+      word-break: break-all;
+    }
+    .action-row-inline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: var(--ghost-bg);
+      text-decoration: none;
+      color: inherit;
+    }
+    @media (max-width: 980px) {
+      .data-import-card h2 {
+        font-size: 1.05rem;
+        line-height: 1.45;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="data-import-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="data_imports" %}
+
+    <section class="hero">
+      <div class="eyebrow">Import & Review</div>
+      <h1>取込・照合</h1>
+      <p>外部DB/source の取込管理と、補助CSVからの反映・照合確認をまとめています。</p>
+    </section>
+
+    <section class="data-import-grid">
+      <article class="data-import-card" id="source-history-card" style="grid-column: 1 / -1;">
+        <div class="eyebrow">Provenance</div>
+        <h2>取込元・履歴情報</h2>
+        <p>現在の運用DBがどの取込元から始まったかを確認するための管理情報です。</p>
+        <div class="meta-row">
+          <div class="summary-box">
+            <div class="label">取込元</div>
+            <div class="value">
+              {% if operational_source_status.label %}
+                {{ operational_source_status.label }}
+              {% elif operational_source_status.source_id %}
+                {{ operational_source_status.source_id }}
+              {% else %}
+                未解決
+              {% endif %}
+            </div>
+          </div>
+          <div class="summary-box">
+            <div class="label">識別子</div>
+            <div class="value">
+              <code>{{ operational_source_status.source_id|default:"未解決" }}</code>
+            </div>
+          </div>
+          <div class="summary-box">
+            <div class="label">状態</div>
+            <div class="value">{{ operational_source_status.status|default:"未解決" }}</div>
+          </div>
+          <div class="summary-box">
+            <div class="label">最新出力</div>
+            <div class="value">
+              {% if operational_latest_export %}
+                <code>{{ operational_latest_export.snapshot_id }}</code>
+              {% else %}
+                まだありません
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% if operational_latest_export.created_at %}
+          <p class="muted">最新出力日時: {{ operational_latest_export.created_at }}</p>
+        {% endif %}
+      </article>
+
+      <article class="data-import-card">
+        <div class="eyebrow">External Source</div>
+        <h2>外部データ取込</h2>
+        <p>MDB などの外部 source 登録、取込実行、ImportBatch、取込時の問題点を確認します。</p>
+        <div class="meta-row">
+          <div class="summary-box">
+            <div class="label">対象</div>
+            <div class="value">外部DB / source</div>
+          </div>
+          <div class="summary-box">
+            <div class="label">履歴</div>
+            <div class="value">ImportBatch / issues</div>
+          </div>
+        </div>
+        <p>
+          <a class="button" href="{% url 'imports:console' %}">外部データ取込を開く</a>
+        </p>
+      </article>
+
+      <article class="data-import-card">
+        <div class="eyebrow">Hand Delivery</div>
+        <h2>手配り名簿取込</h2>
+        <p>補助CSV <code>手配り-表1.csv</code> から、地区定義、地区所属、地区役員、郵便番号・住所・電話番号を反映します。</p>
+        <div class="meta-row">
+          <div class="summary-box" style="grid-column: 1 / -1;">
+            <div class="label">検出した CSV</div>
+            <div class="value">{{ hand_delivery_csv_path|default:"未検出" }}</div>
+          </div>
+        </div>
+        <form method="post" action="{% url 'office:import_hand_delivery_districts' %}">
+          {% csrf_token %}
+          {% if hand_delivery_candidates %}
+            <label class="field" style="margin-bottom: 12px; display: grid; gap: 6px; max-width: 460px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">対象フォルダ</span>
+              <select name="hand_delivery_folder">
+                {% for candidate in hand_delivery_candidates %}
+                  <option value="{{ candidate.folder_name }}" {% if candidate.folder_name == hand_delivery_folder %}selected{% endif %}>
+                    {{ candidate.folder_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </label>
+          {% endif %}
+          <div class="action-row-inline">
+            <button class="button" type="submit">手配り名簿を反映</button>
+            <a class="ghost-button" href="{% url 'office:hand_delivery_review' %}{% if hand_delivery_folder %}?hand_delivery_folder={{ hand_delivery_folder|urlencode }}{% endif %}">照合結果を見る</a>
+          </div>
+        </form>
+      </article>
+
+      <article class="data-import-card">
+        <div class="eyebrow">Postal</div>
+        <h2>郵送名簿取込</h2>
+        <p>補助CSV <code>郵送（遠隔地門徒＋婦人会）-表1.csv</code> から、郵送区分と郵便番号・住所・電話番号を反映します。</p>
+        <div class="meta-row">
+          <div class="summary-box" style="grid-column: 1 / -1;">
+            <div class="label">検出した CSV</div>
+            <div class="value">{{ postal_csv_path|default:"未検出" }}</div>
+          </div>
+        </div>
+        <form method="post" action="{% url 'office:import_postal_assignments' %}">
+          {% csrf_token %}
+          {% if postal_candidates %}
+            <label class="field" style="margin-bottom: 12px; display: grid; gap: 6px; max-width: 460px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">対象フォルダ</span>
+              <select name="postal_folder">
+                {% for candidate in postal_candidates %}
+                  <option value="{{ candidate.folder_name }}" {% if candidate.folder_name == postal_folder %}selected{% endif %}>
+                    {{ candidate.folder_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </label>
+          {% endif %}
+          <div class="action-row-inline">
+            <button class="button" type="submit">郵送名簿を反映</button>
+            <a class="ghost-button" href="{% url 'office:postal_review' %}{% if postal_folder %}?postal_folder={{ postal_folder|urlencode }}{% endif %}">照合結果を見る</a>
+            <a class="ghost-button" href="{% url 'office:postal_compare' %}{% if postal_folder %}?postal_folder={{ postal_folder|urlencode }}{% endif %}">DBと比較</a>
+            <a class="ghost-button" href="{% url 'office:postal_labels' %}">郵送ラベルを印刷</a>
+          </div>
+        </form>
+      </article>
+
+    </section>
+  </div>
+{% endblock %}

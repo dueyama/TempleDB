@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}年回表配布準備 | TempleDB{% endblock %}
+{% block extra_head %}
+<style>
+  .distribution-shell { display: grid; gap: 22px; }
+  .distribution-options, .distribution-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .distribution-options { padding: 18px; border: 1px solid var(--line); background: var(--panel-bg); }
+  .distribution-options input[type="number"] { width: 7em; padding: 9px; font: inherit; }
+  .distribution-options label { display: inline-flex; align-items: center; gap: 8px; }
+  .distribution-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .distribution-card, .distribution-detail { padding: 20px; border: 1px solid var(--line); background: var(--panel-bg); }
+  .distribution-card h2, .distribution-detail h2 { margin: 0 0 12px; }
+  .distribution-count { font-size: 1.7rem; margin: 8px 0; }
+  .distribution-help { color: var(--muted); line-height: 1.7; }
+  .distribution-district { padding: 16px 0; border-top: 1px solid var(--line); }
+  .distribution-district header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .distribution-district h3 { margin: 0; }
+  .distribution-households { display: grid; gap: 8px; margin: 14px 0 0; padding-left: 1.4em; }
+  .distribution-warning { border: 1px solid var(--warning-line); background: var(--warning-bg); padding: 18px; }
+  #unknown-households { scroll-margin-top: 180px; }
+  @media (max-width: 760px) {
+    .distribution-cards { grid-template-columns: 1fr; }
+    .distribution-options { align-items: flex-start; flex-direction: column; }
+    .distribution-options .button, .distribution-card .button { width: 100%; }
+  }
+</style>
+{% endblock %}
+{% block body %}
+<div class="distribution-shell">
+  {% include "includes/office_nav.html" with current_section="distribution" %}
+  {% include "includes/office_subnav.html" with current_page="memorial_distribution" %}
+  <section class="hero">
+    <h1>年回表配布準備</h1>
+    <p>地区リストと年回表を配る順番にまとめます。片面・A4で印刷します。</p>
+  </section>
+  <form method="get" class="distribution-options">
+    <label for="distribution-year">対象年 <input type="number" id="distribution-year" name="year" min="1900" max="2100" value="{{ target_year }}" required>年</label>
+    <input type="hidden" name="include_reference_year" value="0">
+    <label><input type="checkbox" name="include_reference_year" value="1" {% if include_reference_year %}checked{% endif %}>翌年分も空き行に参考表示する</label>
+    <button type="submit" class="button">内訳を確認</button>
+  </form>
+  <div class="distribution-actions">
+    <a class="ghost-button" href="{% url 'office:memorial_notices' %}?{{ selection_query }}">年回表の文面・単独印刷</a>
+    <a class="ghost-button" href="{% url 'office:district_member_sheets' %}">地区メンバー一覧メモ</a>
+    <a class="ghost-button" href="{% url 'office:postal_labels' %}">郵送ラベル</a>
+  </div>
+  <p class="distribution-help">{{ target_year }}年の年回表の対象は {{ household_count }}軒です。年回表は保存済みの文面・文字サイズで作成します。対象年に年回がなく翌年だけあるお宅は年回表の対象に含めません。完了済みの扱いは既存の年回表と同じです。</p>
+  {% if available %}
+    <div class="distribution-cards">
+      <section class="distribution-card">
+        <h2>地区手配り</h2>
+        <p class="distribution-count">{{ district_count }}地区 <small>／ 年回表 {{ district_household_count }}軒</small></p>
+        <p class="distribution-help">全地区を設定順に、地区リスト → 同じ順の年回表 → 次の地区と印刷します。年回案内がない地区はリストだけを出します。年回表の上端には地区名だけを付けます。</p>
+        {% if district_count %}
+          <div class="distribution-actions">
+            <a class="button" href="{% url 'office:memorial_distribution_print' %}?{{ selection_query }}&amp;group=district">地区別まとめ印刷</a>
+            {% if district_with_notices_count %}<a class="ghost-button" href="{% url 'office:memorial_distribution_print' %}?{{ selection_query }}&amp;group=district_with_notices">年回案内がある地区だけ印刷（{{ district_with_notices_count }}地区）</a>{% endif %}
+            {% if district_without_notices_count %}<a class="ghost-button" href="{% url 'office:memorial_distribution_print' %}?{{ selection_query }}&amp;group=district_without_notices">年回案内がない地区だけ印刷（{{ district_without_notices_count }}地区）</a>{% endif %}
+          </div>
+        {% else %}<p>対象はありません。</p>{% endif %}
+      </section>
+      <section class="distribution-card">
+        <h2>郵送</h2>
+        <p class="distribution-count">{{ postal_household_count }}軒</p>
+        <p class="distribution-help">年回表だけをまとめます。上端の目印は「○」です。地区停止による郵送も含みます。</p>
+        {% if postal_household_count %}<a class="button" href="{% url 'office:memorial_distribution_print' %}?{{ selection_query }}&amp;group=postal">郵送分の年回表を印刷</a>{% else %}<p>対象はありません。</p>{% endif %}
+      </section>
+      <section class="distribution-card">
+        <h2>不明</h2>
+        <p class="distribution-count">{{ unknown_household_count }}軒</p>
+        <p class="distribution-help">地区手配り・郵送に分類できないお宅です。配る年回表には目印も「不明」の文字も付けません。</p>
+        {% if unknown_household_count %}
+          <div class="distribution-actions">
+            <a class="ghost-button" href="#unknown-households">不明のお宅一覧（{{ unknown_household_count }}軒）</a>
+            <a class="button" href="{% url 'office:memorial_distribution_print' %}?{{ selection_query }}&amp;group=unknown">不明分の年回表を印刷</a>
+          </div>
+        {% else %}<p>対象はありません。</p>{% endif %}
+      </section>
+    </div>
+    {% if conflict_count %}
+      <section class="distribution-warning">
+        <h2>配布区分の確認が必要です：{{ conflict_count }}軒</h2>
+        <p>地区手配りと郵送の両方に該当するため、まとめ印刷から除いています。戸主の配布設定を確認してください。</p>
+        <ul class="distribution-households">{% for packet in conflicts %}<li><a href="{% url 'office:household_browser' %}?household_id={{ packet.household_id|urlencode }}&amp;focus=detail">{{ packet.name }}</a> — {{ packet.reason }}</li>{% endfor %}</ul>
+      </section>
+    {% endif %}
+    {% if district_groups %}
+      <section class="distribution-detail">
+        <h2>地区ごとの内訳</h2>
+        <p class="distribution-help">年回案内の有無にかかわらず、全地区を地区設定の順で並べています。地区リストには従来どおり全員を載せ、年回表を添えるお宅に「{{ marker_labels.memorial_notice }}」を付けます。</p>
+        {% for group in district_groups %}
+          <article class="distribution-district">
+            <header><h3>{{ group.district_name }} — 年回表 {{ group.household_count }}軒</h3><a class="ghost-button" href="{% url 'office:memorial_distribution_print' %}?{{ selection_query }}&amp;group=district&amp;district={{ group.district_id }}">この地区を印刷</a></header>
+            {% if group.packets %}
+              <details><summary>年回表を添えるお宅</summary><ol class="distribution-households">{% for packet in group.packets %}<li><a href="{% url 'office:household_browser' %}?household_id={{ packet.household_id|urlencode }}&amp;focus=detail">{{ packet.name }}</a></li>{% endfor %}</ol></details>
+            {% else %}<p class="distribution-help">年回案内なし（地区リストのみ印刷）</p>{% endif %}
+          </article>
+        {% endfor %}
+      </section>
+    {% endif %}
+    {% if postal_packets %}
+      <section class="distribution-detail"><h2>郵送のお宅</h2><details><summary>{{ postal_household_count }}軒を確認</summary><ol class="distribution-households">{% for packet in postal_packets %}<li><a href="{% url 'office:household_browser' %}?household_id={{ packet.household_id|urlencode }}&amp;focus=detail">{{ packet.name }}</a></li>{% endfor %}</ol></details></section>
+    {% endif %}
+    {% if unknown_packets %}
+      <section class="distribution-detail" id="unknown-households"><h2>不明のお宅一覧</h2><p class="distribution-help">名前を押すと、その家の詳細を開きます。理由はこの確認画面だけに表示します。</p><ul class="distribution-households">{% for packet in unknown_packets %}<li><a href="{% url 'office:household_browser' %}?household_id={{ packet.household_id|urlencode }}&amp;focus=detail">{{ packet.name }}</a> — {{ packet.reason }}</li>{% endfor %}</ul></section>
+    {% endif %}
+  {% else %}
+    <div class="callout">{% firstof message error_message "対象の年回表はありません。" %}</div>
+  {% endif %}
+</div>
+{% endblock %}

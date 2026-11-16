@@ -1,0 +1,8 @@
+# Development tools from the Mac environment, observed 2026-09-22.
+# Combine with runtime.txt; never install this scope in production.
+pytest==8.4.2
+pytest-django==4.12.0
+ruff==0.11.13
+iniconfig==2.3.0
+pluggy==1.6.0
+pygments==2.20.0

@@ -1,0 +1,5 @@
+{
+  "intro_text": "{{YEAR_LABEL}} に当たるご法事をお勤めいたしたく、下記の通りご案内申し上げます。",
+  "outro_text": "ご都合をお知らせいただけましたら幸甚に存じます。",
+  "signature_text": "{{TEMPLE_SECT}}　{{TEMPLE_NAME}}\n{{TEMPLE_ADDRESS}}\n電話　{{TEMPLE_PHONE}}"
+}

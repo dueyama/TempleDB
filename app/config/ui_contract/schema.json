@@ -1,0 +1,342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://templedb.local/ui-contract/v2/schema.json",
+  "title": "TempleDB UI Contract v2",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/screen"
+    },
+    {
+      "$ref": "#/$defs/workflow"
+    },
+    {
+      "$ref": "#/$defs/component"
+    }
+  ],
+  "$defs": {
+    "action": {
+      "type": "object",
+      "required": [
+        "action_id",
+        "label",
+        "intent",
+        "method",
+        "mutating",
+        "risk_level",
+        "confirmation"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "intent": {
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "GET",
+            "POST",
+            "CLIENT"
+          ]
+        },
+        "route_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mutating": {
+          "type": "boolean"
+        },
+        "risk_level": {
+          "enum": [
+            "none",
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "confirmation": {
+          "enum": [
+            "none",
+            "inline",
+            "browser_confirm",
+            "server_confirm"
+          ]
+        },
+        "result": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "component": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "version",
+        "component_id",
+        "purpose",
+        "structure",
+        "usage"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "component"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "component_id": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "structure": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "usage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "region": {
+      "type": "object",
+      "required": [
+        "region_id",
+        "role",
+        "priority"
+      ],
+      "properties": {
+        "region_id": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "primary",
+            "secondary",
+            "supporting"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "semanticNode": {
+      "type": "object",
+      "required": [
+        "node_id",
+        "kind",
+        "role"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "primary",
+            "secondary",
+            "supporting"
+          ]
+        },
+        "component": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/semanticNode"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "screen": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "version",
+        "dsl_version",
+        "screen_id",
+        "title",
+        "route_name",
+        "route_path",
+        "template",
+        "purpose",
+        "primary_models",
+        "layout",
+        "regions",
+        "actions",
+        "states",
+        "data_bindings",
+        "workflow_refs",
+        "semantic_tree",
+        "visual_signature",
+        "state_matrix",
+        "evidence"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "screen"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "dsl_version": {
+          "const": 2
+        },
+        "screen_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "route_name": {
+          "type": "string"
+        },
+        "route_path": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "primary_models": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "layout": {
+          "type": "object"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/region"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/action"
+          }
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "data_bindings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "workflow_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "semantic_tree": {
+          "$ref": "#/$defs/semanticNode"
+        },
+        "visual_signature": {
+          "type": "object"
+        },
+        "state_matrix": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": [
+            "source_map_ref",
+            "template_paths"
+          ],
+          "properties": {
+            "source_map_ref": {
+              "type": "string"
+            },
+            "template_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "workflow": {
+      "type": "object",
+      "required": [
+        "contract_type",
+        "version",
+        "workflow_id",
+        "title",
+        "entry_points",
+        "steps",
+        "completion"
+      ],
+      "properties": {
+        "contract_type": {
+          "const": "workflow"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "workflow_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "entry_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "completion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

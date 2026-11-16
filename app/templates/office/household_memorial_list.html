@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if print_mode %}年回予定表{% else %}今後の法要一覧{% endif %} | TempleDB</title>
+    <style>
+      :root {
+        --ink: #111;
+        --line: #222;
+        --muted: #5f5f5f;
+        --panel: rgba(255, 255, 255, 0.92);
+        --panel-line: #d0d0d0;
+        --paper: #fff;
+        --list-bg: #f5f2eb;
+        --list-panel: #fff;
+        --list-soft: #ede7dc;
+        --list-accent: #1f463d;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+        background: #efede7;
+      }
+      a { color: inherit; }
+      button,
+      input {
+        font: inherit;
+      }
+      .button,
+      .ghost-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 14px;
+        text-decoration: none;
+      }
+      .button {
+        border: 1px solid #111;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+      }
+      .ghost-button {
+        border: 1px solid var(--panel-line);
+        background: #fff;
+      }
+      .filter-form {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      .field label {
+        font-size: 0.84rem;
+        letter-spacing: 0.04em;
+      }
+      .field input {
+        width: 100%;
+        min-height: 40px;
+        padding: 0 10px;
+        border: 1px solid var(--panel-line);
+        background: #fff;
+      }
+      .empty-state {
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 12mm 10mm;
+        text-align: center;
+        line-height: 1.9;
+      }
+      .list-shell,
+      .list-shell button,
+      .list-shell input {
+        font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+      }
+      .list-shell {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+      }
+      .list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .list-title-block {
+        min-width: 0;
+      }
+      .list-eyebrow {
+        margin: 0 0 6px;
+        color: var(--list-accent);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .list-header h1 {
+        margin: 0;
+        font-size: 1.55rem;
+        line-height: 1.35;
+      }
+      .list-description {
+        margin: 8px 0 0;
+        color: #3f3f3f;
+        line-height: 1.7;
+        font-size: 0.94rem;
+      }
+      .list-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+        flex: 0 0 auto;
+      }
+      .list-panel {
+        display: grid;
+        grid-template-columns: minmax(220px, 280px) 1fr;
+        gap: 16px;
+        padding: 16px;
+        border: 1px solid #d8d1c4;
+        background: var(--list-panel);
+      }
+      .list-panel .filter-form {
+        margin: 0;
+      }
+      .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(120px, 1fr));
+        gap: 10px;
+      }
+      .summary-item {
+        min-width: 0;
+        padding: 12px;
+        background: var(--list-soft);
+      }
+      .summary-item dt {
+        margin: 0 0 4px;
+        color: #5d574d;
+        font-size: 0.78rem;
+      }
+      .summary-item dd {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+      .memorial-list {
+        border: 1px solid #d8d1c4;
+        background: var(--list-panel);
+      }
+      .list-table-head,
+      .memorial-row {
+        display: grid;
+        grid-template-columns: 48px minmax(110px, 0.8fr) minmax(160px, 1.25fr) minmax(160px, 1.2fr) minmax(84px, 0.6fr) minmax(145px, 1fr) minmax(72px, 0.5fr);
+        gap: 0;
+      }
+      .list-table-head {
+        border-bottom: 1px solid #d8d1c4;
+        background: #e4ddd0;
+        color: #3f392f;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      .list-table-head div,
+      .memorial-row > div {
+        min-width: 0;
+        padding: 10px;
+        border-right: 1px solid #e2dbce;
+      }
+      .list-table-head div:last-child,
+      .memorial-row > div:last-child {
+        border-right: 0;
+      }
+      .memorial-row {
+        border-bottom: 1px solid #e2dbce;
+      }
+      .memorial-row:last-child {
+        border-bottom: 0;
+      }
+      .row-index {
+        color: #5d574d;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .row-label {
+        display: none;
+        margin-bottom: 3px;
+        color: #6a6359;
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+      .row-main {
+        display: block;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+      .row-sub {
+        display: block;
+        margin-top: 3px;
+        color: #5d574d;
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+      .completion-detail {
+        grid-column: 2 / -1;
+        border-top: 1px dashed #d8d1c4;
+        border-right: 0 !important;
+        color: #4c2f1b;
+        font-size: 0.84rem;
+        line-height: 1.55;
+      }
+      .completion-status {
+        font-weight: 700;
+      }
+      .app-shell {
+        display: grid;
+        grid-template-columns: minmax(280px, 340px) 1fr;
+        gap: 20px;
+        align-items: start;
+        padding: 20px;
+      }
+      .control-panel {
+        border: 1px solid var(--panel-line);
+        background: var(--panel);
+        padding: 18px;
+      }
+      .control-panel h1 {
+        margin: 0 0 8px;
+        font-size: 1.35rem;
+      }
+      .helper {
+        margin: 0 0 16px;
+        color: #3d3d3d;
+        line-height: 1.7;
+        font-size: 0.94rem;
+      }
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .meta-list {
+        display: grid;
+        gap: 10px;
+      }
+      .meta-item {
+        border-top: 1px solid var(--panel-line);
+        padding-top: 10px;
+      }
+      .meta-item dt {
+        margin-bottom: 4px;
+        color: var(--muted);
+        font-size: 0.76rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .meta-item dd {
+        margin: 0;
+        line-height: 1.6;
+      }
+      .preview-frame {
+        display: grid;
+        gap: 16px;
+        overflow-x: auto;
+      }
+      .paper {
+        width: 190mm;
+        min-height: 277mm;
+        max-width: 100%;
+        margin: 0 auto;
+        background: var(--paper);
+        color: #000;
+        border: 1px solid #b9b9b9;
+        padding: 8mm 7mm 8mm;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      }
+      .paper.page-break {
+        break-after: page;
+        page-break-after: always;
+      }
+      .report-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 4mm;
+      }
+      .report-meta {
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      .report-page-number {
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+      .report-title {
+        margin: 0;
+        text-align: center;
+        font-size: 1.36rem;
+        letter-spacing: 0.06em;
+      }
+      .report-rule {
+        margin: 3mm auto 6mm;
+        width: 64%;
+        min-width: 96mm;
+        border-top: 1px solid var(--line);
+        border-bottom: 3px double var(--line);
+        height: 4px;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 0.77rem;
+      }
+      .report-table thead {
+        display: table-header-group;
+      }
+      .report-table th,
+      .report-table td {
+        padding: 2.2mm 1.6mm;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid var(--line);
+      }
+      .report-table thead th {
+        border-top: 1px solid var(--line);
+        font-weight: 700;
+        text-align: left;
+      }
+      .report-table tbody tr:first-child td {
+        border-top: 0;
+      }
+      .report-table th:nth-child(1),
+      .report-table td:nth-child(1) {
+        width: 4%;
+        padding-right: 1.2mm;
+      }
+      .report-table td:nth-child(1) {
+        text-align: right;
+      }
+      .report-table th:nth-child(2),
+      .report-table td:nth-child(2) {
+        width: 18%;
+      }
+      .report-table th:nth-child(3),
+      .report-table td:nth-child(3) {
+        width: 22%;
+      }
+      .report-table th:nth-child(4),
+      .report-table td:nth-child(4) {
+        width: 19%;
+      }
+      .report-table th:nth-child(5),
+      .report-table td:nth-child(5) {
+        width: 8%;
+        white-space: nowrap;
+        padding-right: 3.4mm;
+      }
+      .report-table td:nth-child(5) {
+        text-align: right;
+      }
+      .report-table th:nth-child(6),
+      .report-table td:nth-child(6) {
+        width: 23%;
+        padding-left: 3.4mm;
+      }
+      .report-table th:nth-child(7),
+      .report-table td:nth-child(7) {
+        width: 6%;
+        white-space: nowrap;
+      }
+      .report-table td:nth-child(7) {
+        text-align: right;
+      }
+      .cell-main {
+        line-height: 1.4;
+      }
+      .cell-main.is-homyo {
+        font-size: 0.74rem;
+        white-space: normal;
+        word-break: break-word;
+      }
+      .cell-main.is-name {
+        font-size: 0.75rem;
+        white-space: normal;
+        word-break: break-word;
+      }
+      .cell-main.is-target-date {
+        white-space: nowrap;
+      }
+      .cell-main.is-date {
+        font-size: 0.72rem;
+        white-space: nowrap;
+      }
+      .cell-main.is-memorial {
+        font-size: 0.72rem;
+        letter-spacing: 0;
+        white-space: nowrap;
+      }
+      .cell-main.is-age {
+        white-space: nowrap;
+      }
+      .cell-sub {
+        margin-top: 0.6mm;
+        color: #333;
+        font-size: 0.68rem;
+        line-height: 1.3;
+        white-space: nowrap;
+      }
+      .report-table .completion-row td {
+        padding-top: 1.2mm;
+        padding-bottom: 1.6mm;
+        background: #f7f4ee;
+        color: #2f241d;
+        font-size: 0.68rem;
+        line-height: 1.4;
+        text-align: left;
+        white-space: normal;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      @media print {
+        body {
+          min-height: auto;
+          background: #fff;
+        }
+        .app-shell {
+          display: block;
+          padding: 0;
+        }
+        .control-panel {
+          display: none;
+        }
+        .preview-frame {
+          gap: 0;
+          overflow: visible;
+        }
+        .paper {
+          width: auto;
+          max-width: none;
+          min-height: 0;
+          margin: 0;
+          border: 0;
+          padding: 0;
+          box-shadow: none;
+        }
+        .paper:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+      }
+      @media (max-width: 1180px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+        .is-print-preview .preview-frame {
+          justify-items: start;
+        }
+        .is-print-preview .paper {
+          width: 190mm;
+          max-width: none;
+        }
+      }
+      @media (max-width: 840px) {
+        .list-shell {
+          padding: 16px;
+        }
+        .list-header {
+          display: grid;
+        }
+        .list-actions {
+          justify-content: stretch;
+        }
+        .list-actions .button,
+        .list-actions .ghost-button {
+          flex: 1 1 180px;
+        }
+        .list-panel {
+          grid-template-columns: 1fr;
+        }
+        .summary-strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 720px) {
+        .summary-strip {
+          grid-template-columns: 1fr;
+        }
+        .list-table-head {
+          display: none;
+        }
+        .memorial-row {
+          grid-template-columns: 42px 1fr;
+          padding: 10px 0;
+        }
+        .memorial-row > div {
+          border-right: 0;
+          padding: 5px 12px;
+        }
+        .row-index {
+          grid-row: 1 / span 7;
+          padding-top: 7px;
+          text-align: center;
+        }
+        .completion-detail {
+          grid-column: 2;
+        }
+        .row-label {
+          display: block;
+        }
+        .is-print-preview .app-shell {
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body class="{% if print_mode %}is-print-preview{% else %}is-list-view{% endif %}">
+    {% if print_mode %}
+      <div class="app-shell">
+        <aside class="control-panel">
+          <h1>年回予定表</h1>
+          <p class="helper">印刷用の A4 帳票プレビューです。通常一覧へ戻って内容を確認してから、必要なときだけ印刷できます。</p>
+          {% if household %}
+            <form class="filter-form" method="get">
+              <input type="hidden" name="print" value="1">
+              <div class="field">
+                <label for="start-date">開始日</label>
+                <input id="start-date" type="date" name="start" value="{{ selected_start_date }}">
+              </div>
+              <button class="button" type="submit">この開始日で表示</button>
+            </form>
+          {% endif %}
+          <div class="actions">
+            <button class="button" type="button" onclick="window.print()">印刷ダイアログを開く</button>
+            <a class="ghost-button" href="{{ list_url }}">一覧に戻る</a>
+            {% if household %}
+              <a class="ghost-button" href="{% url 'office:household_browser' %}?household_id={{ household.household_id }}&focus=detail">戸主ブラウザに戻る</a>
+            {% else %}
+              <a class="ghost-button" href="{% url 'office:household_browser' %}">戸主ブラウザに戻る</a>
+            {% endif %}
+          </div>
+          <dl class="meta-list">
+            <div class="meta-item">
+              <dt>戸主</dt>
+              <dd>{{ household.name|default:"-" }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>開始日</dt>
+              <dd>{{ selected_start_date|default:"-" }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>回忌件数</dt>
+              <dd>{{ entry_count|default:0 }}件</dd>
+            </div>
+            <div class="meta-item">
+              <dt>故人数</dt>
+              <dd>{{ person_count|default:0 }}名</dd>
+            </div>
+            <div class="meta-item">
+              <dt>ページ数</dt>
+              <dd>{{ page_count|default:0 }}頁</dd>
+            </div>
+          </dl>
+        </aside>
+        <main class="preview-frame">
+          {% if available %}
+            {% if pages %}
+              {% for page in pages %}
+                <section class="paper{% if not forloop.last %} page-break{% endif %}">
+                  <div class="report-top">
+                    <div class="report-meta">
+                      <div>出力日 {{ generated_on|date:"Y-m-d" }}</div>
+                      <div>開始日 {{ selected_start_date }}</div>
+                    </div>
+                    <div class="report-page-number">{{ page.number }} 頁</div>
+                  </div>
+                  <h1 class="report-title">年回予定表 【 {{ household.name }} 様 】</h1>
+                  <div class="report-rule"></div>
+                  <table class="report-table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>年回日</th>
+                        <th>{{ deceased_labels.kaimyo }}</th>
+                        <th>{{ deceased_labels.zokumyo }}</th>
+                        <th>回忌</th>
+                        <th>命日</th>
+                        <th>享年</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for entry in page.entries %}
+                        <tr>
+                          <td>{{ entry.index }}</td>
+                          <td>
+                            <div class="cell-main is-target-date">{{ entry.target_date }}</div>
+                          </td>
+                          <td>
+                            <div class="cell-main is-homyo">{{ entry.kaimyo|default:"-" }}</div>
+                          </td>
+                          <td>
+                            <div class="cell-main is-name">{{ entry.name }}</div>
+                            {% if entry.subline %}
+                              <div class="cell-sub">{{ entry.subline }}</div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            <div class="cell-main is-memorial">{{ entry.memorial_label_compact|default:entry.memorial_label }}</div>
+                          </td>
+                          <td>
+                            <div class="cell-main is-date">{{ entry.death_date_display|default:entry.death_date }}</div>
+                          </td>
+                          <td>
+                            <div class="cell-main is-age">{{ entry.age_display|default:"-" }}</div>
+                          </td>
+                        </tr>
+                        {% if entry.is_completed %}
+                          <tr class="completion-row">
+                            <td colspan="7">
+                              <span class="completion-status">{{ entry.completion_status_label|default:"勤修済み" }}</span>
+                              {% if entry.completion_note %} — {{ entry.completion_note }}{% endif %}
+                            </td>
+                          </tr>
+                        {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </section>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state">開始日 {{ selected_start_date }} 以降の年回予定はありません。</div>
+            {% endif %}
+          {% else %}
+            <div class="empty-state">{{ message }}</div>
+          {% endif %}
+        </main>
+      </div>
+    {% else %}
+      <main class="list-shell">
+        <header class="list-header">
+          <div class="list-title-block">
+            <p class="list-eyebrow">戸主別</p>
+            <h1>今後の法要一覧{% if household %} - {{ household.name }} 様{% endif %}</h1>
+            <p class="list-description">開始日以降の年回予定を一覧で確認してから、印刷用の年回予定表へ進めます。</p>
+          </div>
+          <div class="list-actions">
+            {% if household %}
+              <a class="button" href="{{ print_url }}">印刷へ進む</a>
+              <a class="ghost-button" href="{% url 'office:household_browser' %}?household_id={{ household.household_id }}&focus=detail">戸主ブラウザに戻る</a>
+            {% else %}
+              <a class="ghost-button" href="{% url 'office:household_browser' %}">戸主ブラウザに戻る</a>
+            {% endif %}
+          </div>
+        </header>
+        <section class="list-panel">
+          {% if household %}
+            <form class="filter-form" method="get">
+              <div class="field">
+                <label for="start-date">開始日</label>
+                <input id="start-date" type="date" name="start" value="{{ selected_start_date }}">
+              </div>
+              <button class="button" type="submit">この開始日で表示</button>
+            </form>
+          {% endif %}
+          <dl class="summary-strip">
+            <div class="summary-item">
+              <dt>開始日</dt>
+              <dd>{{ selected_start_date|default:"-" }}</dd>
+            </div>
+            <div class="summary-item">
+              <dt>回忌件数</dt>
+              <dd>{{ entry_count|default:0 }}件</dd>
+            </div>
+            <div class="summary-item">
+              <dt>故人数</dt>
+              <dd>{{ person_count|default:0 }}名</dd>
+            </div>
+            <div class="summary-item">
+              <dt>印刷ページ数</dt>
+              <dd>{{ page_count|default:0 }}頁</dd>
+            </div>
+          </dl>
+        </section>
+        {% if available %}
+          {% if rows %}
+            <section class="memorial-list" aria-label="今後の法要一覧">
+              <div class="list-table-head">
+                <div></div>
+                <div>年回日</div>
+                <div>{{ deceased_labels.kaimyo }}</div>
+                <div>{{ deceased_labels.zokumyo }}</div>
+                <div>回忌</div>
+                <div>命日</div>
+                <div>享年</div>
+              </div>
+              {% for entry in rows %}
+                <article class="memorial-row">
+                  <div class="row-index">{{ entry.index }}</div>
+                  <div class="row-cell">
+                    <span class="row-label">年回日</span>
+                    <span class="row-main">{{ entry.target_date }}</span>
+                  </div>
+                  <div class="row-cell">
+                    <span class="row-label">{{ deceased_labels.kaimyo }}</span>
+                    <span class="row-main">{{ entry.kaimyo|default:"-" }}</span>
+                  </div>
+                  <div class="row-cell">
+                    <span class="row-label">{{ deceased_labels.zokumyo }}</span>
+                    <span class="row-main">{{ entry.name }}</span>
+                    {% if entry.subline %}
+                      <span class="row-sub">{{ entry.subline }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="row-cell">
+                    <span class="row-label">回忌</span>
+                    <span class="row-main">{{ entry.memorial_label_compact|default:entry.memorial_label }}</span>
+                  </div>
+                  <div class="row-cell">
+                    <span class="row-label">命日</span>
+                    <span class="row-main">{{ entry.death_date_display|default:entry.death_date }}</span>
+                  </div>
+                  <div class="row-cell">
+                    <span class="row-label">享年</span>
+                    <span class="row-main">{{ entry.age_display|default:"-" }}</span>
+                  </div>
+                  {% if entry.is_completed %}
+                    <div class="completion-detail">
+                      <span class="completion-status">{{ entry.completion_status_label|default:"勤修済み" }}</span>
+                      {% if entry.completion_note %} — {{ entry.completion_note }}{% endif %}
+                    </div>
+                  {% endif %}
+                </article>
+              {% endfor %}
+            </section>
+          {% else %}
+            <div class="empty-state">開始日 {{ selected_start_date }} 以降の年回予定はありません。</div>
+          {% endif %}
+        {% else %}
+          <div class="empty-state">{{ message }}</div>
+        {% endif %}
+      </main>
+    {% endif %}
+  </body>
+</html>

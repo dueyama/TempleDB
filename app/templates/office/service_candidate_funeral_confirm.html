@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}初七日を葬儀同日として記録 | TempleDB{% endblock %}
+
+{% block body %}
+  {% include "includes/office_nav.html" with current_section="memorials" %}
+  <section class="hero">
+    <div class="eyebrow">Memorial candidate</div>
+    <h1>初七日を葬儀と一緒に勤めた記録として残す</h1>
+    <p>
+      <code>{{ person.name }}</code> の <code>{{ service_label }}</code> を予定ではなく完了記録として保存します。
+      記録後は法要台帳の未予定候補から外れます。
+    </p>
+  </section>
+
+  <div class="stack">
+    <section class="panel">
+      <div class="eyebrow">Candidate</div>
+      <h2>{{ person.name }}</h2>
+      <dl class="pair-grid">
+        <div class="pair">
+          <dt>家</dt>
+          <dd>{{ household_label }} <span class="muted">#{{ household_id }}</span></dd>
+        </div>
+        <div class="pair">
+          <dt>法要名</dt>
+          <dd>{{ service_label }}</dd>
+        </div>
+        <div class="pair">
+          <dt>種別</dt>
+          <dd>{{ candidate_type }}</dd>
+        </div>
+        <div class="pair">
+          <dt>候補日</dt>
+          <dd>{{ target_date|default:"未設定" }}</dd>
+        </div>
+        {% if funeral_schedule %}
+          <div class="pair">
+            <dt>葬儀記録</dt>
+            <dd>
+              {{ funeral_schedule.scheduled_date|default:funeral_schedule.completed_on|default:"日付未設定" }}
+              {% if funeral_schedule.scheduled_time %} {{ funeral_schedule.scheduled_time }}{% endif %}
+              {% if funeral_schedule.location %} / {{ funeral_schedule.location }}{% endif %}
+            </dd>
+          </div>
+        {% endif %}
+      </dl>
+      <form method="post" style="display: grid; gap: 14px; margin-top: 18px;" data-quicklink-guard-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <input type="hidden" name="service_label" value="{{ service_label }}">
+        <input type="hidden" name="target_date" value="{{ target_date }}">
+        <input type="hidden" name="candidate_type" value="{{ candidate_type }}">
+        <div class="field">
+          <label for="id_completed_on">実施日</label>
+          <input id="id_completed_on" name="completed_on" type="date" value="{{ completed_on }}">
+        </div>
+        <div class="field">
+          <label for="id_record_note">記録メモ</label>
+          <textarea id="id_record_note" name="record_note" rows="4">{{ default_note }}</textarea>
+        </div>
+        <div class="actions">
+          <button class="button" type="submit" data-quicklink-save>葬儀と一緒に記録</button>
+          <a class="ghost-button" href="{{ next_url }}">戻る</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

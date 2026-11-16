@@ -1,0 +1,719 @@
+{% extends "base.html" %}
+
+{% block title %}護持会費 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .dues-shell {
+      display: grid;
+      gap: 24px;
+    }
+    .dues-actions,
+    .year-switch,
+    .summary-grid,
+    .row-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .dues-workspace {
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+    .dues-workspace.no-sidebar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .dues-sidebar {
+      position: sticky;
+      top: 16px;
+      align-self: start;
+    }
+    .dues-sidebar .dues-card {
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+    }
+    .dues-main {
+      display: grid;
+      gap: 24px;
+    }
+    .field-row {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .field-row label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field-row input,
+    .field-row select,
+    .field-row textarea {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 8px 10px;
+      color: inherit;
+    }
+    .field-row textarea {
+      min-height: 52px;
+      resize: vertical;
+    }
+    .field-row input[type="checkbox"] {
+      width: auto;
+      min-height: 0;
+      padding: 0;
+    }
+    .jump-groups,
+    .jump-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .jump-groups {
+      display: grid;
+      gap: 16px;
+    }
+    .jump-group {
+      display: grid;
+      gap: 8px;
+    }
+    .jump-group-title {
+      font-size: .92rem;
+      color: var(--muted);
+    }
+    .jump-links {
+      display: grid;
+      gap: 8px;
+    }
+    .jump-links.is-kana {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .jump-links .ghost-button {
+      width: 100%;
+      justify-content: flex-start;
+      white-space: normal;
+    }
+    .jump-links.is-kana .ghost-button {
+      justify-content: center;
+      padding: 0;
+      min-height: 38px;
+    }
+    .summary-box,
+    .dues-card,
+    .fee-row {
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.92);
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box,
+    .dues-card {
+      padding: 18px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+    .summary-box.is-active-filter {
+      border-color: #8f5838;
+      box-shadow: 0 10px 30px rgba(92, 47, 25, 0.14);
+    }
+    .summary-value-link {
+      color: #7f3215;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .summary-value-link:hover,
+    .summary-value-link:focus-visible {
+      text-decoration-thickness: 2px;
+    }
+    .dues-filtered-list {
+      display: grid;
+      gap: 16px;
+      scroll-margin-top: 24px;
+    }
+    .active-fee-filter {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      border: 1px solid #b98768;
+      background: rgba(255, 247, 238, 0.96);
+    }
+    .active-fee-filter-copy {
+      display: grid;
+      gap: 3px;
+    }
+    .dues-grid {
+      display: grid;
+      gap: 20px;
+    }
+    .dues-section {
+      display: grid;
+      gap: 14px;
+    }
+    .dues-section h2 {
+      margin: 0;
+    }
+    .district-block {
+      display: grid;
+      gap: 12px;
+    }
+    .district-block h3 {
+      margin: 0;
+    }
+    .postal-group {
+      display: grid;
+      gap: 12px;
+      scroll-margin-top: 24px;
+    }
+    .fee-row {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .fee-row.is-paid {
+      border-color: #8bae77;
+      background: rgba(244, 251, 241, 0.96);
+    }
+    .fee-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .fee-head {
+      display: grid;
+      gap: 4px;
+      align-content: start;
+    }
+    .fee-head strong {
+      font-size: 1.06rem;
+    }
+    .fee-meta {
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: .9rem;
+    }
+    .fee-form {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      width: 352px;
+      max-width: 100%;
+      align-content: start;
+      justify-self: start;
+    }
+    .fee-toolbar {
+      display: grid;
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .fee-toolbar-top,
+    .fee-toolbar-bottom {
+      display: grid;
+      width: 100%;
+      gap: 12px;
+      min-width: 0;
+    }
+    .fee-toolbar-top {
+      grid-template-columns: 210px minmax(0, 1fr);
+      align-items: end;
+    }
+    .fee-toolbar-bottom {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+    }
+    .fee-received-field {
+      width: 210px;
+      min-width: 210px;
+      max-width: 210px;
+    }
+    .fee-received-field input {
+      width: 210px;
+    }
+    .fee-toolbar-actions {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      justify-self: end;
+    }
+    .fee-toolbar-actions .button,
+    .fee-toolbar-actions .ghost-button {
+      min-width: 96px;
+      white-space: nowrap;
+    }
+    .fee-note-inline {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+      width: auto;
+      max-width: 100%;
+      justify-self: start;
+    }
+    .fee-note-inline > div {
+      flex: 0 0 160px;
+      min-width: 160px;
+    }
+    .fee-note-inline label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+    .fee-note-inline input {
+      width: 160px;
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 8px 10px;
+      color: inherit;
+    }
+    .fee-exception-toggle {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .fee-exception-amount-inline {
+      display: grid;
+      grid-template-columns: auto 170px;
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+      justify-self: end;
+    }
+    .fee-exception-amount-inline label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+    .fee-exception-amount-inline input {
+      width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 8px 10px;
+      color: inherit;
+    }
+    .fee-default-amount {
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .fee-status {
+      font-size: .9rem;
+      color: var(--muted);
+    }
+    .fee-status strong {
+      color: inherit;
+    }
+    .postal-scan-candidates {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.62);
+    }
+    .postal-scan-candidate {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+    .postal-scan-candidate img {
+      width: 110px;
+      max-width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .postal-scan-candidate-body {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    @media (max-width: 900px) {
+      .dues-workspace,
+      .dues-workspace.no-sidebar {
+        grid-template-columns: 1fr;
+      }
+      .dues-sidebar {
+        position: static;
+      }
+      .fee-main {
+        grid-template-columns: 1fr;
+      }
+      .fee-toolbar {
+        gap: 10px;
+        width: 100%;
+      }
+      .fee-toolbar-top,
+      .fee-toolbar-bottom {
+        grid-template-columns: 1fr;
+      }
+      .fee-toolbar-actions {
+        justify-content: flex-start;
+        justify-self: start;
+      }
+      .fee-note-inline,
+      .fee-exception-amount-inline {
+        grid-template-columns: 1fr;
+      }
+      .fee-note-inline {
+        display: grid;
+      }
+      .fee-note-inline > div {
+        min-width: 0;
+      }
+      .fee-received-field,
+      .fee-received-field input {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .fee-note-inline,
+      .fee-note-inline input {
+        width: 100%;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="dues-shell">
+    {% include "includes/office_nav.html" with current_section="accounting" %}
+    {% include "includes/office_subnav.html" with current_page="annual_membership_fees" %}
+    <section class="hero">
+      <div class="eyebrow">Membership Fees</div>
+      <h1>{{ year }}年 護持会費</h1>
+      <p>家ごとに当年の護持会費を管理します。通常は <strong>支払済み</strong> のチェックだけで記録し、金額が違うときだけ <strong>例外</strong> を使います。</p>
+      <div class="dues-actions" style="margin-top: 12px;">
+        <a class="button" href="{{ hand_delivery_receipt_url }}">手配り領収書を印刷</a>
+        <a class="ghost-button" href="{{ hand_delivery_check_sheet_url }}">受領チェックシートを印刷</a>
+        <a class="ghost-button" href="{{ hand_delivery_check_sheet_review_url }}">受領チェックを読み取る</a>
+        <a class="ghost-button" href="{{ postal_scan_review_url }}">郵便振込PDF照合</a>
+      </div>
+      <div class="year-switch" style="margin-top: 12px;">
+        {% for candidate_year in available_years %}
+          <a
+            class="ghost-button"
+            href="{% url 'office:annual_membership_fees' %}?year={{ candidate_year }}{% if payment_status %}&amp;payment_status={{ payment_status }}{% endif %}"
+            {% if candidate_year == year %}aria-current="page"{% endif %}
+          >
+            {{ candidate_year }}年
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <article class="summary-box{% if payment_status == 'billable' %} is-active-filter{% endif %}">
+        <div class="label">対象戸数</div>
+        <div class="value">
+          <a
+            class="summary-value-link"
+            href="{{ billable_fees_url }}#membership-fee-list"
+            aria-label="対象戸数 {{ total_households }}戸の一覧を見る"
+            {% if payment_status == 'billable' %}aria-current="page"{% endif %}
+          >{{ total_households }}</a>
+        </div>
+      </article>
+      <article class="summary-box{% if payment_status == 'paid' %} is-active-filter{% endif %}">
+        <div class="label">納付済み</div>
+        <div class="value">
+          <a
+            class="summary-value-link"
+            href="{{ paid_fees_url }}#membership-fee-list"
+            aria-label="納付済み {{ paid_count }}戸の一覧を見る"
+            {% if payment_status == 'paid' %}aria-current="page"{% endif %}
+          >{{ paid_count }}</a>
+        </div>
+      </article>
+      <article class="summary-box{% if payment_status == 'unpaid' %} is-active-filter{% endif %}">
+        <div class="label">未納</div>
+        <div class="value">
+          <a
+            class="summary-value-link"
+            href="{{ unpaid_fees_url }}#membership-fee-list"
+            aria-label="未納 {{ unpaid_count }}戸の一覧を見る"
+            {% if payment_status == 'unpaid' %}aria-current="page"{% endif %}
+          >{{ unpaid_count }}</a>
+        </div>
+      </article>
+      <article class="summary-box">
+        <div class="label">入金合計</div>
+        <div class="value">{{ total_amount }}円</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">今年の既定額</div>
+        <div class="value">{{ default_amount }}円</div>
+      </article>
+    </section>
+
+    <div class="dues-workspace{% if not district_jump_links and not postal_jump_links %} no-sidebar{% endif %}">
+      {% if district_jump_links or postal_jump_links %}
+        <aside class="dues-sidebar">
+          <section class="dues-card">
+            <div class="eyebrow">Jump</div>
+            <h2>一覧ジャンプ</h2>
+            <div class="jump-groups">
+              {% if district_jump_links %}
+                <div class="jump-group">
+                  <div class="jump-group-title">地区</div>
+                  <div class="jump-links">
+                    {% for link in district_jump_links %}
+                      <a class="ghost-button" href="#{{ link.anchor_id }}">{{ link.label }}</a>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+              {% if postal_jump_links %}
+                <div class="jump-group">
+                  <div class="jump-group-title">郵送</div>
+                  <div class="jump-links is-kana">
+                    {% for link in postal_jump_links %}
+                      <a class="ghost-button" href="#{{ link.anchor_id }}">{{ link.label }}</a>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </section>
+        </aside>
+      {% endif %}
+
+      <div class="dues-main">
+        <section class="dues-card">
+          <div class="eyebrow">Default</div>
+          <div class="help-heading-row">
+            <h2>今年の既定額</h2>
+            <div class="help-popover" data-help-popover>
+              <button
+                class="help-popover-button help-popover-button-compact"
+                type="button"
+                aria-controls="dues-default-help"
+                aria-expanded="false"
+                aria-label="今年の既定額の説明"
+                data-help-popover-button
+              >?</button>
+              <div
+                class="help-popover-panel"
+                id="dues-default-help"
+                hidden
+                data-help-popover-panel
+              >
+                <p>通常の家はこの金額を使います。違う額の家だけ、各行で <strong>例外</strong> をチェックして金額を入れます。</p>
+              </div>
+            </div>
+          </div>
+          <form method="post" class="dues-grid">
+            {% csrf_token %}
+            <input type="hidden" name="year" value="{{ year }}">
+            {% if payment_status %}<input type="hidden" name="payment_status" value="{{ payment_status }}">{% endif %}
+            <input type="hidden" name="action" value="save_setting">
+            <div class="fee-exception-grid">
+              {% for field in setting_form.visible_fields %}
+                <div class="field-row">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}{{ field.errors }}{% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            <div class="row-actions">
+              <button class="button" type="submit">今年の既定額を保存</button>
+            </div>
+          </form>
+        </section>
+
+        <div class="dues-filtered-list" id="membership-fee-list">
+          {% if payment_status %}
+            <section class="active-fee-filter" aria-label="護持会費の表示絞り込み">
+              <div class="active-fee-filter-copy">
+                <strong>{{ payment_status_label }}のみ表示中</strong>
+                <span class="muted">{{ filtered_household_count }}件</span>
+              </div>
+              <a class="ghost-button" href="{{ all_fees_url }}#membership-fee-list">すべて表示</a>
+            </section>
+          {% endif %}
+
+          {% if payment_status and filtered_household_count == 0 %}
+            <div class="callout">{{ payment_status_label }}に該当する家はありません。</div>
+          {% endif %}
+
+          <div class="dues-grid">
+          {% if district_groups or not payment_status %}
+          <section class="dues-section" id="dues-districts">
+        <div class="eyebrow">District</div>
+        <div class="help-heading-row">
+          <h2>地区所属</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="dues-district-help"
+              aria-expanded="false"
+              aria-label="地区所属の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="dues-district-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>地区ごとにまとめています。通常は支払済みチェックだけで保存できます。</p>
+            </div>
+          </div>
+        </div>
+        {% for group in district_groups %}
+          <div class="district-block" id="{{ group.anchor_id }}">
+            <h3>{{ group.sort_order }}. {{ group.name }}</h3>
+            {% for row in group.rows %}
+              {% include "office/_annual_membership_fee_row.html" with row=row year=year payment_status=payment_status csrf_token=csrf_token only %}
+            {% endfor %}
+          </div>
+        {% empty %}
+          <div class="callout">地区所属の家はまだありません。</div>
+        {% endfor %}
+          </section>
+          {% endif %}
+
+          {% if postal_groups or not payment_status %}
+          <section class="dues-section" id="dues-postal">
+        <div class="eyebrow">Postal</div>
+        <div class="help-heading-row">
+          <h2>郵送</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="dues-postal-help"
+              aria-expanded="false"
+              aria-label="郵送の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="dues-postal-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>郵送扱いの家です。地区とは別にまとまります。</p>
+            </div>
+          </div>
+        </div>
+        {% for group in postal_groups %}
+          <div class="postal-group" id="{{ group.anchor_id }}">
+            <h3>{{ group.description }}</h3>
+            {% for row in group.rows %}
+              {% include "office/_annual_membership_fee_row.html" with row=row year=year payment_status=payment_status csrf_token=csrf_token only %}
+            {% endfor %}
+          </div>
+        {% empty %}
+          <div class="callout">郵送の家はまだありません。</div>
+        {% endfor %}
+          </section>
+          {% endif %}
+
+          {% if not payment_status %}
+          <section class="dues-section">
+        <div class="eyebrow">Other</div>
+        <div class="help-heading-row">
+          <h2>未設定・請求対象外</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="dues-other-help"
+              aria-expanded="false"
+              aria-label="未設定・その他の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="dues-other-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>婦人会、送付区分未設定、送付しない、地区未設定の家をここへ出します。</p>
+            </div>
+          </div>
+        </div>
+        {% for row in other_rows %}
+          {% include "office/_annual_membership_fee_row.html" with row=row year=year payment_status=payment_status csrf_token=csrf_token only %}
+        {% empty %}
+          <div class="callout">請求対象外の家はありません。</div>
+        {% endfor %}
+          </section>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      document.querySelectorAll("[data-fee-row]").forEach(function (row) {
+        const exception = row.querySelector("[data-fee-exception-toggle]");
+        const amountInput = row.querySelector("[data-fee-exception-amount]");
+        const defaultAmount = row.querySelector("[data-fee-default]");
+        function sync() {
+          const exceptionOn = !!(exception && exception.checked);
+          if (amountInput) {
+            amountInput.disabled = !exceptionOn;
+          }
+          if (defaultAmount) {
+            defaultAmount.style.opacity = exceptionOn ? "0.55" : "1";
+          }
+        }
+        if (exception) exception.addEventListener("change", sync);
+        sync();
+      });
+    })();
+  </script>
+{% endblock %}

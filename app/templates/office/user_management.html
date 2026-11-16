@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}ユーザー管理 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .user-management-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .summary-row,
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-box,
+    .management-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+    .form-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field-help {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .field-errors {
+      margin: 0;
+      padding-left: 18px;
+      color: #9f4d3d;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: #f4ecdf;
+      font-size: .85rem;
+    }
+    .badge.ok {
+      border-color: #7a8e59;
+      background: #f1f8e8;
+    }
+    .inline-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .inline-actions form {
+      margin: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="user-management-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="user_management" %}
+    <section class="hero">
+      <div class="eyebrow">Users</div>
+      <h1>ユーザー管理</h1>
+      <p>ログイン用ユーザーの作成、管理者切替、有効/停止、パスワード再設定を行います。</p>
+      <div class="action-row">
+        <a class="ghost-button" href="/admin/auth/user/">Django Admin で開く</a>
+      </div>
+    </section>
+
+    <section class="summary-row">
+      <article class="summary-box">
+        <div class="label">総ユーザー数</div>
+        <div class="value">{{ user_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">有効ユーザー</div>
+        <div class="value">{{ active_user_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">管理者</div>
+        <div class="value">{{ admin_user_count }}</div>
+      </article>
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Create</div>
+      <h2>ユーザー追加</h2>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_user">
+        <div class="form-grid">
+          <label class="field" for="{{ create_form.username.id_for_label }}">
+            <span>{{ create_form.username.label }}</span>
+            {{ create_form.username }}
+            {% if create_form.username.errors %}
+              <ul class="field-errors">
+                {% for error in create_form.username.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </label>
+          <label class="field" for="{{ create_form.password1.id_for_label }}">
+            <span>{{ create_form.password1.label }}</span>
+            {{ create_form.password1 }}
+            {% if create_form.password1.errors %}
+              <ul class="field-errors">
+                {% for error in create_form.password1.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </label>
+          <label class="field" for="{{ create_form.password2.id_for_label }}">
+            <span>{{ create_form.password2.label }}</span>
+            {{ create_form.password2 }}
+            {% if create_form.password2.errors %}
+              <ul class="field-errors">
+                {% for error in create_form.password2.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </label>
+        </div>
+        <div class="action-row" style="margin-top: 14px;">
+          <label class="field-help">{{ create_form.is_admin }} {{ create_form.is_admin.label }}</label>
+          <label class="field-help">{{ create_form.is_active }} {{ create_form.is_active.label }}</label>
+        </div>
+        {% if create_form.is_admin.help_text %}
+          <p class="field-help">{{ create_form.is_admin.help_text }}</p>
+        {% endif %}
+        {% if create_form.non_field_errors %}
+          <ul class="field-errors" style="margin-top: 12px;">
+            {% for error in create_form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <div style="margin-top: 16px;">
+          <button class="button" type="submit">ユーザーを作成</button>
+        </div>
+      </form>
+    </section>
+
+    {% if selected_password_user and password_form %}
+      <section class="management-card">
+        <div class="eyebrow">Password Reset</div>
+        <h2>パスワード再設定: {{ selected_password_user.username }}</h2>
+        <p class="muted">他ユーザーのパスワードをここで再設定できます。自分のパスワード変更は設定ホームの「自分のパスワード変更」から行えます。</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="set_password">
+          <input type="hidden" name="user_id" value="{{ selected_password_user.id }}">
+          <input type="hidden" name="password_user" value="{{ selected_password_user.id }}">
+          <div class="form-grid">
+            <label class="field" for="{{ password_form.new_password1.id_for_label }}">
+              <span>{{ password_form.new_password1.label }}</span>
+              {{ password_form.new_password1 }}
+              {% if password_form.new_password1.errors %}
+                <ul class="field-errors">
+                  {% for error in password_form.new_password1.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </label>
+            <label class="field" for="{{ password_form.new_password2.id_for_label }}">
+              <span>{{ password_form.new_password2.label }}</span>
+              {{ password_form.new_password2 }}
+              {% if password_form.new_password2.errors %}
+                <ul class="field-errors">
+                  {% for error in password_form.new_password2.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </label>
+          </div>
+          {% if password_form.non_field_errors %}
+            <ul class="field-errors" style="margin-top: 12px;">
+              {% for error in password_form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <div class="action-row" style="margin-top: 16px;">
+            <button class="button" type="submit">パスワードを更新</button>
+            <a class="ghost-button" href="{% url 'office:user_management' %}">閉じる</a>
+          </div>
+        </form>
+      </section>
+    {% endif %}
+
+    <section class="management-card">
+      <div class="eyebrow">Accounts</div>
+      <h2>登録済みユーザー</h2>
+      <p class="muted">自分自身の管理者権限や有効/停止はこの画面からは変更できません。</p>
+      <div class="table-wrap" style="margin-top: 16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>ユーザー名</th>
+              <th>権限</th>
+              <th>状態</th>
+              <th>最終ログイン</th>
+              <th>登録日</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user_row in user_rows %}
+              <tr>
+                <td>
+                  <strong>{{ user_row.username }}</strong>
+                  {% if request.user.pk == user_row.id %}
+                    <div class="muted">現在のログインユーザー</div>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if user_row.is_superuser %}
+                    <span class="badge ok">管理者</span>
+                  {% else %}
+                    <span class="badge">一般</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if user_row.is_active %}
+                    <span class="badge ok">有効</span>
+                  {% else %}
+                    <span class="badge">停止</span>
+                  {% endif %}
+                </td>
+                <td>{{ user_row.last_login|date:"Y-m-d H:i"|default:"未ログイン" }}</td>
+                <td>{{ user_row.date_joined|date:"Y-m-d H:i" }}</td>
+                <td>
+                  <div class="inline-actions">
+                    <form method="post">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="toggle_admin">
+                      <input type="hidden" name="user_id" value="{{ user_row.id }}">
+                      <button class="ghost-button" type="submit">
+                        {% if user_row.is_superuser %}一般にする{% else %}管理者にする{% endif %}
+                      </button>
+                    </form>
+                    <form method="post">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="toggle_active">
+                      <input type="hidden" name="user_id" value="{{ user_row.id }}">
+                      <button class="ghost-button" type="submit">
+                        {% if user_row.is_active %}停止する{% else %}有効にする{% endif %}
+                      </button>
+                    </form>
+                    <a class="ghost-button" href="{% url 'office:user_management' %}?password_user={{ user_row.id }}">パスワード再設定</a>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="muted">登録済みユーザーはまだありません。</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+{% endblock %}

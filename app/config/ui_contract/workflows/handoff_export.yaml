@@ -1,0 +1,40 @@
+contract_type: workflow
+version: 2
+workflow_id: handoff_export
+title: AI引き継ぎパッケージ出力
+entry_points:
+  - settings_home
+steps:
+  - step_id: open_settings
+    intent: Superuser opens settings home.
+    screen_id: settings_home
+  - step_id: request_package
+    intent: Submit the CSRF-protected AI maintenance package form by POST.
+    screen_id: settings_home
+  - step_id: receive_archive
+    intent: Browser downloads application/gzip package.
+    screen_id: settings_home
+completion: Internal tar.gz package is available for trusted Codex-assisted maintenance without exporting individual operational database rows; tracked source may still contain operational references or PII.
+authorization:
+  role: superuser
+  method: POST
+  csrf_required: true
+package_contents:
+  - allowlisted repository source snapshot for maintenance reference
+  - documentation and UI/workflow contract
+  - physical database schema and migration inventory
+  - aggregate model profile and backup status
+package_exclusions:
+  - live database values from household, person, deceased, service, accounting, and other individual operational rows
+  - raw import source files and credential files
+  - database backup or restore payload
+  - private migration-data export
+guardrails:
+  - Export is read-only against the operational database.
+  - Package creation requires a superuser, POST, and CSRF validation.
+  - Source snapshot is maintenance reference, not a database snapshot or fixture source.
+  - Tracked source, tests, migrations, and history may contain operational PII, tenant identity, endpoints, paths, or connection defaults; the package is only for a trusted internal maintainer or AI.
+  - Credential pattern scanning is not PII anonymization or proof that all source text is secret-free.
+  - Aggregate counts cannot be used to rehydrate individual records.
+  - Export is not a restore backup and cannot rehydrate the database.
+  - Private migration-data export is a separate, explicitly authorized workflow.

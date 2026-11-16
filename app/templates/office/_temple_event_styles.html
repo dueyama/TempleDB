@@ -1,0 +1,72 @@
+<style>
+  .temple-events-page,
+  .temple-events-page .temple-event-form {
+    display: grid;
+    gap: 24px;
+  }
+
+  .temple-events-page .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .temple-events-page .temple-filter-form {
+    align-items: end;
+    margin-bottom: 24px;
+  }
+
+  .temple-events-page .temple-panel-actions {
+    margin-top: 24px;
+  }
+
+  .temple-events-page .temple-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .temple-events-page .temple-field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .temple-events-page .temple-field input,
+  .temple-events-page .temple-field select,
+  .temple-events-page .temple-field textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px;
+    border: 1px solid var(--line);
+    background: var(--field-bg);
+    color: var(--ink);
+  }
+
+  .temple-events-page .temple-field input[type="checkbox"] {
+    width: auto;
+    min-height: auto;
+    justify-self: start;
+  }
+
+  .temple-events-page .temple-payment {
+    min-width: 0;
+    margin: 16px 0;
+    padding: 16px;
+    border: 1px solid var(--line);
+  }
+
+  .temple-events-page .temple-payment legend {
+    padding: 0 8px;
+  }
+
+  .temple-events-page .errorlist {
+    color: var(--danger-ink);
+  }
+
+  @media (max-width: 640px) {
+    .temple-events-page .temple-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

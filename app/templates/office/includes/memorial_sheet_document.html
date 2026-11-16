@@ -1,0 +1,85 @@
+<article class="document-blocks">
+  <section class="upper-block">
+    <section class="column person-column">
+      <p class="death-line vertical-text">{{ sheet.death_date_wareki }}往生</p>
+      <p class="homyo vertical-text" style="--homyo-center-offset: {{ sheet.deceased.homyo_center_offset_em }}em;">
+        <span class="homyo-text">
+          {{ sheet.deceased.homyo_display_parts.leading }}{% if sheet.deceased.homyo_display_parts.small %}<span class="homyo-small">{{ sheet.deceased.homyo_display_parts.small }}</span>{% endif %}{{ sheet.deceased.homyo_display_parts.trailing }}
+        </span>
+      </p>
+      <div class="zokumyo-block">
+        {% if sheet.deceased.homyo %}
+          <p class="zokumyo vertical-text">{{ deceased_labels.zokumyo }}　{{ sheet.deceased.zokumyo }}</p>
+        {% else %}
+          <p class="zokumyo vertical-text">　</p>
+        {% endif %}
+        <p class="age-line age-under-name vertical-text">
+          {% if sheet.deceased.age_at_death %}
+            享年{{ sheet.deceased.age_at_death }}{{ sheet.deceased.age_unit }}
+          {% else %}
+            享年未記載
+          {% endif %}
+        </p>
+      </div>
+    </section>
+
+    <section class="column kijitsu-columns">
+      {% for row in sheet.kijitsu_rows %}
+        <div class="kijitsu-col">
+          <p class="kijitsu-label vertical-text">
+            {% if row.label == "満中陰（四十九日）" %}
+              満中陰<br><span class="kijitsu-sub">（四十九日）</span>
+            {% elif row.label == "五七日" %}
+              五七日<br><span class="kijitsu-sub">（三十五日）</span>
+            {% else %}
+              {{ row.label }}
+            {% endif %}
+          </p>
+          <p class="kijitsu-date vertical-text">{{ row.month_day }}（{{ row.weekday }}）</p>
+        </div>
+      {% endfor %}
+    </section>
+    <section class="column temple-column temple-column-upper">
+      <p class="temple-name vertical-text">{{ temple_identity.name }}</p>
+      <p class="temple-phone vertical-text">{{ temple_identity.phone }}</p>
+    </section>
+  </section>
+
+  <section class="lower-block">
+    <section class="column person-column">
+      <p class="death-line vertical-text">{{ sheet.death_date_wareki }}往生</p>
+      <p class="homyo vertical-text" style="--homyo-center-offset: {{ sheet.deceased.homyo_center_offset_em }}em;">
+        <span class="homyo-text">
+          {{ sheet.deceased.homyo_display_parts.leading }}{% if sheet.deceased.homyo_display_parts.small %}<span class="homyo-small">{{ sheet.deceased.homyo_display_parts.small }}</span>{% endif %}{{ sheet.deceased.homyo_display_parts.trailing }}
+        </span>
+      </p>
+      <div class="zokumyo-block">
+        {% if sheet.deceased.homyo %}
+          <p class="zokumyo vertical-text">{{ deceased_labels.zokumyo }}　{{ sheet.deceased.zokumyo }}</p>
+        {% else %}
+          <p class="zokumyo vertical-text">　</p>
+        {% endif %}
+        <p class="age-line age-under-name vertical-text">
+          {% if sheet.deceased.age_at_death %}
+            享年{{ sheet.deceased.age_at_death }}{{ sheet.deceased.age_unit }}
+          {% else %}
+            享年未記載
+          {% endif %}
+        </p>
+      </div>
+    </section>
+
+    <section class="column memorial-columns">
+      {% for row in sheet.memorial_rows %}
+        <div class="memorial-col">
+          <p class="rank vertical-text">{{ row.label }}</p>
+          <p class="year vertical-text">{{ row.year_kanji }}年</p>
+        </div>
+      {% endfor %}
+    </section>
+    <section class="column temple-column temple-column-lower">
+      <p class="temple-name vertical-text">{{ temple_identity.name }}</p>
+      <p class="temple-phone vertical-text">{{ temple_identity.phone }}</p>
+    </section>
+  </section>
+</article>

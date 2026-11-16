@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .transition-shell {
+      display: grid;
+      gap: 22px;
+      max-width: 960px;
+    }
+    .transition-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.94);
+      padding: 22px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .transition-form {
+      display: grid;
+      gap: 18px;
+    }
+    .field-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .field-section {
+      display: grid;
+      gap: 14px;
+    }
+    .field-section h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .field-row {
+      display: grid;
+      gap: 8px;
+    }
+    .field-row label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field-row input,
+    .field-row select,
+    .field-row textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 10px 12px;
+      color: inherit;
+    }
+    .callout {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 14px 16px;
+    }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="transition-shell">
+    <section class="hero">
+      <div class="eyebrow">New Household</div>
+      <h1>{{ title }}</h1>
+      <p>戸主ブラウザから、家と戸主 person をまとめて追加します。</p>
+    </section>
+
+    <section class="transition-card">
+      <form method="post" class="transition-form" data-quicklink-guard-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+
+        <div class="callout">
+          ここでは最初の戸主と家の基本情報だけを作ります。送付区分や詳細な補足は、作成後に戸主レコード編集で続けて調整できます。
+        </div>
+        <div class="field-grid">
+          <div class="field-section">
+            <h3>戸主</h3>
+            {% with field=form.head_name %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.head_name_kana %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.head_gender %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+          </div>
+          <div class="field-section">
+            <h3>家の連絡先</h3>
+            {% with field=form.postal_code %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.address_line1 %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.address_line2 %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.address_line3 %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.phone %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.mobile %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.email %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+          </div>
+          <div class="field-section">
+            <h3>補足</h3>
+            {% with field=form.ledger_category %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="muted">{{ field.help_text }}</div>{% endif %}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.notes %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="button" type="submit" data-quicklink-save>作成する</button>
+          <a class="ghost-button" href="{{ next_url }}">戻る</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

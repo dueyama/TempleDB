@@ -1,0 +1,52 @@
+[Unit]
+Description=TempleDB product staging proxy (Caddy)
+Documentation=file://@WORKSPACE_ROOT@/docs/product_staging_service.md
+Requires=templedb-product-staging.service
+After=templedb-product-staging.service network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=@PROXY_USER@
+Group=@PROXY_GROUP@
+WorkingDirectory=@PRODUCT_STAGING_PROXY_ROOT@
+Environment=TEMPLEDB_PRODUCT_STAGING_PROXY_HOST=127.0.0.1
+Environment=TEMPLEDB_PRODUCT_STAGING_PROXY_PORT=@PRODUCT_STAGING_PROXY_PORT@
+Environment=TEMPLEDB_PRODUCT_STAGING_STATIC_ROOT=@PRODUCT_STAGING_PROXY_ROOT@/static
+Environment=TEMPLEDB_PRODUCT_STAGING_GUNICORN_UPSTREAM=127.0.0.1:@PRODUCT_STAGING_GUNICORN_PORT@
+Environment=XDG_DATA_HOME=@PRODUCT_STAGING_PROXY_STATE_ROOT@/data
+Environment=XDG_CONFIG_HOME=@PRODUCT_STAGING_PROXY_STATE_ROOT@/config
+ExecStartPre=/usr/bin/caddy validate --config @PRODUCT_STAGING_PROXY_ROOT@/Caddyfile --adapter caddyfile
+ExecStart=/usr/bin/caddy run --config @PRODUCT_STAGING_PROXY_ROOT@/Caddyfile --adapter caddyfile
+ExecStartPost=/usr/bin/curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --max-time 3 --output /dev/null http://127.0.0.1:@PRODUCT_STAGING_PROXY_PORT@/login/
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+InaccessiblePaths=-/var/run/postgresql
+ReadWritePaths=@PRODUCT_STAGING_PROXY_STATE_ROOT@
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

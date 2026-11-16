@@ -1,0 +1,1265 @@
+{% extends "base.html" %}
+
+{% block title %}護持会費 郵便振込PDF照合 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .postal-scan-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .postal-scan-actions,
+    .postal-scan-summary,
+    .postal-scan-card-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .postal-scan-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .postal-upload-form {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .postal-upload-form input[type="file"] {
+      max-width: 280px;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 6px 8px;
+      color: inherit;
+    }
+    .postal-scan-card,
+    .summary-box {
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.92);
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .postal-scan-card,
+    .summary-box {
+      padding: 18px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .postal-ocr-progress {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+    }
+    .postal-ocr-progress-head,
+    .postal-ocr-progress-metrics {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .postal-ocr-progress-bar {
+      height: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #f5ebdc;
+    }
+    .postal-ocr-progress-fill {
+      height: 100%;
+      width: 0;
+      background: #6f5d2f;
+      transition: width .2s ease;
+    }
+    .postal-ocr-progress-message {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .postal-ocr-modal[hidden] {
+      display: none;
+    }
+    .postal-ocr-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .postal-ocr-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(39, 30, 21, .48);
+    }
+    .postal-ocr-modal-dialog {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 16px;
+      width: min(560px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      padding: 20px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      box-shadow: 0 24px 70px rgba(39, 30, 21, .28);
+    }
+    .postal-ocr-modal-head {
+      display: grid;
+      gap: 6px;
+    }
+    .postal-ocr-modal-head h2 {
+      margin: 0;
+      font-size: 1.18rem;
+    }
+    .postal-ocr-modal-current {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+      overflow-wrap: anywhere;
+    }
+    .postal-ocr-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    body.postal-ocr-modal-open {
+      overflow: hidden;
+    }
+    .postal-scan-list {
+      display: grid;
+      gap: 16px;
+    }
+    .postal-scan-checked-controls {
+      order: 2;
+      display: flex;
+      justify-content: flex-start;
+    }
+    .postal-scan-card {
+      display: grid;
+      gap: 14px;
+      scroll-margin-top: 96px;
+    }
+    .postal-scan-card[data-postal-scan-status="checked"] {
+      order: 3;
+    }
+    .postal-scan-card[hidden] {
+      display: none;
+    }
+    .postal-scan-card-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+    }
+    .postal-scan-layout {
+      display: grid;
+      grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .postal-page-image,
+    .postal-crop {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .postal-page-image {
+      margin-top: 12px;
+    }
+    .postal-ocr-box {
+      display: grid;
+      gap: 4px;
+      margin: 12px 0;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+    }
+    .postal-ocr-box strong {
+      font-weight: 700;
+    }
+    .postal-receipt-warning {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 8px;
+      padding: 10px 12px;
+      border: 1px solid #c88a2b;
+      background: #fff4d8;
+      color: #65420f;
+    }
+    .postal-scan-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .postal-scan-form label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .postal-scan-form input[type="text"],
+    .postal-scan-form input[type="date"],
+    .postal-scan-form textarea {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 8px 10px;
+      color: inherit;
+    }
+    .postal-scan-form textarea {
+      min-width: min(420px, 100%);
+      min-height: 72px;
+      resize: vertical;
+    }
+    .postal-candidate-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fffdf8;
+    }
+    .postal-candidate-table th,
+    .postal-candidate-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .postal-candidate-table th {
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .postal-candidate-name {
+      display: grid;
+      gap: 3px;
+      min-width: 170px;
+    }
+    .ai-recommendation-badge {
+      width: fit-content;
+      border: 1px solid #8b5f2b;
+      border-radius: 999px;
+      background: #fff4d8;
+      padding: 2px 7px;
+      color: #6c4317;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+    .postal-candidate-contact {
+      display: grid;
+      gap: 4px;
+      min-width: 240px;
+    }
+    .postal-candidate-contact-line {
+      overflow-wrap: anywhere;
+    }
+    .postal-candidate-contact-edit {
+      margin-top: 8px;
+    }
+    .postal-candidate-contact-edit summary {
+      color: var(--accent);
+      cursor: pointer;
+      font-size: .86rem;
+    }
+    .postal-candidate-contact-form {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, minmax(110px, 1fr));
+      margin-top: 8px;
+      max-width: 420px;
+    }
+    .postal-candidate-contact-form label {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    .postal-candidate-contact-form input {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 6px 8px;
+      color: inherit;
+    }
+    .postal-candidate-contact-form .span-2 {
+      grid-column: 1 / -1;
+    }
+    @media (max-width: 900px) {
+      .postal-scan-card-header,
+      .postal-scan-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="postal-scan-shell">
+    {% include "includes/office_nav.html" with current_section="accounting" %}
+    {% include "includes/office_subnav.html" with current_page="annual_membership_fees" %}
+
+    <section class="hero">
+      <div class="eyebrow">Membership Fees / Postal Scans</div>
+      <h1>{{ year }}年 護持会費 郵便振込PDF照合</h1>
+      <div class="postal-scan-actions" style="margin-top: 12px;">
+        <form class="postal-upload-form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="upload_pdfs">
+          <input type="hidden" name="year" value="{{ year }}">
+          <input type="file" name="pdf_files" accept="application/pdf,.pdf" multiple>
+          <button class="button" type="submit">PDFをアップロードして読み込む</button>
+        </form>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="scan_pending">
+          <input type="hidden" name="year" value="{{ year }}">
+          <button class="button" type="submit">未処理PDFを読み込む</button>
+        </form>
+        <form method="post" action="{{ current_url }}" data-ocr-run-form>
+          {% csrf_token %}
+          <input type="hidden" name="action" value="run_ai_ocr">
+          <input type="hidden" name="year" value="{{ year }}">
+          <button class="ghost-button" type="submit" data-ocr-run-button>AI OCRを一括実行</button>
+        </form>
+        <form method="post" action="{{ current_url }}" data-ocr-run-form>
+          {% csrf_token %}
+          <input type="hidden" name="action" value="run_ai_ocr">
+          <input type="hidden" name="year" value="{{ year }}">
+          <input type="hidden" name="force" value="1">
+          <button class="ghost-button" type="submit" data-ocr-run-button>AI OCRを再実行</button>
+        </form>
+        <form method="post" action="{{ current_url }}" id="postal-ocr-stop-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="stop_ai_ocr">
+          <input type="hidden" name="year" value="{{ year }}">
+          <button class="ghost-button" type="submit" data-ocr-stop-button>AI OCRを停止</button>
+        </form>
+        <a class="ghost-button" href="{{ fees_url }}">護持会費へ戻る</a>
+      </div>
+    </section>
+
+    <section
+      class="postal-ocr-progress"
+      data-ocr-progress-panel
+      data-progress-url="{{ ocr_progress_url }}"
+      data-state="{{ ocr_progress.state }}"
+    >
+      <div class="postal-ocr-progress-head">
+        <strong>AI OCR進捗</strong>
+        <span class="postal-ocr-progress-message" data-ocr-progress-message>{{ ocr_progress.message }}</span>
+      </div>
+      <div class="postal-ocr-progress-bar" aria-hidden="true">
+        <div
+          class="postal-ocr-progress-fill"
+          data-ocr-progress-fill
+          style="width: {{ ocr_progress.percent|default:0 }}%;"
+        ></div>
+      </div>
+      <div class="postal-ocr-progress-metrics">
+        <span>進捗 <strong data-ocr-completed>{{ ocr_progress.completed_count|default:0 }}</strong> / <strong data-ocr-total>{{ ocr_progress.total_count|default:0 }}</strong></span>
+        <span>成功 <strong data-ocr-processed>{{ ocr_progress.processed_count|default:0 }}</strong></span>
+        <span>対象外 <strong data-ocr-skipped>{{ ocr_progress.skipped_count|default:0 }}</strong></span>
+        <span>エラー <strong data-ocr-errors>{{ ocr_progress.error_count|default:0 }}</strong></span>
+        <span data-ocr-current>{{ ocr_progress.current_label }}</span>
+      </div>
+    </section>
+
+    <div class="postal-ocr-modal" data-ocr-progress-modal hidden aria-hidden="true">
+      <div class="postal-ocr-modal-backdrop" aria-hidden="true"></div>
+      <section
+        class="postal-ocr-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="postal-ocr-modal-title"
+      >
+        <div class="postal-ocr-modal-head">
+          <h2 id="postal-ocr-modal-title" data-ocr-modal-title>AI OCR実行中</h2>
+          <span class="postal-ocr-progress-message" data-ocr-modal-message>{{ ocr_progress.message }}</span>
+        </div>
+        <div class="postal-ocr-progress-bar" aria-hidden="true">
+          <div
+            class="postal-ocr-progress-fill"
+            data-ocr-modal-fill
+            style="width: {{ ocr_progress.percent|default:0 }}%;"
+          ></div>
+        </div>
+        <div class="postal-ocr-progress-metrics">
+          <span>進捗 <strong data-ocr-modal-completed>{{ ocr_progress.completed_count|default:0 }}</strong> / <strong data-ocr-modal-total>{{ ocr_progress.total_count|default:0 }}</strong></span>
+          <span>成功 <strong data-ocr-modal-processed>{{ ocr_progress.processed_count|default:0 }}</strong></span>
+          <span>対象外 <strong data-ocr-modal-skipped>{{ ocr_progress.skipped_count|default:0 }}</strong></span>
+          <span>エラー <strong data-ocr-modal-errors>{{ ocr_progress.error_count|default:0 }}</strong></span>
+        </div>
+        <p class="postal-ocr-modal-current" data-ocr-modal-current>{{ ocr_progress.current_label }}</p>
+        <div class="postal-ocr-modal-actions">
+          <button class="ghost-button" type="button" data-ocr-modal-stop>AI OCRを停止</button>
+          <button class="button" type="button" data-ocr-modal-dismiss hidden>閉じる</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="postal-scan-summary">
+      <article class="summary-box">
+        <div class="label">未処理</div>
+        <div class="value">{{ pending_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">確認待ち</div>
+        <div class="value">{{ needs_review_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">処理済み</div>
+        <div class="value">{{ checked_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">AI OCR済み</div>
+        <div class="value">{{ ocr_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">PDF置き場</div>
+        <div class="value" style="font-size: .95rem; overflow-wrap: anywhere;">{{ pending_path }}</div>
+      </article>
+    </section>
+
+    {% if not default_amount %}
+      <div class="callout">今年の既定額が未設定です。PDFの払込金額が読めるものは実入金額で受領できます。</div>
+    {% endif %}
+
+    <section class="postal-scan-list" id="postal-scan-worklist">
+      {% if scan_count and not action_required_count %}
+        <div class="callout" data-postal-scans-complete>
+          すべて確認済みです。処理済みの内容は下のボタンから確認できます。
+        </div>
+      {% endif %}
+      {% if checked_count %}
+        <div class="postal-scan-checked-controls">
+          <button
+            class="ghost-button"
+            type="button"
+            data-checked-scans-toggle
+            data-checked-count="{{ checked_count }}"
+            aria-controls="postal-scan-worklist"
+            aria-expanded="false"
+            hidden
+          >
+            処理済み {{ checked_count }}件を表示
+          </button>
+        </div>
+      {% endif %}
+      {% for scan in scans %}
+        <article
+          class="postal-scan-card"
+          id="postal-scan-{{ scan.id }}"
+          data-postal-scan-status="{{ scan.status }}"
+        >
+          <header class="postal-scan-card-header">
+            <div>
+              <div class="eyebrow">{{ scan.status_label }}</div>
+              <h2>{{ scan.original_filename }}</h2>
+              <div class="muted">ページ {{ scan.page_number }} / {{ scan.page_count }}</div>
+              {% if scan.statement_date %}
+                <div class="muted">通知票日付 {{ scan.statement_date }}</div>
+              {% endif %}
+              {% if scan.selected_household_name_snapshot %}
+                <div class="muted">{{ scan.selected_household_name_snapshot }} / {{ scan.confirmed_at }}</div>
+              {% endif %}
+              {% if scan.is_unknown_payment and scan.unknown_payment_note %}
+                <div class="muted">不明入金メモ {{ scan.unknown_payment_note }}</div>
+              {% endif %}
+            </div>
+            <div class="postal-scan-card-actions">
+              <a
+                class="ghost-button"
+                href="{% url 'office:annual_membership_fee_postal_scan_file' scan.id 'pdf' %}"
+                target="_blank"
+                rel="noopener"
+              >
+                元PDF
+              </a>
+              {% if scan.status == "move_error" %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="retry_move">
+                  <input type="hidden" name="year" value="{{ year }}">
+                  <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                  <button class="button" type="submit">PDF移動を再実行</button>
+                </form>
+              {% endif %}
+            </div>
+          </header>
+
+          {% if scan.move_error %}
+            <div class="callout">{{ scan.move_error }}</div>
+          {% endif %}
+
+          <div class="postal-scan-layout">
+            <div>
+              {% if scan.has_crop %}
+                <img
+                  class="postal-crop"
+                  src="{% url 'office:annual_membership_fee_postal_scan_file' scan.id 'crop' %}"
+                  alt="郵便振込 名前欄"
+                >
+              {% else %}
+                <div class="callout">切り抜き未作成</div>
+              {% endif %}
+              {% if scan.has_page_image %}
+                <img
+                  class="postal-page-image"
+                  src="{% url 'office:annual_membership_fee_postal_scan_file' scan.id 'page' %}"
+                  alt="郵便振込 ページ全体"
+                >
+              {% else %}
+                <div class="callout">ページ画像未作成</div>
+              {% endif %}
+            </div>
+            <div>
+              {% if scan.status == "move_error" and scan.payment_id %}
+                <div class="callout">
+                  入金は保存済みです。上部の「PDF移動を再実行」で処理済み配置へ移してから、
+                  必要に応じて確定内容を再編集してください。
+                </div>
+              {% else %}
+                {% if scan.status == "checked" %}
+                <details class="postal-candidate-contact-edit">
+                  <summary>確定内容を再編集</summary>
+                  <div class="callout" style="margin-top: 10px;">
+                    変更を保存するまでは現在の確定内容を維持します。PDFの処理済み配置も変わりません。
+                  </div>
+                {% endif %}
+                {% if scan.has_ocr %}
+                  <div class="postal-ocr-box">
+                    <div><strong>AI OCR</strong> {{ scan.ocr.name|default:"氏名未読" }}</div>
+                    {% if scan.ocr.name_candidates %}
+                      <div class="muted">候補 {{ scan.ocr.name_candidates|join:" / " }}</div>
+                    {% endif %}
+                    {% if scan.ocr.address %}
+                      <div class="muted">{{ scan.ocr.address }}</div>
+                    {% endif %}
+                    {% if scan.ocr.phone %}
+                      <div class="muted">{{ scan.ocr.phone }}</div>
+                    {% endif %}
+                    <div class="muted">
+                      {{ scan.ocr.model }} / confidence {{ scan.ocr.confidence }}
+                    </div>
+                  </div>
+                {% endif %}
+                {% if scan.receipt_details.paid_amount %}
+                  <div class="postal-ocr-box">
+                    <div><strong>払込金額</strong> {{ scan.receipt_details.paid_amount }}円</div>
+                    <div class="muted">口座徴収料金 {{ scan.receipt_details.collection_fee|default:0 }}円</div>
+                    <div class="muted">実入金 {{ scan.receipt_details.net_amount }}円</div>
+                    {% if scan.receipt_details.handling_office_name %}
+                      <div class="muted">
+                        取扱店 {{ scan.receipt_details.handling_office_name }}
+                        {% if scan.receipt_details.handling_office_code %}
+                          （{{ scan.receipt_details.handling_office_code }}）
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+                <form class="postal-scan-form" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="search_scan">
+                  <input type="hidden" name="year" value="{{ year }}">
+                  <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                  <label>
+                    名前検索
+                    <input type="text" name="q" value="{{ scan.candidate_query }}" autocomplete="off">
+                  </label>
+                  <button class="ghost-button" type="submit">検索</button>
+                </form>
+                {% if scan.status == "pending" or scan.status == "needs_review" %}
+                  {% if scan.candidates or scan.handling_office_evidence.rows %}
+                    <form method="post" style="margin-top: 8px;">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="run_ai_reasoning">
+                      <input type="hidden" name="year" value="{{ year }}">
+                      <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                      <button class="ghost-button" type="submit">AIで候補を推理</button>
+                    </form>
+                  {% endif %}
+                {% endif %}
+
+                {% if scan.candidate_notice %}
+                  <div class="callout" role="note">{{ scan.candidate_notice }}</div>
+                {% endif %}
+
+                {% if scan.handling_office_evidence %}
+                  <div class="callout" role="note">
+                    <div><strong>取扱店から推理するための根拠</strong></div>
+                    <div>
+                      票の右側の印字は「取扱店 {{ scan.handling_office_evidence.handling_office_name }}
+                      {% if scan.handling_office_evidence.handling_office_code %}
+                        （{{ scan.handling_office_evidence.handling_office_code }}）
+                      {% endif %}」。
+                      TempleDBの住所に「{{ scan.handling_office_evidence.handling_office_name }}」を含む家は
+                      {{ scan.handling_office_evidence.address_match_count }}件です。
+                    </div>
+                    <ul>
+                      {% for evidence in scan.handling_office_evidence.rows %}
+                        <li>
+                          <strong>{{ evidence.household_name }}</strong>
+                          （台帳ID {{ evidence.legacy_household_id }}）
+                          — {{ evidence.status_label }}
+                          {% if evidence.delivery_method_label %}
+                            <span class="muted"> / {{ evidence.delivery_method_label }}</span>
+                          {% endif %}
+                          {% if evidence.address %}<span class="muted"> / {{ evidence.address }}</span>{% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                    <div class="muted">{{ scan.handling_office_evidence.note }}</div>
+                  </div>
+                {% endif %}
+
+                {% if scan.ai_reasoning %}
+                  <div class="postal-ocr-box" role="note">
+                    <div><strong>AIの推理（候補比較）</strong></div>
+                    {% if scan.ai_reasoning.stale %}
+                      <div class="postal-receipt-warning" role="alert">
+                        <strong>再推理が必要</strong>
+                        <span>{{ scan.ai_reasoning.stale_message }}</span>
+                      </div>
+                    {% elif scan.ai_reasoning.recommendation_valid %}
+                      <div>
+                        推奨候補:
+                        <strong>{{ scan.ai_reasoning.recommended_household_name }}</strong>
+                        （台帳ID {{ scan.ai_reasoning.recommended_household_uid }}）
+                      </div>
+                    {% else %}
+                      <div><strong>一人には絞り込めませんでした。</strong></div>
+                    {% endif %}
+                    {% if scan.ai_reasoning.summary %}<p>{{ scan.ai_reasoning.summary }}</p>{% endif %}
+                    {% if scan.ai_reasoning.candidate_assessments %}
+                      <ul>
+                        {% for assessment in scan.ai_reasoning.candidate_assessments %}
+                          <li>
+                            <strong>{{ assessment.household_name }}</strong>
+                            （台帳ID {{ assessment.household_uid }}）
+                            — {{ assessment.assessment_label }}: {{ assessment.reason }}
+                            <span class="muted"> / {{ assessment.status_label }}</span>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                    {% if scan.ai_reasoning.reasoning_points %}
+                      <div><strong>判断に使った根拠</strong></div>
+                      <ul>
+                        {% for point in scan.ai_reasoning.reasoning_points %}<li>{{ point }}</li>{% endfor %}
+                      </ul>
+                    {% endif %}
+                    {% if scan.ai_reasoning.uncertainties %}
+                      <div class="muted">不確実な点: {{ scan.ai_reasoning.uncertainties|join:" / " }}</div>
+                    {% endif %}
+                    <div class="muted">
+                      {{ scan.ai_reasoning.model }} / AI確信度 {{ scan.ai_reasoning.confidence }}
+                    </div>
+                    <div class="muted">AIは入金を確定していません。最後の確定は人が行います。</div>
+                  </div>
+                {% endif %}
+
+                {% if scan.ai_recommended_candidate and not scan.candidates %}
+                  <div class="callout" role="note">
+                    <div>
+                      <strong>AI推奨候補 {{ scan.ai_recommended_candidate.household_name }}</strong>
+                      （台帳ID {{ scan.ai_recommended_candidate.legacy_household_id }}）
+                    </div>
+                    <div class="muted">
+                      {{ scan.ai_recommended_candidate.delivery_method_label }} /
+                      {{ scan.ai_recommended_candidate.address }}
+                    </div>
+                    {% if scan.ai_recommended_candidate.receipt_warning %}
+                      <div class="postal-receipt-warning" role="note">
+                        <strong>注意</strong>
+                        <span>{{ scan.ai_recommended_candidate.receipt_warning }}</span>
+                      </div>
+                    {% endif %}
+                    {% if scan.ai_recommended_candidate.can_receive_payment %}
+                      {% if default_amount or scan.receipt_details.net_amount %}
+                        <form method="post" style="margin-top: 8px;">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="confirm_scan">
+                          <input type="hidden" name="year" value="{{ year }}">
+                          <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                          <input type="hidden" name="household_id" value="{{ scan.ai_recommended_candidate.legacy_household_id }}">
+                          <input type="hidden" name="received_on" value="{{ scan.received_on_default|date:'Y-m-d' }}">
+                          <button class="button" type="submit">確認して受領</button>
+                        </form>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                {% if scan.candidates %}
+                  <table class="postal-candidate-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">家</th>
+                        <th scope="col">住所・連絡先</th>
+                        <th scope="col">一致度</th>
+                        <th scope="col">受領</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for candidate in scan.candidates %}
+                        <tr>
+                          <td>
+                            <div class="postal-candidate-name">
+                              <strong>{{ candidate.household_name }}</strong>
+                              {% if candidate.ai_recommended %}<span class="ai-recommendation-badge">AI推奨</span>{% endif %}
+                              {% if candidate.head_name_kana %}
+                                <span class="muted">{{ candidate.head_name_kana }}</span>
+                              {% endif %}
+                              <span class="muted">台帳ID {{ candidate.legacy_household_id }}</span>
+                              <span class="muted">
+                                {{ candidate.delivery_method_label }}
+                                {% if candidate.district_name %} / {{ candidate.district_name }}{% endif %}
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="postal-candidate-contact">
+                              {% if candidate.postal_code or candidate.address %}
+                                <div class="postal-candidate-contact-line">
+                                  {% if candidate.postal_code %}〒{{ candidate.postal_code }}{% endif %}
+                                  {{ candidate.address }}
+                                </div>
+                              {% endif %}
+                              {% if candidate.phone %}
+                                <div class="postal-candidate-contact-line">電話 {{ candidate.phone }}</div>
+                              {% endif %}
+                              {% if candidate.mobile %}
+                                <div class="postal-candidate-contact-line">携帯 {{ candidate.mobile }}</div>
+                              {% endif %}
+                              {% if candidate.mailing_name or candidate.mailing_address or candidate.mailing_phone %}
+                                <div class="postal-candidate-contact-line muted">
+                                  送付先
+                                  {% if candidate.mailing_name %}{{ candidate.mailing_name }}{% endif %}
+                                  {% if candidate.mailing_address %} {{ candidate.mailing_address }}{% endif %}
+                                  {% if candidate.mailing_phone %} / {{ candidate.mailing_phone }}{% endif %}
+                                </div>
+                              {% endif %}
+                              <details class="postal-candidate-contact-edit">
+                                <summary>DB住所・電話を修正</summary>
+                                <form class="postal-candidate-contact-form" method="post">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="action" value="save_candidate_contact">
+                                  <input type="hidden" name="year" value="{{ year }}">
+                                  <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                                  <input type="hidden" name="household_id" value="{{ candidate.legacy_household_id }}">
+                                  {% if scan.ocr.phone or scan.ocr.address %}
+                                    <div class="muted span-2">
+                                      {% if scan.ocr.phone %}OCR電話 {{ scan.ocr.phone }}{% endif %}
+                                      {% if scan.ocr.address %}{% if scan.ocr.phone %} / {% endif %}OCR住所 {{ scan.ocr.address }}{% endif %}
+                                    </div>
+                                  {% endif %}
+                                  <label>
+                                    郵便番号
+                                    <input type="text" name="postal_code" value="{{ candidate.postal_code }}" autocomplete="off">
+                                  </label>
+                                  <label>
+                                    電話
+                                    <input type="text" name="phone" value="{{ candidate.phone }}" autocomplete="off">
+                                  </label>
+                                  <label>
+                                    住所1
+                                    <input type="text" name="address_line1" value="{{ candidate.address_line1 }}" autocomplete="off">
+                                  </label>
+                                  <label>
+                                    携帯
+                                    <input type="text" name="mobile" value="{{ candidate.mobile }}" autocomplete="off">
+                                  </label>
+                                  <label>
+                                    住所2
+                                    <input type="text" name="address_line2" value="{{ candidate.address_line2 }}" autocomplete="off">
+                                  </label>
+                                  <label>
+                                    送付先電話
+                                    <input type="text" name="mailing_phone" value="{{ candidate.mailing_phone }}" autocomplete="off">
+                                  </label>
+                                  <label class="span-2">
+                                    住所3
+                                    <input type="text" name="address_line3" value="{{ candidate.address_line3 }}" autocomplete="off">
+                                  </label>
+                                  <button class="ghost-button span-2" type="submit">住所・電話を保存</button>
+                                </form>
+                              </details>
+                            </div>
+                          </td>
+                          <td>
+                            {{ candidate.score }}点
+                            {% if candidate.match_reasons %}
+                              <div class="muted">{{ candidate.match_reasons|join:" / " }}</div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if candidate.already_paid %}
+                              <div class="postal-receipt-warning" role="note">
+                                <strong>入金済み</strong>
+                                <span>{{ candidate.payment_status_label }}</span>
+                              </div>
+                            {% elif candidate.receipt_warning %}
+                              <div class="postal-receipt-warning" role="note">
+                                <strong>注意</strong>
+                                <span>{{ candidate.receipt_warning }}</span>
+                              </div>
+                            {% endif %}
+                            {% if candidate.already_paid %}
+                              <span class="muted">重複して受領できません</span>
+                            {% elif candidate.can_receive_payment %}
+                              {% if default_amount or scan.receipt_details.net_amount or scan.can_reedit_existing_payment %}
+                                <form method="post">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="action" value="confirm_scan">
+                                  <input type="hidden" name="year" value="{{ year }}">
+                                  <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                                  <input type="hidden" name="household_id" value="{{ candidate.legacy_household_id }}">
+                                  <input type="hidden" name="received_on" value="{{ scan.received_on_default|date:'Y-m-d' }}">
+                                  {% if scan.status == "checked" %}<input type="hidden" name="reedit" value="1">{% endif %}
+                                  <button class="button" type="submit">
+                                    {% if scan.status == "checked" %}この内容に変更{% else %}確認して受領{% endif %}
+                                  </button>
+                                </form>
+                              {% else %}
+                                <span class="muted">払込金額または既定額を確認してください</span>
+                              {% endif %}
+                            {% elif candidate.billing_note %}
+                              <span class="muted">{{ candidate.billing_note }}</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% endif %}
+                <details class="postal-candidate-contact-edit" style="margin-top: 14px;">
+                  <summary>
+                    {% if scan.status == "checked" %}不明入金へ変更{% else %}不明入金として処理{% endif %}
+                  </summary>
+                  <form class="postal-scan-form" method="post" style="margin-top: 10px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_unknown_payment">
+                    <input type="hidden" name="year" value="{{ year }}">
+                    <input type="hidden" name="scan_id" value="{{ scan.id }}">
+                    {% if scan.status == "checked" %}<input type="hidden" name="reedit" value="1">{% endif %}
+                    <label>
+                      メモ
+                      <textarea name="unknown_note" autocomplete="off" placeholder="例: 氏名・住所未記入、候補なし"></textarea>
+                    </label>
+                    <button class="ghost-button" type="submit">
+                      {% if scan.status == "checked" %}不明入金へ変更{% else %}不明入金として処理済みにする{% endif %}
+                    </button>
+                  </form>
+                </details>
+                {% if scan.status == "checked" %}
+                  </details>
+                {% endif %}
+              {% endif %}
+              <div class="row-actions" style="margin-top: 12px;">
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:annual_membership_fee_postal_scan_file' scan.id 'pdf' %}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  元PDFを開く
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="callout">郵便振込PDFはまだ登録されていません。</div>
+      {% endfor %}
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const toggle = document.querySelector("[data-checked-scans-toggle]");
+      const checkedCards = Array.from(
+        document.querySelectorAll('[data-postal-scan-status="checked"]'),
+      );
+      if (!toggle || !checkedCards.length) {
+        return;
+      }
+
+      const checkedCount = Number(toggle.dataset.checkedCount || checkedCards.length);
+      const checkedHashTarget = () => {
+        if (!window.location.hash) {
+          return null;
+        }
+        let targetId = window.location.hash.slice(1);
+        try {
+          targetId = decodeURIComponent(targetId);
+        } catch (_error) {
+          return null;
+        }
+        const target = document.getElementById(targetId);
+        if (target && target.dataset.postalScanStatus === "checked") {
+          return target;
+        }
+        return null;
+      };
+
+      let expanded = Boolean(checkedHashTarget());
+      const renderCheckedCards = () => {
+        checkedCards.forEach((card) => {
+          card.hidden = !expanded;
+        });
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        toggle.textContent = expanded
+          ? `処理済み ${checkedCount}件を隠す`
+          : `処理済み ${checkedCount}件を表示`;
+      };
+
+      toggle.hidden = false;
+      toggle.addEventListener("click", () => {
+        expanded = !expanded;
+        renderCheckedCards();
+      });
+      window.addEventListener("hashchange", () => {
+        const target = checkedHashTarget();
+        if (target && !expanded) {
+          expanded = true;
+          renderCheckedCards();
+          target.scrollIntoView({block: "start"});
+        }
+      });
+      renderCheckedCards();
+    })();
+  </script>
+
+  <script>
+    (() => {
+      const panel = document.querySelector("[data-ocr-progress-panel]");
+      const runForms = Array.from(document.querySelectorAll("[data-ocr-run-form]"));
+      const stopForm = document.getElementById("postal-ocr-stop-form");
+      if (!panel || !runForms.length || !stopForm || !window.fetch) {
+        return;
+      }
+      const progressUrl = panel.dataset.progressUrl;
+      const modal = document.querySelector("[data-ocr-progress-modal]");
+      const runButtons = Array.from(document.querySelectorAll("[data-ocr-run-button]"));
+      const stopButton = stopForm.querySelector("[data-ocr-stop-button]");
+      const messageEl = panel.querySelector("[data-ocr-progress-message]");
+      const fillEl = panel.querySelector("[data-ocr-progress-fill]");
+      const completedEl = panel.querySelector("[data-ocr-completed]");
+      const totalEl = panel.querySelector("[data-ocr-total]");
+      const processedEl = panel.querySelector("[data-ocr-processed]");
+      const skippedEl = panel.querySelector("[data-ocr-skipped]");
+      const errorsEl = panel.querySelector("[data-ocr-errors]");
+      const currentEl = panel.querySelector("[data-ocr-current]");
+      const modalEls = modal
+        ? {
+            title: modal.querySelector("[data-ocr-modal-title]"),
+            message: modal.querySelector("[data-ocr-modal-message]"),
+            fill: modal.querySelector("[data-ocr-modal-fill]"),
+            completed: modal.querySelector("[data-ocr-modal-completed]"),
+            total: modal.querySelector("[data-ocr-modal-total]"),
+            processed: modal.querySelector("[data-ocr-modal-processed]"),
+            skipped: modal.querySelector("[data-ocr-modal-skipped]"),
+            errors: modal.querySelector("[data-ocr-modal-errors]"),
+            current: modal.querySelector("[data-ocr-modal-current]"),
+            stopButton: modal.querySelector("[data-ocr-modal-stop]"),
+            dismissButton: modal.querySelector("[data-ocr-modal-dismiss]"),
+          }
+        : null;
+      let pollTimer = null;
+      let reloadAfterTerminal = false;
+      let modalIsOpen = false;
+      let stopInFlight = false;
+      const terminalStates = new Set(["completed", "stopped", "error"]);
+      const activeStates = new Set(["running", "stopping"]);
+
+      const stateTitle = (state) => {
+        if (state === "completed") {
+          return "AI OCR完了";
+        }
+        if (state === "stopped") {
+          return "AI OCR停止済み";
+        }
+        if (state === "stopping") {
+          return "AI OCR停止中";
+        }
+        if (state === "error") {
+          return "AI OCRエラー";
+        }
+        return "AI OCR実行中";
+      };
+
+      const setText = (element, value) => {
+        if (element) {
+          element.textContent = value;
+        }
+      };
+
+      const setModalOpen = (open, focusModal = false) => {
+        if (!modal || modalIsOpen === open) {
+          return;
+        }
+        modalIsOpen = open;
+        modal.hidden = !open;
+        modal.setAttribute("aria-hidden", open ? "false" : "true");
+        document.body.classList.toggle("postal-ocr-modal-open", open);
+        if (open && focusModal) {
+          window.setTimeout(() => {
+            const focusTarget =
+              modalEls.stopButton && !modalEls.stopButton.disabled
+                ? modalEls.stopButton
+                : modalEls.dismissButton;
+            if (focusTarget) {
+              focusTarget.focus();
+            }
+          }, 0);
+        }
+      };
+
+      const currentProgressFromDom = () => ({
+        state: panel.dataset.state || "unknown",
+        message: messageEl.textContent || "",
+        percent: parseInt(fillEl.style.width, 10) || 0,
+        completed_count: parseInt(completedEl.textContent, 10) || 0,
+        total_count: parseInt(totalEl.textContent, 10) || 0,
+        processed_count: parseInt(processedEl.textContent, 10) || 0,
+        skipped_count: parseInt(skippedEl.textContent, 10) || 0,
+        error_count: parseInt(errorsEl.textContent, 10) || 0,
+        current_label: currentEl.textContent || "",
+      });
+
+      const renderModalProgress = (progress, state) => {
+        if (!modalEls) {
+          return;
+        }
+        const percent = Number(progress.percent || 0);
+        const isActive = activeStates.has(state);
+        setText(modalEls.title, stateTitle(state));
+        setText(modalEls.message, progress.message || "");
+        if (modalEls.fill) {
+          modalEls.fill.style.width = `${percent}%`;
+        }
+        setText(modalEls.completed, progress.completed_count || 0);
+        setText(modalEls.total, progress.total_count || 0);
+        setText(modalEls.processed, progress.processed_count || 0);
+        setText(modalEls.skipped, progress.skipped_count || 0);
+        setText(modalEls.errors, progress.error_count || 0);
+        setText(modalEls.current, progress.current_label || "");
+        if (modalEls.stopButton) {
+          modalEls.stopButton.disabled = stopInFlight || !isActive;
+        }
+        if (modalEls.dismissButton) {
+          modalEls.dismissButton.hidden = isActive;
+        }
+      };
+
+      const renderProgress = (progress, options = {}) => {
+        const state = progress.state || "unknown";
+        const percent = Number(progress.percent || 0);
+        const isActive = activeStates.has(state);
+        panel.dataset.state = state;
+        messageEl.textContent = progress.message || "";
+        fillEl.style.width = `${percent}%`;
+        completedEl.textContent = progress.completed_count || 0;
+        totalEl.textContent = progress.total_count || 0;
+        processedEl.textContent = progress.processed_count || 0;
+        skippedEl.textContent = progress.skipped_count || 0;
+        errorsEl.textContent = progress.error_count || 0;
+        currentEl.textContent = progress.current_label || "";
+        runButtons.forEach((button) => {
+          button.disabled = isActive;
+        });
+        if (stopButton) {
+          stopButton.disabled = stopInFlight || !isActive;
+        }
+        renderModalProgress(progress, state);
+        if (isActive) {
+          setModalOpen(true, options.focusModal === true);
+        }
+        if (!isActive && pollTimer) {
+          window.clearInterval(pollTimer);
+          pollTimer = null;
+        }
+        if (reloadAfterTerminal && terminalStates.has(state)) {
+          reloadAfterTerminal = false;
+          window.setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      };
+
+      const pollProgress = () => {
+        fetch(progressUrl, {
+          credentials: "same-origin",
+          headers: {"X-Requested-With": "XMLHttpRequest"},
+        })
+          .then((response) => response.json())
+          .then(renderProgress)
+          .catch(() => {});
+      };
+
+      const startPolling = () => {
+        if (pollTimer) {
+          return;
+        }
+        pollProgress();
+        pollTimer = window.setInterval(pollProgress, 1500);
+      };
+
+      const submitStopRequest = () => {
+        if (stopInFlight) {
+          return;
+        }
+        stopInFlight = true;
+        renderProgress(
+          {
+            ...currentProgressFromDom(),
+            state: "stopping",
+            message: "AI OCRの停止を要求しています。",
+          },
+          {focusModal: true},
+        );
+        const formData = new FormData(stopForm);
+        const postUrl = stopForm.getAttribute("action") || window.location.href;
+        fetch(postUrl, {
+          method: "POST",
+          body: formData,
+          credentials: "same-origin",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken") || "",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`AI OCR停止リクエストに失敗しました (${response.status})。`);
+            }
+            return response.json();
+          })
+          .then((progress) => {
+            stopInFlight = false;
+            renderProgress(progress, {focusModal: true});
+            if (activeStates.has(progress.state || "")) {
+              startPolling();
+            }
+          })
+          .catch((error) => {
+            const currentProgress = currentProgressFromDom();
+            stopInFlight = false;
+            renderProgress(
+              {
+                ...currentProgress,
+                state: "error",
+                message: error.message || "AI OCR停止リクエストに失敗しました。",
+                error_count: Math.max(currentProgress.error_count, 1),
+              },
+              {focusModal: true},
+            );
+          });
+      };
+
+      runForms.forEach((runForm) => {
+        runForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          reloadAfterTerminal = true;
+          renderProgress(
+            {
+              ...currentProgressFromDom(),
+              state: "running",
+              message: "AI OCR開始を要求しています。",
+            },
+            {focusModal: true},
+          );
+          const formData = new FormData(runForm);
+          const postUrl = runForm.getAttribute("action") || window.location.href;
+          fetch(postUrl, {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin",
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+              "X-CSRFToken": formData.get("csrfmiddlewaretoken") || "",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`AI OCR開始リクエストに失敗しました (${response.status})。`);
+              }
+              return response.json();
+            })
+            .then((payload) => {
+              if (payload.started === false) {
+                reloadAfterTerminal = false;
+              }
+              if (payload.progress) {
+                renderProgress(payload.progress, {focusModal: true});
+              }
+              if (payload.started !== false) {
+                startPolling();
+              }
+            })
+            .catch((error) => {
+              const currentProgress = currentProgressFromDom();
+              reloadAfterTerminal = false;
+              renderProgress(
+                {
+                  ...currentProgress,
+                  state: "error",
+                  message: error.message || "AI OCR開始リクエストに失敗しました。",
+                  error_count: Math.max(currentProgress.error_count, 1),
+                },
+                {focusModal: true},
+              );
+            });
+        });
+      });
+
+      stopForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitStopRequest();
+      });
+
+      if (modalEls && modalEls.stopButton) {
+        modalEls.stopButton.addEventListener("click", submitStopRequest);
+      }
+      if (modalEls && modalEls.dismissButton) {
+        modalEls.dismissButton.addEventListener("click", () => {
+          setModalOpen(false);
+        });
+      }
+      window.addEventListener("beforeunload", (event) => {
+        if (activeStates.has(panel.dataset.state || "")) {
+          event.preventDefault();
+          event.returnValue = "";
+        }
+      });
+
+      renderProgress({
+        state: panel.dataset.state,
+        message: messageEl.textContent,
+        percent: parseInt(fillEl.style.width, 10) || 0,
+        completed_count: parseInt(completedEl.textContent, 10) || 0,
+        total_count: parseInt(totalEl.textContent, 10) || 0,
+        processed_count: parseInt(processedEl.textContent, 10) || 0,
+        skipped_count: parseInt(skippedEl.textContent, 10) || 0,
+        error_count: parseInt(errorsEl.textContent, 10) || 0,
+        current_label: currentEl.textContent,
+      });
+      if (panel.dataset.state === "running" || panel.dataset.state === "stopping") {
+        setModalOpen(true, true);
+        startPolling();
+      }
+    })();
+  </script>
+{% endblock %}

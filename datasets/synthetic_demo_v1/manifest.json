@@ -1,0 +1,13 @@
+{
+  "dataset_id": "synthetic_demo_v1",
+  "version": 1,
+  "source_id": "demo-synthetic-rich",
+  "source_label": "TempleDB rich synthetic demo source",
+  "source_path": "demo://synthetic_demo_v1",
+  "source_file_name": "synthetic_demo_v1",
+  "prepared_snapshot_id": "synthetic_demo_v1-snapshot",
+  "scope": "demo_synthetic_rich",
+  "description": "Reusable aggregate-profile synthetic data for portable TempleDB demos. No real names, addresses, notes, or row-level source records are included.",
+  "generator_seed": 20260425,
+  "profile_source": "aggregate_database_profile"
+}

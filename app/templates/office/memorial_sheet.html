@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ print_heading_labels.memorial_sheet }} | TempleDB</title>
+    <link rel="stylesheet" href="{% url 'office:memorial_sheet_font_css' %}">
+    <style>
+      :root {
+        --ink: #1d1b15;
+        --paper: #fff;
+        --line: #ddd6c6;
+        --accent: #7a3b1d;
+        --font-print-body: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif;
+        --font-print-homyo: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: var(--font-print-body);
+        background:
+          radial-gradient(circle at 15% 10%, #f2eee3 0, transparent 45%),
+          radial-gradient(circle at 80% 20%, #e7edf0 0, transparent 40%),
+          linear-gradient(120deg, #ece8de, #f7f6f2 45%, #e7ecef);
+      }
+      a { color: inherit; }
+      .app-shell {
+        display: grid;
+        grid-template-columns: minmax(280px, 360px) 1fr;
+        gap: 24px;
+        padding: 24px;
+        align-items: start;
+      }
+      .control-panel {
+        background: rgba(255, 255, 255, 0.84);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 16px 32px rgba(40, 36, 24, 0.08);
+      }
+      .control-panel h1 {
+        margin: 0 0 8px;
+        font-size: 1.5rem;
+      }
+      .helper {
+        margin: 0 0 18px;
+        color: #5e5b52;
+        line-height: 1.7;
+      }
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--accent);
+        background: var(--accent);
+        color: #fffaf0;
+        text-decoration: none;
+        cursor: pointer;
+        font: inherit;
+      }
+      .mobile-print-action {
+        display: none;
+      }
+      .ghost-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.88);
+        text-decoration: none;
+      }
+      .meta-list {
+        display: grid;
+        gap: 10px;
+      }
+      .font-controls {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 14px;
+      }
+      .text-controls {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 14px;
+      }
+      .text-controls h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+      .text-controls p {
+        margin: 0;
+        color: #5e5b52;
+        line-height: 1.6;
+        font-size: 0.92rem;
+      }
+      .font-controls h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+      .font-controls p {
+        margin: 0;
+        color: #5e5b52;
+        line-height: 1.6;
+        font-size: 0.92rem;
+      }
+      .font-control-group {
+        display: grid;
+        gap: 8px;
+      }
+      .font-control-group label {
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+      .font-control-row {
+        display: grid;
+        gap: 8px;
+      }
+      .font-control-row select,
+      .font-control-row input {
+        width: 100%;
+        min-height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.94);
+        font: inherit;
+      }
+      .font-help {
+        color: #6b655b;
+        font-size: 0.84rem;
+        line-height: 1.5;
+      }
+      .font-apply-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .font-status {
+        color: #6b655b;
+        font-size: 0.84rem;
+      }
+      .font-reset {
+        justify-self: start;
+      }
+      .meta-item {
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+      }
+      .meta-item dt {
+        color: #6b655b;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .meta-item dd {
+        margin: 0;
+        line-height: 1.6;
+      }
+      .preview-frame {
+        display: flex;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        overflow: hidden;
+      }
+      .sheet-slot {
+        display: block;
+      }
+      .sheet-frame {
+        width: 190mm;
+        height: 281mm;
+        transform-origin: top left;
+      }
+      .a4-page {
+        width: 190mm;
+        height: 281mm;
+        max-width: 100%;
+        background: var(--paper);
+        color: #000;
+        border: 1px solid #000;
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
+        margin: 0 auto;
+        padding: 10mm 9mm;
+      }
+      .document-blocks {
+        display: flex;
+        flex-direction: column;
+        gap: 8mm;
+        height: 100%;
+      }
+      .upper-block,
+      .lower-block {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 12mm;
+        min-height: 0;
+        flex: 1;
+        padding-top: 10mm;
+      }
+      .upper-block {
+        padding-bottom: 4mm;
+        border-bottom: 1px solid #000;
+      }
+      .column {
+        min-height: 0;
+      }
+      .vertical-text {
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        letter-spacing: 0.08em;
+      }
+      .person-column {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 3.5mm;
+        padding-top: 30mm;
+      }
+      .kijitsu-columns {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.2mm;
+        padding-top: 2.5mm;
+      }
+      .kijitsu-col {
+        display: grid;
+        grid-template-rows: 42mm auto;
+        align-items: start;
+        row-gap: 2mm;
+      }
+      .memorial-columns {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.8mm;
+        padding-top: 2.5mm;
+      }
+      .memorial-col {
+        display: grid;
+        grid-template-rows: 24mm auto;
+        align-items: start;
+        row-gap: 26mm;
+      }
+      .homyo,
+      .zokumyo,
+      .death-line,
+      .age-line,
+      .kijitsu-label,
+      .kijitsu-date,
+      .rank,
+      .year,
+      .temple-name,
+      .temple-phone {
+        margin: 0;
+      }
+      .homyo {
+        font-family: var(--font-print-homyo);
+        font-size: 2.25rem;
+        font-weight: 700;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .homyo-text {
+        display: inline-block;
+        transform: translateY(var(--homyo-center-offset, 0));
+      }
+      .homyo-small {
+        display: inline-block;
+        font-size: 0.72em;
+        transform: translateX(0.18em);
+      }
+      .zokumyo {
+        font-size: 1.05rem;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .death-line {
+        font-size: 1.18rem;
+        margin-top: -10mm;
+      }
+      .age-line {
+        font-size: 0.74rem;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .zokumyo-block {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.8mm;
+        margin-top: 25mm;
+      }
+      .age-under-name {
+        margin-top: 3.1rem;
+      }
+      .kijitsu-label {
+        font-size: 1.26rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .kijitsu-sub {
+        font-size: 0.68em;
+      }
+      .kijitsu-date {
+        font-size: 1.14rem;
+        color: #000;
+        white-space: nowrap;
+      }
+      .rank {
+        font-size: 1.42rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .year {
+        font-size: 1.22rem;
+        white-space: nowrap;
+      }
+      .temple-column {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 3mm;
+        padding-top: 40mm;
+      }
+      .temple-column-upper {
+        margin-left: 5mm;
+      }
+      .temple-column-lower {
+        align-self: flex-end;
+        margin-left: 17mm;
+        margin-bottom: 6mm;
+        padding-top: 0;
+      }
+      .temple-name {
+        font-size: 1.14rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .temple-phone {
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+      .notice {
+        margin-top: 16px;
+        color: #6b655b;
+        font-size: 0.92rem;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+      @media print {
+        html, body {
+          width: auto;
+          height: auto;
+          margin: 0 !important;
+          padding: 0 !important;
+          min-height: 0 !important;
+          overflow: visible !important;
+          background: #fff !important;
+        }
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .control-panel,
+        .screen-only {
+          display: none !important;
+        }
+        .app-shell {
+          display: block !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .preview-frame {
+          display: block !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          border: none !important;
+          background: transparent !important;
+          overflow: visible !important;
+        }
+        .sheet-slot,
+        .sheet-frame {
+          display: block !important;
+          width: auto !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          transform: none !important;
+        }
+        .a4-page {
+          width: auto !important;
+          height: auto !important;
+          min-height: 0 !important;
+          margin: 0 !important;
+          padding: 10mm 9mm !important;
+          border: none !important;
+          box-shadow: none !important;
+          background: #fff !important;
+          overflow: visible !important;
+        }
+        .document-blocks {
+          height: auto !important;
+        }
+      }
+      @media screen and (max-width: 1120px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+        .preview-frame {
+          padding: 12px;
+        }
+        .desktop-print-action {
+          display: none;
+        }
+        .mobile-print-action {
+          display: inline-flex;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% if request.user.is_authenticated %}
+      {% include "includes/app_quicklinks.html" %}
+    {% endif %}
+    {% if available %}
+      <main class="app-shell">
+        <aside class="control-panel screen-only">
+          <h1>{{ print_heading_labels.memorial_sheet }}</h1>
+          <p class="helper">
+            故人ごとの印刷向け年忌表です。<br>
+            <strong>{{ deceased_labels.kaimyo }}</strong>・{{ deceased_labels.zokumyo }}・命日・享年から、<strong>中陰</strong> と <strong>年忌</strong> をその場で計算しています。
+          </p>
+          <dl class="meta-list">
+            <div class="meta-item">
+              <dt>家</dt>
+              <dd>{{ household.name }} (#{{ household.household_id }})</dd>
+            </div>
+            <div class="meta-item">
+              <dt>{{ deceased_labels.kaimyo }}</dt>
+              <dd>{% if sheet.deceased.homyo %}{{ sheet.deceased.homyo }}{% else %}未登録{% endif %}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>{{ deceased_labels.zokumyo }}</dt>
+              <dd>{{ sheet.deceased.zokumyo }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>命日</dt>
+              <dd>{{ sheet.death_date_iso }} / {{ sheet.death_date_wareki }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>享年</dt>
+              <dd>
+                {% if sheet.deceased.age_at_death %}
+                  {{ sheet.deceased.age_at_death }}{{ sheet.deceased.age_unit }}
+                {% else %}
+                  未登録
+                {% endif %}
+              </dd>
+            </div>
+          </dl>
+          <section class="font-controls">
+            <h2>印刷書体</h2>
+            <p>{{ deceased_labels.kaimyo }}とその他本文を別々に切り替えます。設定はこのブラウザに保存されます。</p>
+            <div class="font-control-group">
+              <label for="homyo-font-preset">{{ deceased_labels.kaimyo }}書体</label>
+              <div class="font-control-row">
+                <select id="homyo-font-preset" data-font-role="homyo">
+                  <option value='"Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif'>明朝（既定）</option>
+                  <option value='"TempleDB-HGGyoshotai", "HGGyoshotai", "HG行書体", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif'>HG行書体</option>
+                  <option value='"TempleDB-AGENDAJinmeiGyoshotaiL1", "AGENDAJinmeiGyoshotaiL1", "AGENDA人名行書体L1", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif'>AGENDA人名行書体</option>
+                  <option value='"TempleDB-DFPGyoSho-Lt", "DFPGyoSho-Lt", "DFGyoSho-Lt-MP-RKSJ-H", "ＤＦＰ行書体", "Hiragino Mincho ProN", serif'>DFP行書体</option>
+                  <option value='"Hiragino Sans", "ヒラギノ角ゴシック", "Yu Gothic", "游ゴシック体", sans-serif'>角ゴシック</option>
+                  <option value="__custom__">手入力を使う</option>
+                </select>
+                <input
+                  id="homyo-font-custom"
+                  data-font-custom-role="homyo"
+                  type="text"
+                  placeholder='例: HGGyoshotai, "Hiragino Mincho ProN", serif'
+                >
+              </div>
+            </div>
+            <div class="font-control-group">
+              <label for="body-font-preset">その他書体</label>
+              <div class="font-control-row">
+                <select id="body-font-preset" data-font-role="body">
+                  <option value='"Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif'>明朝（既定）</option>
+                  <option value='"Hiragino Sans", "ヒラギノ角ゴシック", "Yu Gothic", "游ゴシック体", "YuGothic", sans-serif'>角ゴシック</option>
+                  <option value='"Yu Mincho", "游明朝体", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Noto Serif JP", serif'>游明朝</option>
+                  <option value='"Hiragino Maru Gothic ProN", "ヒラギノ丸ゴ ProN", "Hiragino Sans", sans-serif'>丸ゴシック</option>
+                  <option value="__custom__">手入力を使う</option>
+                </select>
+                <input
+                  id="body-font-custom"
+                  data-font-custom-role="body"
+                  type="text"
+                  placeholder='例: "Hiragino Sans", "Yu Gothic", sans-serif'
+                >
+              </div>
+            </div>
+            <div class="font-help">別の端末で印刷する場合は、その端末にも同じフォントが必要です。</div>
+            <div class="font-apply-row">
+              <button class="button" id="font-apply" type="button">書体を適用</button>
+              <button class="ghost-button font-reset" id="font-reset" type="button">既定に戻す</button>
+              <span class="font-status" id="font-status" aria-live="polite"></span>
+            </div>
+          </section>
+          <section class="text-controls">
+            <h2>寺院情報</h2>
+            <p>寺院名と電話番号は設定ページで DB 保存します。この画面では保存済みの値を表示しています。</p>
+            <dl class="meta-list">
+              <div class="meta-item">
+                <dt>寺院名</dt>
+                <dd>{{ temple_identity.name }}</dd>
+              </div>
+              <div class="meta-item">
+                <dt>電話</dt>
+                <dd>{{ temple_identity.phone }}</dd>
+              </div>
+            </dl>
+            <div class="font-apply-row">
+              <a class="ghost-button font-reset" href="{% url 'office:settings_home' %}#temple-identity-card">設定で変更</a>
+            </div>
+          </section>
+          <div class="actions">
+            <button class="button desktop-print-action" type="button" onclick="window.print()">印刷する</button>
+            <a class="button mobile-print-action" href="?print=1">印刷画面を開く</a>
+            <a class="ghost-button" href="{% url 'office:household_browser' %}?household_id={{ household.household_id }}">戸主ブラウザへ戻る</a>
+          </div>
+          <p class="notice">
+            `中陰` と `年忌` は DB 保存値ではなく、命日からオンデマンド計算しています。
+          </p>
+        </aside>
+
+        <section class="preview-frame">
+          <div class="sheet-slot" data-responsive-sheet-slot>
+            <div class="sheet-frame" data-responsive-sheet-frame>
+              <div class="a4-page">
+                {% include "office/includes/memorial_sheet_document.html" %}
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    {% else %}
+      <main class="app-shell">
+        <aside class="control-panel">
+          <h1>{{ print_heading_labels.memorial_sheet }}</h1>
+          <p class="helper">{{ message }}</p>
+          <div class="actions">
+            <a class="ghost-button" href="{% url 'office:household_browser' %}">戸主ブラウザへ戻る</a>
+          </div>
+        </aside>
+      </main>
+    {% endif %}
+    <script>
+      (() => {
+        const fontStorageKey = "templedb.memorialSheet.fonts.v1";
+        const defaults = {
+          body: '"Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif',
+          homyo: '"Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif',
+        };
+        const fontValueAliases = {
+          '"HGGyoshotai", "HG行書体", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif': '"TempleDB-HGGyoshotai", "HGGyoshotai", "HG行書体", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif',
+          '"AGENDAJinmeiGyoshotaiL1", "AGENDA人名行書体L1", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif': '"TempleDB-AGENDAJinmeiGyoshotaiL1", "AGENDAJinmeiGyoshotaiL1", "AGENDA人名行書体L1", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif',
+          '"DFPGyoSho-Lt", "DFGyoSho-Lt-MP-RKSJ-H", "ＤＦＰ行書体", serif': '"TempleDB-DFPGyoSho-Lt", "DFPGyoSho-Lt", "DFGyoSho-Lt-MP-RKSJ-H", "ＤＦＰ行書体", "Hiragino Mincho ProN", serif',
+        };
+        const root = document.documentElement;
+        const selectMap = {
+          homyo: document.querySelector('[data-font-role="homyo"]'),
+          body: document.querySelector('[data-font-role="body"]'),
+        };
+        const customMap = {
+          homyo: document.querySelector('[data-font-custom-role="homyo"]'),
+          body: document.querySelector('[data-font-custom-role="body"]'),
+        };
+        const applyButton = document.getElementById("font-apply");
+        const resetButton = document.getElementById("font-reset");
+        const status = document.getElementById("font-status");
+        const bodyTargets = document.querySelectorAll(
+          ".zokumyo, .death-line, .age-line, .kijitsu-label, .kijitsu-date, .rank, .year, .temple-name, .temple-phone"
+        );
+        const homyoTargets = document.querySelectorAll(".homyo");
+        const preview = document.querySelector(".preview-frame");
+        const sheetSlot = document.querySelector("[data-responsive-sheet-slot]");
+        const sheetFrame = document.querySelector("[data-responsive-sheet-frame]");
+        if (!selectMap.homyo || !selectMap.body || !customMap.homyo || !customMap.body || !applyButton) {
+          return;
+        }
+
+        const fitSheet = () => {
+          if (!sheetSlot || !sheetFrame || window.matchMedia("print").matches) {
+            return;
+          }
+          sheetFrame.style.transform = "";
+          sheetSlot.style.width = "";
+          sheetSlot.style.height = "";
+          const availableWidth = Math.max(1, sheetSlot.parentElement.clientWidth);
+          const scale = Math.min(1, availableWidth / sheetFrame.offsetWidth);
+          sheetFrame.style.transform = `scale(${scale})`;
+          sheetSlot.style.width = `${sheetFrame.offsetWidth * scale}px`;
+          sheetSlot.style.height = `${sheetFrame.offsetHeight * scale}px`;
+        };
+
+        const resetSheetScale = () => {
+          if (!sheetSlot || !sheetFrame) {
+            return;
+          }
+          sheetFrame.style.transform = "";
+          sheetSlot.style.width = "";
+          sheetSlot.style.height = "";
+        };
+
+        const normalizeFontValue = (value) => fontValueAliases[value] || value;
+
+        const readStored = () => {
+          try {
+            const raw = window.localStorage.getItem(fontStorageKey);
+            if (!raw) {
+              return {...defaults};
+            }
+            const parsed = JSON.parse(raw);
+            return {
+              body: normalizeFontValue(parsed.body || defaults.body),
+              homyo: normalizeFontValue(parsed.homyo || defaults.homyo),
+            };
+          } catch (error) {
+            return {...defaults};
+          }
+        };
+
+        const saveStored = (state) => {
+          try {
+            window.localStorage.setItem(fontStorageKey, JSON.stringify(state));
+          } catch (error) {
+            return;
+          }
+        };
+
+        const syncControls = (role, value) => {
+          const select = selectMap[role];
+          const custom = customMap[role];
+          const presetValues = Array.from(select.options).map((option) => option.value).filter((option) => option !== "__custom__");
+          if (presetValues.includes(value)) {
+            select.value = value;
+            custom.value = "";
+          } else {
+            select.value = "__custom__";
+            custom.value = value;
+          }
+        };
+
+        const forcePreviewRerender = () => {
+          if (!preview) {
+            return;
+          }
+          preview.style.opacity = "0.99";
+          void preview.offsetHeight;
+          preview.style.opacity = "";
+        };
+
+        const applyFonts = (state, message = "") => {
+          root.style.setProperty("--font-print-body", state.body);
+          root.style.setProperty("--font-print-homyo", state.homyo);
+          document.body.style.fontFamily = state.body;
+          bodyTargets.forEach((element) => {
+            element.style.fontFamily = state.body;
+          });
+          homyoTargets.forEach((element) => {
+            element.style.fontFamily = state.homyo;
+          });
+          forcePreviewRerender();
+          syncControls("body", state.body);
+          syncControls("homyo", state.homyo);
+          if (status) {
+            status.textContent = message;
+          }
+        };
+
+        const buildStateFromControls = () => {
+          const next = {};
+          for (const role of ["body", "homyo"]) {
+            const selected = selectMap[role].value;
+            const customValue = customMap[role].value.trim();
+            next[role] = selected === "__custom__" && customValue ? customValue : (selected === "__custom__" ? defaults[role] : selected);
+          }
+          return next;
+        };
+
+        const stored = readStored();
+        applyFonts(stored, "保存済みの書体を反映しました。");
+        saveStored(stored);
+        fitSheet();
+        window.addEventListener("resize", fitSheet);
+        window.addEventListener("orientationchange", () => window.setTimeout(fitSheet, 250));
+        window.addEventListener("beforeprint", resetSheetScale);
+        window.addEventListener("afterprint", fitSheet);
+
+        applyButton.addEventListener("click", () => {
+          const state = buildStateFromControls();
+          applyFonts(state, "書体を適用しました。");
+          saveStored(state);
+          fitSheet();
+        });
+
+        if (resetButton) {
+          resetButton.addEventListener("click", () => {
+            applyFonts({...defaults}, "既定の書体に戻しました。");
+            saveStored({...defaults});
+            fitSheet();
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

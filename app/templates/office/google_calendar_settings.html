@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block title %}Google カレンダー | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .google-calendar-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .summary-row,
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-box,
+    .management-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.05rem;
+    }
+    .form-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field-help {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .field-errors {
+      margin: 0;
+      padding-left: 18px;
+      color: #9f4d3d;
+    }
+    .step-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 10px;
+    }
+    .step-list li {
+      line-height: 1.7;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: #f4ecdf;
+      font-size: .85rem;
+    }
+    .badge.ok {
+      border-color: #7a8e59;
+      background: #f1f8e8;
+    }
+    .badge.ng {
+      border-color: #9f4d3d;
+      background: #fff1ec;
+    }
+    .progress-stack {
+      display: grid;
+      gap: 10px;
+    }
+    .progress-meter {
+      width: 100%;
+      height: 16px;
+    }
+    .progress-details {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.6;
+    }
+    .progress-recent {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 6px;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="google-calendar-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="google_calendar_settings" %}
+    <section class="hero">
+      <div class="eyebrow">Google Calendar</div>
+      <h1>Google カレンダー同期</h1>
+      <p>TempleDB を正本にして、Google カレンダーへ片方向同期するための設定です。</p>
+      <p class="muted">Service Account の JSON は DB へ保存せず、環境変数 <code>TEMPLEDB_GOOGLE_SERVICE_ACCOUNT_FILE</code> で参照します。</p>
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Guide</div>
+      <h2>最初の準備</h2>
+      <ol class="step-list">
+        <li>寺の Google アカウントで、TempleDB 専用の非公開カレンダーを 1 つ作ります。</li>
+        <li>Google Cloud で Service Account を作り、その JSON ファイルを TempleDB サーバーへ置きます。</li>
+        <li>TempleDB の環境変数 <code>TEMPLEDB_GOOGLE_SERVICE_ACCOUNT_FILE</code> に、その JSON ファイルのパスを設定します。</li>
+        <li>この画面の <code>client_email</code> を、対象カレンダーへ「予定を変更」権限で個別共有します。</li>
+        <li>Google カレンダーの設定画面で <code>Calendar ID</code> を確認して、この画面へ入力します。</li>
+        <li>最後に「Google カレンダー同期を有効にする」をオンにして保存します。</li>
+      </ol>
+      <p class="muted" style="margin-top: 16px;">ここまで終わると、TempleDB で法要予定を保存した直後に Google カレンダーへ反映されます。</p>
+    </section>
+
+    <section class="summary-row">
+      <article class="summary-box">
+        <div class="label">同期状態</div>
+        <div class="value">
+          {% if google_calendar_setting.enabled %}
+            有効
+          {% else %}
+            無効
+          {% endif %}
+        </div>
+      </article>
+      <article class="summary-box">
+        <div class="label">Calendar ID</div>
+        <div class="value" style="word-break: break-all;">{{ google_calendar_setting.calendar_id|default:"未設定" }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">Service Account</div>
+        <div class="value" style="word-break: break-all;">{{ google_calendar_account_info.client_email|default:"未検出" }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">TempleDB URL</div>
+        <div class="value" style="word-break: break-all;">
+          <div>内部: {{ google_calendar_effective_base_url|default:"未設定" }}</div>
+          <div>外部: {{ google_calendar_effective_external_base_url|default:"未設定" }}</div>
+        </div>
+      </article>
+      <article class="summary-box">
+        <div class="label">競合 / エラー</div>
+        <div class="value">{{ google_calendar_sync_counts.conflict }} / {{ google_calendar_sync_counts.error }}</div>
+      </article>
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Configuration</div>
+      <h2>同期設定</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+          <label class="field" for="{{ google_calendar_form.calendar_id.id_for_label }}">
+            <span>{{ google_calendar_form.calendar_id.label }}</span>
+            {{ google_calendar_form.calendar_id }}
+            {% if google_calendar_form.calendar_id.help_text %}
+              <span class="field-help">{{ google_calendar_form.calendar_id.help_text }}</span>
+            {% endif %}
+            {% if google_calendar_form.calendar_id.errors %}
+              <ul class="field-errors">
+                {% for error in google_calendar_form.calendar_id.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </label>
+        </div>
+        <div class="callout" style="margin-top: 14px;">
+          <strong>TempleDBリンクは、この端末の <code>.env</code> で設定します。</strong>
+          <br>
+          LAN内用:
+          <code>TEMPLEDB_BASE_URL={{ google_calendar_effective_base_url }}</code>
+          {% if google_calendar_base_url_source == "database_compatibility" %}
+            （旧DB値を互換利用中。`.env`へ移してください）
+          {% elif google_calendar_base_url_source == "local_default" %}
+            （`.env`未設定のためローカル既定値）
+          {% endif %}
+          <br>
+          外から用:
+          <code>TEMPLEDB_EXTERNAL_BASE_URL={{ google_calendar_effective_external_base_url|default:"" }}</code>
+          {% if google_calendar_external_base_url_source == "database_compatibility" %}
+            （旧DB値を互換利用中。`.env`へ移してください）
+          {% elif google_calendar_external_base_url_source == "unset" %}
+            （未設定ならGoogleカレンダーにはLAN内用リンクだけを入れます）
+          {% endif %}
+          <br>
+          変更後はTempleDBを再起動してください。この画面からURLは変更しません。
+        </div>
+        <div class="action-row" style="margin-top: 14px;">
+          <label class="field-help">{{ google_calendar_form.enabled }} {{ google_calendar_form.enabled.label }}</label>
+        </div>
+        {% if google_calendar_form.non_field_errors %}
+          <ul class="field-errors" style="margin-top: 12px;">
+            {% for error in google_calendar_form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <div class="action-row" style="margin-top: 16px;">
+          <button class="button" type="submit">設定を保存</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Service Account</div>
+      <h2>共有設定の案内</h2>
+      <p>Google カレンダー側では、次の Service Account メールアドレスへ対象カレンダーを「予定を変更」権限で個別共有してください。</p>
+      <div class="summary-row">
+        <article class="summary-box">
+          <div class="label">JSON ファイル</div>
+          <div class="value" style="font-size: 0.95rem; word-break: break-all;">
+            {{ google_calendar_account_info.path|default:"未設定" }}
+          </div>
+        </article>
+        <article class="summary-box">
+          <div class="label">client_email</div>
+          <div class="value" style="font-size: 0.95rem; word-break: break-all;">
+            {{ google_calendar_account_info.client_email|default:"未検出" }}
+          </div>
+        </article>
+        <article class="summary-box">
+          <div class="label">project_id</div>
+          <div class="value" style="font-size: 0.95rem; word-break: break-all;">
+            {{ google_calendar_account_info.project_id|default:"未検出" }}
+          </div>
+        </article>
+      </div>
+      {% if google_calendar_configuration_errors %}
+        <div class="callout" style="margin-top: 16px;">
+          <strong>現在の設定では同期を実行できません。</strong>
+          <ul class="field-errors" style="margin-top: 8px;">
+            {% for error in google_calendar_configuration_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="callout" style="margin-top: 16px;">同期に必要な設定は揃っています。実際の共有権限不足は初回同期時のエラーで検知します。</div>
+      {% endif %}
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Guide</div>
+      <h2>日常の使い方</h2>
+      <ol class="step-list">
+        <li>TempleDB で法要予定を新規登録、更新、中止、完了、リセットすると、保存後に Google カレンダー同期を試みます。</li>
+        <li>各法要の編集画面右側に「Google Calendar / 同期状態」が出ます。ここで状態、最終同期時刻、エラーメッセージを確認できます。</li>
+        <li>Google カレンダーの詳細には、戸主名とTempleDBの法要編集リンクが入ります。LAN内用は <code>TEMPLEDB_BASE_URL</code>、外から用は <code>TEMPLEDB_EXTERNAL_BASE_URL</code> を使い、2種類が異なる場合は両方を入れます。</li>
+        <li>Google 側で誰かが直接触って競合した場合は、状態が「競合」になります。TempleDB 側を確認してから「再同期」を押してください。</li>
+        <li>Google 側のイベントが消えていた場合は、次回同期または日次 reconcile で再作成を試みます。</li>
+        <li>設定や共有に問題がある場合は、このページのエラー表示を直してから再同期します。</li>
+      </ol>
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Initial Sync</div>
+      <h2>既存法要を一括同期</h2>
+      <p>初回だけ、すでに TempleDB に入っている法要予定をまとめて Google カレンダーへ反映できます。以後は通常どおり保存時同期で増減します。</p>
+      <ol class="step-list" style="margin-top: 14px;">
+        <li>まず 1 件だけ法要編集画面で保存または「再同期」を押し、Google カレンダーへ出ることを確認します。</li>
+        <li>問題なければ、この画面の「既存法要を一括同期」を押します。</li>
+        <li>作成・更新・競合・エラーの件数は、実行後のメッセージと下の同期メタデータで確認できます。</li>
+      </ol>
+      <div
+        id="google-calendar-bulk-sync-panel"
+        class="summary-box"
+        style="margin-top: 16px;"
+        data-status-url="{{ google_calendar_bulk_sync_status_url }}"
+        data-startable="{% if google_calendar_bulk_sync_ready %}1{% else %}0{% endif %}"
+      >
+        <div class="label">進行状況</div>
+        <div class="progress-stack" style="margin-top: 12px;">
+          <progress
+            id="google-calendar-bulk-sync-progress"
+            class="progress-meter"
+            max="{% if google_calendar_bulk_sync_status.total_count %}{{ google_calendar_bulk_sync_status.total_count }}{% else %}1{% endif %}"
+            value="{{ google_calendar_bulk_sync_status.processed_count|default:0 }}"
+          ></progress>
+          <div class="progress-details">
+            <div id="google-calendar-bulk-sync-summary">
+              {% if google_calendar_bulk_sync_status.summary %}
+                {{ google_calendar_bulk_sync_status.summary }}
+              {% else %}
+                まだ一括同期は開始していません。
+              {% endif %}
+            </div>
+            <div id="google-calendar-bulk-sync-counts">
+              {{ google_calendar_bulk_sync_status.processed_count|default:0 }} / {{ google_calendar_bulk_sync_status.total_count|default:0 }} 件
+            </div>
+            <div id="google-calendar-bulk-sync-current">
+              {% if google_calendar_bulk_sync_status.current_sync_key %}
+                現在: <code>{{ google_calendar_bulk_sync_status.current_sync_key }}</code>
+              {% else %}
+                現在: -
+              {% endif %}
+            </div>
+            <div id="google-calendar-bulk-sync-actions">
+              作成 {{ google_calendar_bulk_sync_status.action_counts.created|default:0 }}件 /
+              更新 {{ google_calendar_bulk_sync_status.action_counts.updated|default:0 }}件 /
+              エラー {{ google_calendar_bulk_sync_status.action_counts.error|default:0 }}件 /
+              競合 {{ google_calendar_bulk_sync_status.action_counts.conflict|default:0 }}件
+            </div>
+          </div>
+          <ul id="google-calendar-bulk-sync-recent" class="progress-recent">
+            {% for item in google_calendar_bulk_sync_status.recent_results %}
+              <li><code>{{ item.sync_key }}</code> {{ item.action }}: {{ item.message }}</li>
+            {% empty %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <form method="post" style="margin-top: 16px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="bulk_sync_google_calendar">
+        <div class="action-row">
+          <button class="button" id="google-calendar-bulk-sync-button" type="submit"{% if not google_calendar_bulk_sync_ready or google_calendar_bulk_sync_running %} disabled{% endif %}>
+            {% if google_calendar_bulk_sync_running %}同期中...{% else %}既存法要を一括同期{% endif %}
+          </button>
+          {% if not google_calendar_bulk_sync_ready %}
+            <span class="field-help">先に有効化と設定エラー解消を済ませてください。</span>
+          {% elif google_calendar_bulk_sync_running %}
+            <span class="field-help">バックグラウンドで一括同期を実行中です。下の進行状況が自動更新されます。</span>
+          {% endif %}
+        </div>
+      </form>
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Bindings</div>
+      <h2>同期メタデータ</h2>
+      <div class="summary-row" style="margin-bottom: 16px;">
+        <article class="summary-box">
+          <div class="label">未同期</div>
+          <div class="value">{{ google_calendar_sync_counts.pending }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">同期済み</div>
+          <div class="value">{{ google_calendar_sync_counts.synced }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">エラー</div>
+          <div class="value">{{ google_calendar_sync_counts.error }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">競合</div>
+          <div class="value">{{ google_calendar_sync_counts.conflict }}</div>
+        </article>
+      </div>
+      {% if google_calendar_recent_bindings %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>sync_key</th>
+                <th>状態</th>
+                <th>Google event</th>
+                <th>最終同期</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for binding in google_calendar_recent_bindings %}
+                <tr>
+                  <td><code>{{ binding.sync_key }}</code></td>
+                  <td>
+                    <span class="badge{% if binding.sync_status == 'synced' %} ok{% elif binding.sync_status == 'error' or binding.sync_status == 'conflict' %} ng{% endif %}">
+                      {{ binding.get_sync_status_display }}
+                    </span>
+                  </td>
+                  <td style="word-break: break-all;">{{ binding.google_event_id|default:"-" }}</td>
+                  <td>{% if binding.last_synced_at %}{{ binding.last_synced_at|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
+                  <td style="word-break: break-all;">{{ binding.last_error_message|default:"-" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">まだ同期メタデータはありません。</p>
+      {% endif %}
+    </section>
+  </div>
+  {{ google_calendar_bulk_sync_status|json_script:"google-calendar-bulk-sync-status-json" }}
+  <script>
+    (function () {
+      const panel = document.getElementById("google-calendar-bulk-sync-panel");
+      const dataNode = document.getElementById("google-calendar-bulk-sync-status-json");
+      const button = document.getElementById("google-calendar-bulk-sync-button");
+      const progress = document.getElementById("google-calendar-bulk-sync-progress");
+      const summary = document.getElementById("google-calendar-bulk-sync-summary");
+      const counts = document.getElementById("google-calendar-bulk-sync-counts");
+      const current = document.getElementById("google-calendar-bulk-sync-current");
+      const actions = document.getElementById("google-calendar-bulk-sync-actions");
+      const recent = document.getElementById("google-calendar-bulk-sync-recent");
+      if (!panel || !dataNode || !progress || !summary || !counts || !current || !actions || !recent) {
+        return;
+      }
+
+      let statusPayload = {};
+      try {
+        statusPayload = JSON.parse(dataNode.textContent || "{}");
+      } catch (_error) {
+        statusPayload = {};
+      }
+      const statusUrl = panel.dataset.statusUrl || "";
+      const startable = panel.dataset.startable === "1";
+      let timerId = null;
+
+      function renderRecent(results) {
+        recent.textContent = "";
+        if (!Array.isArray(results) || results.length === 0) {
+          return;
+        }
+        results.forEach((item) => {
+          const row = document.createElement("li");
+          const key = document.createElement("code");
+          key.textContent = item.sync_key || "";
+          row.appendChild(key);
+          row.appendChild(document.createTextNode(" " + (item.action || "") + ": " + (item.message || "")));
+          recent.appendChild(row);
+        });
+      }
+
+      function renderStatus(payload) {
+        const totalCount = Number(payload.total_count || 0);
+        const processedCount = Number(payload.processed_count || 0);
+        progress.max = totalCount > 0 ? totalCount : 1;
+        progress.value = Math.min(processedCount, progress.max);
+        summary.textContent = payload.summary || "まだ一括同期は開始していません。";
+        counts.textContent = processedCount + " / " + totalCount + " 件";
+        current.textContent = payload.current_sync_key ? "現在: " + payload.current_sync_key : "現在: -";
+        const actionCounts = payload.action_counts || {};
+        actions.textContent =
+          "作成 " + Number(actionCounts.created || 0) + "件 / " +
+          "更新 " + Number(actionCounts.updated || 0) + "件 / " +
+          "エラー " + Number(actionCounts.error || 0) + "件 / " +
+          "競合 " + Number(actionCounts.conflict || 0) + "件";
+        renderRecent(payload.recent_results || []);
+
+        const running = Boolean(payload.running);
+        if (button) {
+          button.disabled = !startable || running;
+          button.textContent = running ? "同期中..." : "既存法要を一括同期";
+        }
+        if (running && statusUrl && !timerId) {
+          timerId = window.setInterval(fetchStatus, 2000);
+        }
+        if (!running && timerId) {
+          window.clearInterval(timerId);
+          timerId = null;
+        }
+      }
+
+      function fetchStatus() {
+        if (!statusUrl) {
+          return;
+        }
+        const requestUrl = new URL(statusUrl, window.location.origin);
+        requestUrl.searchParams.set("_", String(Date.now()));
+        window.fetch(requestUrl.toString(), {
+          cache: "no-store",
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        })
+          .then((response) => response.json())
+          .then((payload) => {
+            renderStatus(payload || {});
+          })
+          .catch(() => {});
+      }
+
+      renderStatus(statusPayload || {});
+      if (statusPayload && statusPayload.running && statusUrl && !timerId) {
+        timerId = window.setInterval(fetchStatus, 2000);
+      }
+    })();
+  </script>
+{% endblock %}

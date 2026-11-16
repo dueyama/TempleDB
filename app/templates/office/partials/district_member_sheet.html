@@ -1,0 +1,32 @@
+<section class="district-sheet" aria-label="{{ sheet.district_name }} の地区メンバー一覧">
+  <header class="district-sheet-header">
+    <h2 class="district-title">{{ sheet.district_name }}</h2>
+    <div class="district-meta">
+      {{ sheet.member_count }}名
+      {% if sheet.last_printed_at %}
+        <span class="district-last-print-record">/ 前回印刷記録 {{ sheet.last_printed_at|date:"Y-m-d H:i" }}</span>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="district-members">
+    {% for member in sheet.members %}
+      <div class="district-member">
+        <span class="district-marker">{% if member.is_district_officer %}※{% endif %}</span>
+        <span class="district-member-name">{{ member.name }}{% if include_memorial_notice_marker and member.has_memorial_notice_target %}<span class="district-notice-label">{{ marker_labels.memorial_notice }}</span>{% endif %}</span>
+      </div>
+    {% empty %}
+      <div class="district-empty">地区所属の current person はまだいません。</div>
+    {% endfor %}
+  </div>
+
+  <section class="district-note-block">
+    {% if sheet.manual_note %}
+      <div class="district-manual-note">
+        <div class="district-note-title">メモ</div>
+        <div>{{ sheet.manual_note|linebreaksbr }}</div>
+      </div>
+    {% endif %}
+    <div class="district-write-box" aria-hidden="true"></div>
+  </section>
+</section>

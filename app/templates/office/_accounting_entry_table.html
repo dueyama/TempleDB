@@ -1,0 +1,56 @@
+<div class="month-table-wrap">
+  <table class="month-table">
+    <thead>
+      <tr>
+        <th scope="col" class="compact-col">日付</th>
+        <th scope="col" class="compact-col">区分</th>
+        <th scope="col">戸主</th>
+        <th scope="col">対象者</th>
+        <th scope="col" class="compact-col">法要</th>
+        <th scope="col">合わせ法要</th>
+        <th scope="col" class="compact-col">方法</th>
+        <th scope="col" class="compact-col">金額</th>
+        <th scope="col">メモ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in entries %}
+        <tr>
+          <td class="compact-col day-cell" title="{{ entry.received_on }}">{% if show_month_day %}{{ entry.received_on_month_day|default:entry.received_on }}{% else %}{{ entry.received_on_short|default:entry.received_on }}{% endif %}</td>
+          <td class="compact-col">{{ entry.payment_category_label }}</td>
+          <td class="household-cell">
+            {% if entry.household_url %}
+              <a href="{{ entry.household_url }}">{{ entry.household_name }}</a>
+            {% else %}
+              {{ entry.household_name }}
+            {% endif %}
+          </td>
+          <td class="meta-cell person-cell">{% if entry.is_temple_event %}納入者: {% endif %}{{ entry.person_name|default:"-" }}</td>
+          <td class="meta-cell compact-col service-cell">
+            {% if entry.service_edit_url %}
+              <a href="{{ entry.service_edit_url }}">{{ entry.service_label|default:"-" }}</a>
+            {% elif entry.payment_edit_url %}
+              <a href="{{ entry.payment_edit_url }}">{{ entry.service_label|default:"-" }}</a>
+            {% else %}
+              {{ entry.service_label|default:"-" }}
+            {% endif %}
+          </td>
+          <td class="meta-cell linked-services-cell">
+            {% if entry.linked_service_items %}
+              <div class="linked-service-list">
+                {% for linked_service in entry.linked_service_items %}
+                  <div class="linked-service-item">{{ linked_service }}</div>
+                {% endfor %}
+              </div>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td class="meta-cell compact-col">{{ entry.payment_method_label }}</td>
+          <td class="amount-cell">{{ entry.amount }}円</td>
+          <td class="notes-cell">{{ entry.notes|default:"-" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

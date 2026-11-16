@@ -1,0 +1,26 @@
+{
+	auto_https off
+	admin off
+}
+
+http://:{$TEMPLEDB_PROXY_PORT} {
+	bind {$TEMPLEDB_PROXY_HOST}
+
+	header {
+		Strict-Transport-Security "max-age=3600"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+
+	handle_path /static/* {
+		root * {$TEMPLEDB_STATIC_ROOT}
+		file_server
+	}
+
+	handle {
+		reverse_proxy {$TEMPLEDB_GUNICORN_UPSTREAM} {
+			header_up X-Forwarded-Proto https
+		}
+	}
+}

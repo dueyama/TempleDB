@@ -1,0 +1,63 @@
+[Unit]
+Description=TempleDB product staging candidate (Gunicorn)
+Documentation=file://@WORKSPACE_ROOT@/docs/product_staging_service.md
+Requires=@PRODUCT_STAGING_POSTGRESQL_UNIT@
+After=@PRODUCT_STAGING_POSTGRESQL_UNIT@ network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=@RUN_USER@
+Group=@RUN_GROUP@
+WorkingDirectory=@WORKSPACE_ROOT@/app
+EnvironmentFile=@PRODUCT_STAGING_MACHINE_ENV@
+EnvironmentFile=@PRODUCT_STAGING_SAFETY_ENV@
+# This verifier runs with the fixed system Python before any configured Python.
+ExecStartPre=@PRODUCT_STAGING_RUNTIME_PYTHON_VERIFIER@
+# The renderer expands this to the read-only activated candidate verifier.
+# Leaving the token in place makes systemd validation and startup fail closed.
+ExecStartPre=@ACTIVATED_CANDIDATE_VERIFIER@
+ExecStartPre=/usr/bin/pg_isready -q -h ${DATABASE_HOST} -p ${DATABASE_PORT} -d ${DATABASE_NAME}
+ExecStartPre=@PRODUCT_STAGING_RUNTIME_PYTHON@ manage.py verify_runtime_contract --engine postgresql --runtime-kind product
+ExecStartPre=@PRODUCT_STAGING_RUNTIME_PYTHON@ manage.py migrate --check --skip-checks
+ExecStartPre=@PRODUCT_STAGING_RUNTIME_PYTHON@ manage.py check --deploy --fail-level WARNING
+ExecStartPre=/usr/bin/test -r @WORKSPACE_ROOT@/app/staticfiles/icons/favicon.ico
+ExecStartPre=/usr/bin/test -r @WORKSPACE_ROOT@/app/staticfiles/office/schema_map.css
+ExecStart=@PRODUCT_STAGING_RUNTIME_PYTHON@ -m gunicorn config.wsgi:application --bind ${TEMPLEDB_GUNICORN_UPSTREAM} --workers 1 --threads 1 --worker-class sync --timeout 180 --graceful-timeout 30 --forwarded-allow-ips 127.0.0.1 --no-control-socket --access-logfile - --access-logformat "%%(h)s %%(t)s \"%%(m)s %%(U)s %%(H)s\" %%(s)s %%(b)s %%(L)s" --error-logfile -
+ExecStartPost=/usr/bin/curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --max-time 3 --output /dev/null --header "Host: localhost" --header "X-Forwarded-Proto: https" http://127.0.0.1:@PRODUCT_STAGING_GUNICORN_PORT@/login/
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+BindReadOnlyPaths=@WORKSPACE_ROOT@
+BindReadOnlyPaths=@TENANT_ROOT@
+BindPaths=@PRODUCT_STAGING_BACKUP_ROOT@
+BindPaths=@TENANT_ROOT@/data/generated
+BindPaths=@TENANT_ROOT@/data/private
+BindPaths=@TENANT_ROOT@/data/runtime
+BindPaths=@TENANT_ROOT@/config/tenant_preferences
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

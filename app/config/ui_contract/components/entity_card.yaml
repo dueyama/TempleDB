@@ -1,0 +1,17 @@
+contract_type: component
+version: 2
+component_id: entity_card
+purpose: Repeated record summary card for households, people, schedules, and candidates.
+structure:
+  - title line with primary name or service label
+  - compact metadata badges
+  - pair-grid or short details
+  - action bar for record-specific navigation
+usage:
+  - household_browser.household_list
+  - household_detail.current_people
+  - household_detail.memorial_people
+  - service_ledger.event_sections
+rules:
+  - Keep record identity and household/person relationship visible.
+  - Cards may collapse details but must preserve the main edit/open affordance.

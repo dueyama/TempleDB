@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ print_heading_labels.memorial_sheet }} PDF</title>
+    <style>
+      :root {
+        --font-print-body: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif;
+        --font-print-homyo: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 210mm;
+        height: 297mm;
+        background: #fff;
+        color: #000;
+        font-family: var(--font-print-body);
+      }
+      body {
+        padding: 8mm 10mm;
+      }
+      .a4-page {
+        width: 190mm;
+        height: 281mm;
+        background: #fff;
+        color: #000;
+        border: 1px solid #000;
+        padding: 10mm 9mm;
+      }
+      .document-blocks {
+        display: flex;
+        flex-direction: column;
+        gap: 8mm;
+        height: 100%;
+      }
+      .upper-block,
+      .lower-block {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 12mm;
+        min-height: 0;
+        flex: 1;
+        padding-top: 10mm;
+      }
+      .upper-block {
+        padding-bottom: 4mm;
+        border-bottom: 1px solid #000;
+      }
+      .column {
+        min-height: 0;
+      }
+      .vertical-text {
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        letter-spacing: 0.08em;
+      }
+      .person-column {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 3.5mm;
+        padding-top: 30mm;
+      }
+      .kijitsu-columns {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.2mm;
+        padding-top: 2.5mm;
+      }
+      .kijitsu-col {
+        display: grid;
+        grid-template-rows: 46mm auto;
+        align-items: start;
+        row-gap: 2mm;
+      }
+      .memorial-columns {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.8mm;
+        padding-top: 2.5mm;
+      }
+      .memorial-col {
+        display: grid;
+        grid-template-rows: 24mm auto;
+        align-items: start;
+        row-gap: 26mm;
+      }
+      .homyo,
+      .zokumyo,
+      .death-line,
+      .age-line,
+      .kijitsu-label,
+      .kijitsu-date,
+      .rank,
+      .year,
+      .temple-name,
+      .temple-phone {
+        margin: 0;
+      }
+      .homyo {
+        font-family: var(--font-print-homyo);
+        font-size: 2.25rem;
+        font-weight: 700;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .homyo-text {
+        display: inline-block;
+        transform: translateY(var(--homyo-center-offset, 0));
+      }
+      .homyo-small {
+        display: inline-block;
+        font-size: 0.72em;
+        transform: translateX(0.18em);
+      }
+      .zokumyo {
+        font-size: 1.05rem;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .death-line {
+        font-size: 1.18rem;
+        margin-top: -10mm;
+      }
+      .age-line {
+        font-size: 0.74rem;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .zokumyo-block {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.8mm;
+        margin-top: 25mm;
+      }
+      .age-under-name {
+        margin-top: 3.1rem;
+      }
+      .kijitsu-label {
+        font-size: 1.26rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .kijitsu-sub {
+        font-size: 0.68em;
+      }
+      .kijitsu-date {
+        font-size: 1.14rem;
+        color: #000;
+        white-space: nowrap;
+      }
+      .rank {
+        font-size: 1.42rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .year {
+        font-size: 1.22rem;
+        white-space: nowrap;
+      }
+      .temple-column {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 3mm;
+        padding-top: 40mm;
+      }
+      .temple-column-upper {
+        margin-left: 5mm;
+      }
+      .temple-column-lower {
+        align-self: flex-end;
+        margin-left: 17mm;
+        margin-bottom: 6mm;
+        padding-top: 0;
+      }
+      .temple-name {
+        font-size: 1.14rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .temple-phone {
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="a4-page">
+      {% include "office/includes/memorial_sheet_document.html" %}
+    </div>
+  </body>
+</html>

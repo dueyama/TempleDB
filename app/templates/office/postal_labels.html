@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}郵送ラベル印刷 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .label-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .label-tools,
+    .label-summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .label-option-form {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+    }
+    .label-option-form label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .label-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .preview-stack {
+      display: grid;
+      gap: 24px;
+      justify-content: center;
+    }
+    .postal-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 21.2mm 18.6mm 22mm;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(68, 50, 33, 0.08);
+    }
+    .postal-grid {
+      width: 172.8mm;
+      min-height: 253.8mm;
+      display: grid;
+      grid-template-columns: repeat(2, 86.4mm);
+      grid-template-rows: repeat(6, 42.3mm);
+    }
+    .postal-label {
+      width: 86.4mm;
+      height: 42.3mm;
+      padding: 4.8mm 5.5mm 4.2mm;
+      border: 1px dashed rgba(108, 98, 88, 0.24);
+      display: grid;
+      align-content: start;
+      gap: 1.4mm;
+      position: relative;
+    }
+    .postal-label.is-empty {
+      border-color: rgba(108, 98, 88, 0.08);
+      background: rgba(245, 241, 232, 0.16);
+    }
+    .postal-code {
+      font-size: 4.1mm;
+      line-height: 1.1;
+      letter-spacing: .04em;
+    }
+    .postal-marker {
+      position: absolute;
+      right: 5.5mm;
+      bottom: 4.2mm;
+      min-height: 0;
+      max-width: 38mm;
+      font-size: 3.3mm;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-align: right;
+      white-space: normal;
+    }
+    .postal-address {
+      display: grid;
+      gap: .35mm;
+      font-size: 3.6mm;
+      line-height: 1.28;
+      min-height: 15.4mm;
+    }
+    .postal-addressee {
+      margin-top: .1mm;
+      font-family: var(--font-display);
+      font-size: 5.8mm;
+      line-height: 1.12;
+      letter-spacing: .04em;
+      word-break: break-word;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 21.2mm 18.6mm 22mm;
+    }
+    @media print {
+      body {
+        background: #fff;
+      }
+      .shell {
+        max-width: none;
+        padding: 0;
+      }
+      .session-bar,
+      .global-nav,
+      .office-subnav,
+      .hero,
+      .label-tools,
+      .label-summary,
+      .label-screen-notice,
+      .spot-selection-callout,
+      .flash-list {
+        display: none !important;
+      }
+      .label-shell {
+        gap: 0;
+      }
+      .preview-stack {
+        gap: 0;
+      }
+      .postal-sheet {
+        width: 172.8mm;
+        min-height: 253.8mm;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+        break-after: page;
+        page-break-after: always;
+      }
+      .postal-sheet:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+      .postal-label {
+        border: 0;
+      }
+      .postal-label.is-empty {
+        background: transparent;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="label-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="postal_labels" %}
+    <section class="hero">
+      <div class="eyebrow">Settings / Postal</div>
+      <h1>郵送ラベル印刷</h1>
+      <p>A4、上余白 21.2mm、下余白 22mm、左右余白 18.6mm、86.4mm × 42.3mm のラベルを 2列 × 6行で配置します。</p>
+    </section>
+
+    {% if available %}
+      <section class="label-tools">
+        <form class="label-option-form" method="get">
+          {% for household_uid in selected_household_uids %}
+            <input type="hidden" name="household_uid" value="{{ household_uid }}">
+          {% endfor %}
+          <label>
+            <input type="checkbox" name="include_memorial_notice_marker" value="1" {% if include_memorial_notice_marker %}checked{% endif %}>
+            {{ print_heading_labels.memorial_notice }}ありの家に「{{ marker_labels.memorial_notice }}」を入れる
+          </label>
+          <button class="ghost-button" type="submit">反映</button>
+        </form>
+        <button class="button" type="button" onclick="window.print()">印刷する</button>
+        <a class="ghost-button" href="{% url 'office:postal_labels' %}?format=pdf{% if include_memorial_notice_marker %}&include_memorial_notice_marker=1{% endif %}{% for household_uid in selected_household_uids %}&household_uid={{ household_uid|urlencode }}{% endfor %}">PDFを開く</a>
+        <a class="ghost-button" href="{% url 'office:postal_compare' %}">DBと比較</a>
+        <a class="ghost-button" href="{% url 'office:postal_review' %}">照合結果を見る</a>
+      </section>
+
+      {% if spot_selection_active %}
+        <div class="callout spot-selection-callout">
+          スポット印刷：指定された{{ requested_household_count }}戸だけを対象にしています。送付区分そのものは変更しません。
+          {% if missing_household_count %}対象を確認できなかった戸主が{{ missing_household_count }}件あります。{% endif %}
+        </div>
+      {% endif %}
+
+      <section class="label-summary">
+        <article class="summary-box">
+          <div class="label">郵送ラベル件数</div>
+          <div class="value">{{ total_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">印刷ページ数</div>
+          <div class="value">{{ page_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">1ページ</div>
+          <div class="value">12面</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">{{ marker_labels.memorial_notice }}</div>
+          <div class="value">
+            {% if include_memorial_notice_marker %}
+              {{ memorial_notice_marker_count }}
+            {% else %}
+              オフ
+            {% endif %}
+          </div>
+        </article>
+      </section>
+      {% if include_memorial_notice_marker %}
+        <p class="muted label-screen-notice">{{ memorial_notice_target_year }}年の{{ print_heading_labels.memorial_notice }}対象にだけ「{{ marker_labels.memorial_notice }}」を入れます。</p>
+      {% endif %}
+      {% if memorial_notice_marker_warning %}
+        <p class="muted label-screen-notice">{{ memorial_notice_marker_warning }}</p>
+      {% endif %}
+
+      <div class="preview-stack">
+        {% for page in label_pages %}
+          <section class="postal-sheet" aria-label="郵送ラベル {{ forloop.counter }} ページ目">
+            <div class="postal-grid">
+              {% for label in page %}
+                <article class="postal-label{% if not label %} is-empty{% endif %}">
+                  {% if label %}
+                    <div class="postal-marker">{{ label.marker_text }}</div>
+                    <div class="postal-code">{{ label.postal_code_display|default:"" }}</div>
+                    <div class="postal-address">
+                      {% for line in label.address_lines %}
+                        <div>{{ line }}</div>
+                      {% endfor %}
+                    </div>
+                    <div class="postal-addressee">{{ label.addressee }}</div>
+                  {% endif %}
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="callout">{{ error_message }}</div>
+    {% endif %}
+  </div>
+{% endblock %}

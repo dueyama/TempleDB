@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "templedb"
+version = "0.1.0"
+license = {text = "MIT"}
+description = "AI-maintainable temple administration workspace"
+requires-python = ">=3.13"
+dependencies = [
+  "Django>=5.2.15,<5.3",
+  "djangorestframework>=3.15,<4.0",
+  "google-api-python-client>=2.170,<3.0",
+  "google-auth>=2.40,<3.0",
+  "gunicorn>=25.3,<26.0; sys_platform != 'win32'",
+  "matplotlib>=3.10,<4.0",
+  "pandas>=3.0,<4.0",
+  "Pillow>=12.0,<13.0",
+  "psycopg[binary]>=3.2,<4.0; sys_platform != 'win32'",
+  "pypdfium2>=5.11,<6.0",
+  "reportlab>=4.0,<5.0",
+]
+
+[project.optional-dependencies]
+ai = [
+  "mcp>=1.0,<2.0",
+]
+dev = [
+  "pytest>=8.0,<9.0",
+  "pytest-django>=4.8,<5.0",
+  "ruff>=0.11,<0.12",
+]
+
+[tool.setuptools.packages.find]
+include = ["apps*", "config*"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# UP038 is deprecated; tuple-based isinstance checks remain clearer and faster.
+ignore = ["UP038"]
+
+[tool.ruff.lint.pycodestyle]
+# Keep formatting at 100 characters, but only flag exceptionally long lines.
+max-line-length = 200
+
+[tool.ruff.lint.per-file-ignores]
+# Preserve generated historical migrations while continuing to lint them for other issues.
+"**/migrations/*.py" = ["E501"]

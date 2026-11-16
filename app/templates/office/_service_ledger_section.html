@@ -1,0 +1,307 @@
+{% if section_collapsible %}
+  <details class="section-card section-card-collapsible{% if section_class %} {{ section_class }}{% endif %}"{% if section_id %} id="{{ section_id }}"{% endif %}{% if section_open %} open{% endif %}>
+    <summary class="section-card-summary">
+      <div>
+        <div class="eyebrow">{{ eyebrow }}</div>
+        <h2>{{ title }}{% if title_count %} {{ title_count }}件{% endif %}</h2>
+      </div>
+      <span class="summary-chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="section-card-body">
+{% else %}
+  <section class="section-card{% if section_class %} {{ section_class }}{% endif %}"{% if section_id %} id="{{ section_id }}"{% endif %}>
+    {% if section_action_url and section_action_label or section_help_text %}
+      <div class="section-card-head">
+        <div>
+          <div class="eyebrow">{{ eyebrow }}</div>
+          {% if section_help_text %}
+            <div class="help-heading-row">
+              <h2>{{ title }}{% if title_count %} {{ title_count }}件{% endif %}</h2>
+              <div class="help-popover" data-help-popover>
+                <button
+                  class="help-popover-button help-popover-button-compact"
+                  type="button"
+                  aria-controls="{{ section_help_id|default:'service-ledger-section-help' }}"
+                  aria-expanded="false"
+                  aria-label="{{ title }}の説明"
+                  data-help-popover-button
+                >?</button>
+                <div
+                  class="help-popover-panel"
+                  id="{{ section_help_id|default:'service-ledger-section-help' }}"
+                  hidden
+                  data-help-popover-panel
+                >
+                  <p>{{ section_help_text }}</p>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <h2>{{ title }}{% if title_count %} {{ title_count }}件{% endif %}</h2>
+          {% endif %}
+        </div>
+        {% if section_action_url and section_action_label %}
+          <a class="{{ section_action_class|default:'section-card-link' }}" href="{{ section_action_url }}">{{ section_action_label }}</a>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="eyebrow">{{ eyebrow }}</div>
+      <h2>{{ title }}{% if title_count %} {{ title_count }}件{% endif %}</h2>
+    {% endif %}
+{% endif %}
+      {% if section_pagination %}
+        {% include "office/_service_ledger_candidate_pagination.html" with navigation=section_pagination only %}
+      {% endif %}
+      <div class="card-stack">
+        {% for item in entries %}
+          {% if item.is_temple_event %}
+            {% include "office/_home_temple_event.html" %}
+          {% else %}
+          <details class="event-card ledger-card{% if item.is_overdue %} is-overdue{% endif %}"{% if card_view_mode == "expanded" or item.quick_completion.form.is_bound %} open{% endif %}>
+            <summary class="ledger-card-summary">
+              <div class="summary-heading">
+                {% if item.scheduled_date or item.scheduled_time or item.location %}
+                  <div class="summary-date">
+                    {% if item.scheduled_date %}{{ item.scheduled_date }}{% endif %}
+                    {% if item.scheduled_time %} {{ item.scheduled_time }}{% endif %}
+                    {% if show_relative_days and item.days_until_label %} / {{ item.days_until_label }}{% endif %}
+                    {% if item.location %} / {{ item.location }}{% endif %}
+                  </div>
+                {% endif %}
+                <div class="summary-title">
+                  {% if item.person_id and item.household_id %}
+                    <a
+                      class="summary-link-text"
+                      data-summary-link="1"
+                      onclick="event.preventDefault(); event.stopPropagation(); window.location.assign(this.href);"
+                      href="{% url 'office:edit_person' item.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                    >
+                      {{ item.person_name|default:"対象未設定" }}{% if item.service_label_compact|default:item.service_label %} / {{ item.service_label_compact|default:item.service_label }}{% endif %}
+                    </a>
+                  {% elif item.is_household_event %}
+                    {% if item.household_id and item.household_name %}
+                      <a
+                        class="summary-link-text"
+                        data-summary-link="1"
+                        onclick="event.preventDefault(); event.stopPropagation(); window.location.assign(this.href);"
+                        href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail"
+                      >
+                        {{ item.household_name }}
+                      </a>
+                    {% elif item.household_name %}
+                      {{ item.household_name }}
+                    {% elif item.household_id %}
+                      {{ identifier_labels.household }} {{ item.household_id }}
+                    {% else %}
+                      対象未設定
+                    {% endif %}
+                    {% if item.service_label_compact|default:item.service_label %} / {{ item.service_label_compact|default:item.service_label }}{% endif %}
+                  {% else %}
+                    {{ item.person_name|default:"対象未設定" }}{% if item.event_id and not item.person_id %} <span class="muted">{{ identifier_labels.service_event }} {{ item.event_id }}</span>{% endif %}
+                  {% endif %}
+                </div>
+                <div class="summary-subtitle">
+                  {% if item.person_id %}
+                    {% if item.household_id and item.household_name %}
+                      戸主:
+                      <a
+                        class="summary-link-text"
+                        onclick="event.preventDefault(); event.stopPropagation(); window.location.assign(this.href);"
+                        href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail"
+                      >
+                        {{ item.household_name }}
+                      </a>
+                    {% elif item.household_name %}
+                      戸主: {{ item.household_name }}
+                    {% elif item.household_id %}
+                      {{ identifier_labels.household }} {{ item.household_id }}
+                    {% endif %}
+                  {% elif item.is_household_event %}
+                    {% if item.household_id %}
+                      {{ identifier_labels.household }} {{ item.household_id }}
+                    {% endif %}
+                  {% else %}
+                    {{ item.service_label }}
+                    {% if item.household_id and item.household_name %}
+                      /
+                      <a
+                        class="summary-link-text"
+                        onclick="event.preventDefault(); event.stopPropagation(); window.location.assign(this.href);"
+                        href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail"
+                      >
+                        {{ item.household_name }}
+                      </a>
+                    {% elif item.household_name %}
+                      / {{ item.household_name }}
+                    {% endif %}
+                    {% if item.household_id and not item.person_id %}
+                      / {{ identifier_labels.household }} {{ item.household_id }}
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="badge-row summary-badges">
+                <span class="badge">{{ item.status_label }}</span>
+                <span class="badge">{{ item.category_label }}</span>
+                {% if item.linked_group_count|default:0 > 1 %}<span class="badge">リンク {{ item.linked_group_count }}件</span>{% endif %}
+                {% if item.is_today %}<span class="badge today">今日</span>{% endif %}
+                {% if item.is_overdue %}<span class="badge overdue">予定日超過</span>{% endif %}
+              </div>
+              <span class="summary-chevron" aria-hidden="true"></span>
+            </summary>
+            <div class="ledger-card-body">
+              {% if item.quick_completion %}
+                {% include "office/_home_service_completion.html" with quick=item.quick_completion csrf_token=csrf_token only %}
+              {% endif %}
+              {% if not item.is_candidate %}
+                <div class="card-meta" style="margin: 0;">{{ identifier_labels.service_event }} {{ item.event_id }}</div>
+              {% endif %}
+              {% if item.note_count or item.payment_count %}
+                <div class="badge-row">
+                  {% if item.note_count %}<span class="badge">メモ {{ item.note_count }}</span>{% endif %}
+                  {% if item.payment_count %}<span class="badge">入金 {{ item.payment_count }}</span>{% endif %}
+                </div>
+              {% endif %}
+              <dl class="pair-grid">
+                {% if item.target_date %}
+                  <div class="pair">
+                    <dt>{{ target_date_label|default:"命日基準日" }}</dt>
+                    <dd>{{ item.target_date }}</dd>
+                  </div>
+                {% endif %}
+                {% if show_completed_on %}
+                  <div class="pair">
+                    <dt>実施日</dt>
+                    <dd>{{ item.completed_on|default:"不明" }}</dd>
+                  </div>
+                {% endif %}
+                {% if item.location %}
+                  <div class="pair">
+                    <dt>場所</dt>
+                    <dd>{{ item.location }}</dd>
+                  </div>
+                {% endif %}
+                {% if item.relationship %}
+                  <div class="pair">
+                    <dt>続柄</dt>
+                    <dd>{{ item.relationship }}</dd>
+                  </div>
+                {% endif %}
+                {% if item.death_date %}
+                  <div class="pair">
+                    <dt>命日</dt>
+                    <dd>{{ item.death_date }}</dd>
+                  </div>
+                {% endif %}
+                {% if item.kaimyo %}
+                  <div class="pair">
+                    <dt>{{ deceased_labels.kaimyo }}</dt>
+                    <dd>{{ item.kaimyo }}</dd>
+                  </div>
+                {% endif %}
+                {% if item.notes and not item.is_candidate %}
+                  <div class="pair">
+                    <dt>{{ item.notes_label|default:"メモ" }}</dt>
+                    <dd>{{ item.notes }}</dd>
+                  </div>
+                {% endif %}
+              </dl>
+              {% if item.linked_entries %}
+                <div class="callout">
+                  <strong>一緒に勤める対象</strong>
+                  <div style="display: grid; gap: 8px; margin-top: 8px;">
+                    {% for linked in item.linked_entries %}
+                      <div style="padding: 8px 10px; border: 1px solid var(--line-color); border-radius: 10px; background: rgba(255,255,255,0.55);">
+                        <div>
+                          {% if linked.person_id and linked.household_id %}
+                          <strong>
+                            <a
+                              class="person-link"
+                              href="{% url 'office:edit_person' linked.household_id linked.person_id %}?next={{ current_url|urlencode }}"
+                            >
+                              {{ linked.person_name|default:"対象未設定" }}
+                            </a>
+                          </strong>
+                            / {{ linked.service_label_compact|default:linked.service_label }}
+                          {% else %}
+                            <strong>{{ linked.person_name|default:"対象未設定" }}</strong> / {{ linked.service_label_compact|default:linked.service_label }}
+                          {% endif %}
+                        </div>
+                        <div class="muted">
+                          {{ identifier_labels.service_event }} {{ linked.event_id }}
+                          {% if linked.target_date %}命日基準日 {{ linked.target_date }}{% endif %}
+                          {% if linked.scheduled_date %}{% if linked.target_date %} / {% endif %}予定 {{ linked.scheduled_date }}{% if linked.scheduled_time %} {{ linked.scheduled_time }}{% endif %}{% endif %}
+                          {% if linked.status_label %} / {{ linked.status_label }}{% endif %}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+              <div class="card-actions">
+                {% if item.is_candidate %}
+                  <a
+                    class="button"
+                    href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?service_label={{ item.service_label|urlencode }}&target_date={{ item.target_date|urlencode }}&category={{ item.schedule_category|urlencode }}&next={{ current_url|urlencode }}"
+                  >
+                    この候補を予定登録
+                  </a>
+                  {% if item.can_record_with_funeral %}
+                    <a
+                      class="ghost-button"
+                      href="{% url 'office:record_candidate_with_funeral' item.household_id item.person_id %}?service_label={{ item.service_label|urlencode }}&target_date={{ item.target_date|urlencode }}&candidate_type={{ item.candidate_type|urlencode }}&next={{ current_url|urlencode }}"
+                    >
+                      葬儀と一緒に記録
+                    </a>
+                  {% endif %}
+                  <a
+                    class="ghost-button"
+                    href="{% url 'office:cancel_memorial_candidate' item.household_id item.person_id %}?service_label={{ item.service_label|urlencode }}&target_date={{ item.target_date|urlencode }}&candidate_type={{ item.candidate_type|urlencode }}&next={{ current_url|urlencode }}"
+                  >
+                    この候補を中止記録
+                  </a>
+                {% else %}
+                  <a
+                    class="button"
+                    href="{% url 'office:edit_service_schedule' item.household_id item.event_id %}?source_table={{ item.source_table|urlencode }}&next={{ current_url|urlencode }}"
+                  >
+                    この法要を編集
+                  </a>
+                  <a
+                    class="ghost-button"
+                    href="{% url 'office:print_service_schedule' item.household_id item.event_id %}?source_table={{ item.source_table|urlencode }}&next={{ current_url|urlencode }}"
+                  >
+                    情報印刷
+                  </a>
+                  {% if show_person_action and item.household_id and item.person_id %}
+                    <a
+                      class="ghost-button"
+                      href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail#memorial-person-{{ item.person_id|urlencode }}"
+                    >
+                      この人の過去帳を開く
+                    </a>
+                  {% endif %}
+                {% endif %}
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail"
+                >
+                  この家を開く
+                </a>
+              </div>
+            </div>
+          </details>
+          {% endif %}
+        {% empty %}
+          <div class="callout">{{ empty_message }}</div>
+        {% endfor %}
+      </div>
+      {% if section_pagination.page.has_other_pages %}
+        {% include "office/_service_ledger_candidate_pagination.html" with navigation=section_pagination only %}
+      {% endif %}
+{% if section_collapsible %}
+    </div>
+  </details>
+{% else %}
+  </section>
+{% endif %}

@@ -1,0 +1,439 @@
+<div class="summary-grid">
+  <div class="summary-box">
+    <div class="label">過去帳</div>
+    <div class="value">{{ memorial_member_total }}</div>
+  </div>
+  <a class="summary-box" href="#missing-death-dates" style="display: block; color: inherit; text-decoration: none;">
+    <div class="label">命日不明</div>
+    <div class="value">{{ missing_death_date_count }}</div>
+  </a>
+  <a class="summary-box" href="#unknown-gender" style="display: block; color: inherit; text-decoration: none;">
+    <div class="label">性別不明</div>
+    <div class="value">{{ unknown_gender_count }}</div>
+  </a>
+  <a class="summary-box" href="#address-line2-overlap" style="display: block; color: inherit; text-decoration: none;">
+    <div class="label">住所2重複候補</div>
+    <div class="value">{{ address_line2_overlap_count }}</div>
+  </a>
+  <a class="summary-box" href="#homyo-order-issues" style="display: block; color: inherit; text-decoration: none;">
+    <div class="label">{{ tenant_terms.homyo_order_issue }}</div>
+    <div class="value">{{ homyo_order_issue_count }}</div>
+  </a>
+  <a class="summary-box" href="#same-name-candidates" style="display: block; color: inherit; text-decoration: none;">
+    <div class="label">同名候補グループ</div>
+    <div class="value">{{ same_name_group_count }}</div>
+  </a>
+  <a class="summary-box" href="#latest-import-issues" style="display: block; color: inherit; text-decoration: none;">
+    <div class="label">Latest Import Issues</div>
+    <div class="value">{{ import_issue_total }}</div>
+  </a>
+</div>
+
+<section id="missing-death-dates" class="section-card" style="scroll-margin-top: 96px;">
+  <div class="eyebrow">Missing death dates</div>
+  <h2>命日不明の過去帳</h2>
+  <p class="muted">過去帳なのに命日が空のレコードです。年忌計算できないので優先確認対象です。</p>
+  <div class="stack">
+    {% for item in missing_death_date_members %}
+      <article class="issue-card">
+        <h3>{{ item.name }} <span class="muted">{{ identifier_labels.person }} {{ item.person_id }}</span></h3>
+        <div class="card-meta">{{ item.household_name }} / {{ identifier_labels.household }} {{ item.household_id }}</div>
+        <dl class="pair-grid">
+          <div class="pair">
+            <dt>種別</dt>
+            <dd>{{ item.member_type_label }}</dd>
+          </div>
+          {% if item.relationship %}
+            <div class="pair">
+              <dt>続柄</dt>
+              <dd>{{ item.relationship }}</dd>
+            </div>
+          {% endif %}
+          {% if item.kaimyo %}
+            <div class="pair">
+              <dt>{{ deceased_labels.kaimyo }}</dt>
+              <dd>{{ item.kaimyo }}</dd>
+            </div>
+          {% endif %}
+          {% if item.note %}
+            <div class="pair">
+              <dt>備考</dt>
+              <dd>{{ item.note }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+        <p style="margin-top: 14px;">
+          <a class="button" href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}">この家を開く</a>
+          {% if data_backend == 'db' %}
+            <a class="ghost-button" href="{% url 'office:edit_person' item.household_id item.person_id %}?next={{ current_url|urlencode }}">この人を修正</a>
+          {% endif %}
+        </p>
+      </article>
+    {% empty %}
+      <div class="callout">命日不明の過去帳は見つかりませんでした。</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="address-line2-overlap" class="section-card" style="scroll-margin-top: 96px;">
+  <div class="eyebrow">Address overlap</div>
+  <h2>住所2重複候補</h2>
+  <p class="muted">住所2全体が住所1の末尾にそのまま重なっている、安全に整理しやすい候補だけを出します。</p>
+  <div class="stack">
+    {% for item in address_line2_overlap_households %}
+      <article class="issue-card">
+        <h3>{{ item.household_name }} <span class="muted">{{ identifier_labels.household }} {{ item.household_id }}</span></h3>
+        <div class="card-meta">住所1の末尾に <code>{{ item.overlap_text }}</code> が重複しています。</div>
+        <dl class="pair-grid">
+          <div class="pair">
+            <dt>住所1</dt>
+            <dd>{{ item.address_line1|default:"-" }}</dd>
+          </div>
+          <div class="pair">
+            <dt>住所2</dt>
+            <dd>{{ item.address_line2|default:"-" }}</dd>
+          </div>
+        </dl>
+        <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <a class="button" href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}">この家を開く</a>
+          {% if data_backend == 'db' %}
+            <form method="post" action="{% url 'office:clear_household_address_line2' item.household_id %}" style="display: flex; gap: 10px; flex-wrap: wrap; margin: 0;">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ current_url }}">
+              <input type="hidden" name="change_note" value="データ問題点一覧で住所2重複を解消">
+              <button class="ghost-button" type="submit">住所2を破棄</button>
+            </form>
+            <a class="ghost-button" href="{% url 'office:edit_household' item.household_id %}?next={{ current_url|urlencode }}">戸主レコードを修正</a>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="callout">住所2重複の候補は見つかりませんでした。</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="unknown-gender" class="section-card" style="scroll-margin-top: 96px;">
+  <div class="eyebrow">Unknown gender</div>
+  <h2>性別不明</h2>
+  <p class="muted">`男 / 女` として読めないレコードです。空欄や入力揺れが混じる可能性があるので、一覧で確認します。</p>
+  {% if data_backend == 'db' %}
+    <form id="unknown-gender-batch-form" method="post" action="{% url 'office:bulk_update_people_gender' %}" style="margin: 14px 0 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ current_url }}">
+      <input type="hidden" name="change_note" value="データ問題点一覧で性別を一括更新">
+      <button class="button" type="submit">チェック内容を反映</button>
+      <span class="muted">各人の `男` / `女` をチェックします。どちらもチェックしなければそのままです。</span>
+    </form>
+  {% endif %}
+  <div class="stack">
+    {% for item in unknown_gender_members %}
+      <article class="issue-card">
+        <h3>{{ item.name }} <span class="muted">{{ identifier_labels.person }} {{ item.person_id }}</span></h3>
+        <div class="card-meta">{{ item.household_name }} / {{ identifier_labels.household }} {{ item.household_id }}</div>
+        {% if data_backend == 'db' %}
+          <div style="display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 12px;">
+            <label style="display: inline-flex; gap: 8px; align-items: center;">
+              <input
+                type="checkbox"
+                name="male_people"
+                value="{{ item.household_id }}:{{ item.person_id }}"
+                form="unknown-gender-batch-form"
+              >
+              <span>男</span>
+            </label>
+            <label style="display: inline-flex; gap: 8px; align-items: center;">
+              <input
+                type="checkbox"
+                name="female_people"
+                value="{{ item.household_id }}:{{ item.person_id }}"
+                form="unknown-gender-batch-form"
+              >
+              <span>女</span>
+            </label>
+          </div>
+        {% endif %}
+        <dl class="pair-grid">
+          <div class="pair">
+            <dt>種別</dt>
+            <dd>{{ item.member_type_label }}</dd>
+          </div>
+          {% if item.relationship %}
+            <div class="pair">
+              <dt>続柄</dt>
+              <dd>{{ item.relationship }}</dd>
+            </div>
+          {% endif %}
+          <div class="pair">
+            <dt>性別入力</dt>
+            <dd>{% if item.raw_gender %}{{ item.raw_gender }}{% else %}未入力{% endif %}</dd>
+          </div>
+          {% if item.death_date %}
+            <div class="pair">
+              <dt>命日</dt>
+              <dd>{{ item.death_date }}</dd>
+            </div>
+          {% endif %}
+          {% if item.kaimyo %}
+            <div class="pair">
+              <dt>{{ deceased_labels.kaimyo }}</dt>
+              <dd>{{ item.kaimyo }}</dd>
+            </div>
+          {% endif %}
+          {% if item.note %}
+            <div class="pair">
+              <dt>備考</dt>
+              <dd>{{ item.note }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+        <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <a class="button" href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}">この家を開く</a>
+          {% if data_backend == 'db' %}
+            <a class="ghost-button" href="{% url 'office:edit_person' item.household_id item.person_id %}?next={{ current_url|urlencode }}">この人を修正</a>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="callout">性別不明の候補は見つかりませんでした。</div>
+    {% endfor %}
+  </div>
+  {% if data_backend == 'db' and unknown_gender_members %}
+    <div style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <button class="button" type="submit" form="unknown-gender-batch-form">チェック内容を反映</button>
+    </div>
+  {% endif %}
+</section>
+
+<section id="homyo-order-issues" class="section-card" style="scroll-margin-top: 96px;">
+  <div class="eyebrow">Homyo order</div>
+  <h2>{{ tenant_terms.homyo_order_issue }}</h2>
+  <p class="muted">{{ tenant_copy.data_quality.homyo_order_description }}</p>
+  <div class="stack">
+    {% for item in homyo_order_issue_members %}
+      <article class="issue-card">
+        <h3>{{ item.name }} <span class="muted">{{ identifier_labels.person }} {{ item.person_id }}</span></h3>
+        <div class="card-meta">{{ item.household_name }} / {{ identifier_labels.household }} {{ item.household_id }}</div>
+        <dl class="pair-grid">
+          {% if item.relationship %}
+            <div class="pair">
+              <dt>続柄</dt>
+              <dd>{{ item.relationship }}</dd>
+            </div>
+          {% endif %}
+          <div class="pair">
+            <dt>現在の{{ deceased_labels.kaimyo }}</dt>
+            <dd>{{ item.kaimyo }}</dd>
+          </div>
+          <div class="pair">
+            <dt>想定される並び</dt>
+            <dd>{{ item.suggested_kaimyo }}</dd>
+          </div>
+          <div class="pair">
+            <dt>院号</dt>
+            <dd>{{ item.ingo }}</dd>
+          </div>
+          <div class="pair">
+            <dt>{{ tenant_terms.homyo_body }}</dt>
+            <dd>{{ item.homyo }}</dd>
+          </div>
+        </dl>
+        <p style="margin-top: 14px;">
+          <a class="button" href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}">この家を開く</a>
+          {% if data_backend == 'db' %}
+            <a class="ghost-button" href="{% url 'office:edit_person' item.household_id item.person_id %}?next={{ current_url|urlencode }}">この人を修正</a>
+          {% endif %}
+        </p>
+      </article>
+    {% empty %}
+      <div class="callout">{{ tenant_copy.data_quality.homyo_order_empty }}</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="same-name-candidates" class="section-card" style="scroll-margin-top: 96px;">
+  <div class="eyebrow">Same-name candidates</div>
+  <h2>同名候補</h2>
+  <p class="muted">氏名の空白を除いて一致する家族レコードを候補表示しています。重複の断定ではなく、入力ミスや二重登録の確認用です。</p>
+  <div class="stack">
+    {% for group in same_name_groups %}
+      <article class="issue-card">
+        <h3>{{ group.display_name }}</h3>
+        <div class="card-meta">同名 {{ group.count }} 件 / 家 {{ group.household_count }} 軒</div>
+        {% if group.households %}
+          <div class="same-name-compare-block">
+            <div class="same-name-section-label">家の比較</div>
+            <div class="same-name-household-grid">
+              {% for household in group.households %}
+                <article class="same-name-household">
+                  <h4>{{ household.household_name }} <span class="muted">{{ identifier_labels.household }} {{ household.household_id }}</span></h4>
+                  <dl class="pair-grid">
+                    {% if household.matching_members_preview %}
+                      <div class="pair">
+                        <dt>この候補</dt>
+                        <dd>{{ household.matching_members_preview }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.head_name %}
+                      <div class="pair">
+                        <dt>{{ household.head_label }}</dt>
+                        <dd>{{ household.head_name }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.household_member_summary %}
+                      <div class="pair">
+                        <dt>家の構成</dt>
+                        <dd>{{ household.household_member_summary }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.address %}
+                      <div class="pair">
+                        <dt>住所</dt>
+                        <dd>{{ household.address }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.phone %}
+                      <div class="pair">
+                        <dt>電話</dt>
+                        <dd>{{ household.phone }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.delivery_label %}
+                      <div class="pair">
+                        <dt>送付</dt>
+                        <dd>{{ household.delivery_label }}</dd>
+                      </div>
+                    {% endif %}
+                    <div class="pair">
+                      <dt>寺院有縁系</dt>
+                      <dd>{{ household.yuen_label }}</dd>
+                    </div>
+                    {% if household.event_summary %}
+                      <div class="pair">
+                        <dt>予定</dt>
+                        <dd>{{ household.event_summary }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.current_member_names_preview %}
+                      <div class="pair">
+                        <dt>現在帳の人</dt>
+                        <dd>{{ household.current_member_names_preview }}</dd>
+                      </div>
+                    {% endif %}
+                    {% if household.memorial_member_names_preview %}
+                      <div class="pair">
+                        <dt>過去帳の人</dt>
+                        <dd>{{ household.memorial_member_names_preview }}</dd>
+                      </div>
+                    {% endif %}
+                  </dl>
+                  <p style="margin-top: 14px;">
+                    <a class="ghost-button" href="{% url 'office:household_browser' %}?household_id={{ household.household_id }}">この家を開く</a>
+                  </p>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        <div class="same-name-section-label">候補レコード</div>
+        <div class="same-name-grid">
+          {% for member in group.members %}
+            <article class="same-name-member">
+              <h4>{{ member.name|default:member.household_name }} <span class="muted">{{ identifier_labels.person }} {{ member.person_id }}</span></h4>
+              <p class="muted" style="margin: 6px 0 12px;">{{ member.household_name }} / {{ identifier_labels.household }} {{ member.household_id }}</p>
+              <dl class="pair-grid">
+                <div class="pair">
+                  <dt>種別</dt>
+                  <dd>{{ member.member_type_label }}</dd>
+                </div>
+                {% if member.household_role_label %}
+                  <div class="pair">
+                    <dt>家の中での位置</dt>
+                    <dd>{{ member.household_role_label }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.household_member_summary %}
+                  <div class="pair">
+                    <dt>家の構成</dt>
+                    <dd>{{ member.household_member_summary }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.current_member_names_preview %}
+                  <div class="pair">
+                    <dt>現在帳の人</dt>
+                    <dd>{{ member.current_member_names_preview }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.memorial_member_names_preview %}
+                  <div class="pair">
+                    <dt>過去帳の人</dt>
+                    <dd>{{ member.memorial_member_names_preview }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.relationship %}
+                  <div class="pair">
+                    <dt>続柄</dt>
+                    <dd>{{ member.relationship }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.death_date %}
+                  <div class="pair">
+                    <dt>命日</dt>
+                    <dd>{{ member.death_date }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.kaimyo %}
+                  <div class="pair">
+                    <dt>{{ deceased_labels.kaimyo }}</dt>
+                    <dd>{{ member.kaimyo }}</dd>
+                  </div>
+                {% endif %}
+                {% if member.note %}
+                  <div class="pair">
+                    <dt>備考</dt>
+                    <dd>{{ member.note }}</dd>
+                  </div>
+                {% endif %}
+              </dl>
+              <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <a class="button" href="{% url 'office:household_browser' %}?household_id={{ member.household_id }}">この家を開く</a>
+                {% if data_backend == 'db' %}
+                  <a class="ghost-button" href="{% url 'office:edit_person' member.household_id member.person_id %}?next={{ current_url|urlencode }}">この人を修正</a>
+                  <form method="post" action="{% url 'office:delete_person_from_same_name_candidates' member.household_id member.person_id %}" style="display: flex; gap: 10px; flex-wrap: wrap; margin: 0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ current_url }}">
+                    <input type="hidden" name="change_note" value="同名候補一覧から家族レコードを削除">
+                    <button
+                      class="danger-button"
+                      type="submit"
+                      onclick="return confirm('この家族レコードを削除済みにします。よろしいですか？');"
+                    >
+                      この人を削除
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="callout">同名候補は見つかりませんでした。</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="latest-import-issues" class="section-card" style="scroll-margin-top: 96px;">
+  <div class="eyebrow">取込確認</div>
+  <h2>直近取込の確認事項</h2>
+  <div class="stack">
+    {% for item in import_issue_breakdown %}
+      <article class="issue-card">
+        <h3>{{ item.code }}</h3>
+        <div class="card-meta">{{ item.severity }} / {{ item.count }} 件</div>
+      </article>
+    {% empty %}
+      <div class="callout">直近取込に記録された確認事項はありません。</div>
+    {% endfor %}
+  </div>
+</section>

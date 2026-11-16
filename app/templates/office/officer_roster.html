@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .roster-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .roster-grid,
+    .meta-row,
+    .badge-row,
+    .action-row-inline {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    .summary-box,
+    .roster-card,
+    .tools-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: rgba(245, 236, 220, 0.95);
+      font-size: .84rem;
+    }
+    .pair-grid {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .pair dt {
+      margin: 0 0 2px;
+      color: var(--muted);
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .pair dd {
+      margin: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="roster-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page=current_page %}
+
+    <section class="hero">
+      <div class="eyebrow">Settings / Roles</div>
+      <h1>{{ title }}</h1>
+      <p>{{ description }}</p>
+      {% if available %}
+        <div class="action-row-inline" style="margin-top: 16px;">
+          <a class="ghost-button" href="{{ csv_export_url }}">CSVを書き出す</a>
+        </div>
+      {% endif %}
+    </section>
+
+    {% if current_page == "district_officer_roster" %}
+      <section class="tools-box">
+        <div class="eyebrow">Print</div>
+        <h2>{{ role_labels.district_officer }}向け印刷</h2>
+        <p>{{ title }}から、そのまま印刷物へ進みます。</p>
+        <div class="action-row-inline" style="margin-top: 16px;">
+          <a class="button" href="{% url 'office:district_officer_postal_labels' %}">{{ role_document_labels.district_officer_postal_labels }}</a>
+          <a class="ghost-button" href="{% url 'office:district_officer_delivery_labels' %}">{{ role_document_labels.district_officer_delivery_labels }}</a>
+          <a class="ghost-button" href="{% url 'office:district_member_sheets' %}">地区メンバー一覧（A4）</a>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if current_page == "monto_sodai_roster" %}
+      <section class="tools-box">
+        <div class="eyebrow">Print</div>
+        <h2>{{ role_labels.monto_sodai }}向け印刷</h2>
+        <p>{{ title }}から、そのまま郵送ラベル印刷へ進みます。</p>
+        <div class="action-row-inline" style="margin-top: 16px;">
+          <a class="button" href="{% url 'office:monto_sodai_postal_labels' %}">{{ postal_label_label|default:role_document_labels.monto_sodai_postal_labels }}</a>
+        </div>
+      </section>
+
+    {% endif %}
+
+    <section class="section-card">
+      <div class="eyebrow">Roster</div>
+      <h2>{{ title }}</h2>
+      {% if error_message %}
+        <div class="callout">{{ error_message }}</div>
+      {% else %}
+        <div class="meta-row">
+          <div class="summary-box">
+            <div class="label">件数</div>
+            <div class="value">{{ total_count }}</div>
+          </div>
+        </div>
+        <div class="roster-grid" style="margin-top: 18px;">
+          {% for row in rows %}
+            <article class="roster-card">
+              <h3>{{ row.person_name }}</h3>
+              {% if row.role_badges %}
+                <div class="badge-row" style="margin-top: 10px;">
+                  {% for badge in row.role_badges %}
+                    <span class="badge">{{ badge }}</span>
+                  {% endfor %}
+                  {% if current_page == "district_officer_roster" and row.home_district_is_inactive %}
+                    <span class="badge">手配り停止中（郵送扱い）</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+              <dl class="pair-grid">
+                <div class="pair">
+                  <dt>家</dt>
+                  <dd>{{ row.household_name|default:"-" }} / {{ identifier_labels.household }} {{ row.household_id }}</dd>
+                </div>
+                <div class="pair">
+                  <dt>{{ identifier_labels.person }}</dt>
+                  <dd>{{ row.person_id }}</dd>
+                </div>
+                {% if row.assigned_district_names %}
+                  <div class="pair">
+                    <dt>担当地区</dt>
+                    <dd>{{ row.assigned_district_names|join:"、" }}</dd>
+                  </div>
+                {% endif %}
+                {% if row.home_district_name %}
+                  <div class="pair">
+                    <dt>所属地区</dt>
+                    <dd>{{ row.home_district_name }}</dd>
+                  </div>
+                {% endif %}
+                <div class="pair">
+                  <dt>送付区分</dt>
+                  <dd>{{ row.delivery_method }}</dd>
+                </div>
+                <div class="pair">
+                  <dt>住所</dt>
+                  <dd>
+                    {% if row.postal_code %}〒{{ row.postal_code }} {% endif %}
+                    {% if row.address_lines %}{{ row.address_lines|join:" " }}{% else %}-{% endif %}
+                  </dd>
+                </div>
+                <div class="pair">
+                  <dt>電話</dt>
+                  <dd>{{ row.phone|default:"-" }}</dd>
+                </div>
+              </dl>
+              <div class="action-row-inline" style="margin-top: 16px;">
+                <a class="ghost-button" href="{% url 'office:edit_person' row.household_id row.person_id %}?next={{ current_url|urlencode }}">この人を修正</a>
+                <a class="ghost-button" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">この家を開く</a>
+                <form method="post" action="{{ remove_action_url }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="person_pk" value="{{ row.person_pk }}">
+                  <input type="hidden" name="role_key" value="{{ role_key }}">
+                  <input type="hidden" name="next" value="{{ current_url }}">
+                  <button class="ghost-button" type="submit">{{ remove_role_label }}を外す</button>
+                </form>
+              </div>
+            </article>
+          {% empty %}
+            <div class="callout">{{ title }}に該当する person はまだありません。</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

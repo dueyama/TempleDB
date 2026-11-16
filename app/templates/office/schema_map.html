@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}データベース関係図 | TempleDB{% endblock %}
+
+{% load static %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'office/schema_map.css' %}">
+{% endblock %}
+
+{% block body %}
+  <div class="schema-shell" data-schema-explorer>
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="schema_map" %}
+
+    <section class="hero">
+      <div class="eyebrow">Physical Schema</div>
+      <h1>データベース関係図</h1>
+      <p>現在接続しているデータベースから、テーブル・カラム・主キー・一意制約・外部キーを読み取った物理構造です。</p>
+      <p class="muted">表示専用です。この画面からデータやデータベース構造を変更することはありません。</p>
+    </section>
+
+    <section class="schema-summary-grid" aria-label="データベース概要">
+      <article class="schema-summary-box">
+        <div class="label">DBエンジン</div>
+        <div class="value is-text">{{ database_schema.engine_label }}</div>
+      </article>
+      <article class="schema-summary-box">
+        <div class="label">データベース</div>
+        <div class="value is-text">{{ database_schema.database_name }}</div>
+      </article>
+      {% if database_schema.schema_name %}
+        <article class="schema-summary-box">
+          <div class="label">スキーマ</div>
+          <div class="value is-text">{{ database_schema.schema_name }}</div>
+        </article>
+      {% endif %}
+      <article class="schema-summary-box">
+        <div class="label">テーブル</div>
+        <div class="value">{{ database_schema.table_count }}</div>
+      </article>
+      <article class="schema-summary-box">
+        <div class="label">ビュー</div>
+        <div class="value">{{ database_schema.view_count }}</div>
+      </article>
+      <article class="schema-summary-box">
+        <div class="label">カラム</div>
+        <div class="value">{{ database_schema.column_count }}</div>
+      </article>
+      <article class="schema-summary-box">
+        <div class="label">外部キー</div>
+        <div class="value">{{ database_schema.relation_count }}</div>
+      </article>
+      <article class="schema-summary-box">
+        <div class="label">制約</div>
+        <div class="value">{{ database_schema.constraint_count }}</div>
+      </article>
+    </section>
+
+    <section class="schema-card" aria-labelledby="schema-filter-heading">
+      <div class="schema-heading">
+        <div class="eyebrow">Filter</div>
+        <h2 id="schema-filter-heading">表示を絞り込む</h2>
+        <p class="schema-note">テーブル名・カラム名・接続先を検索できます。分類のチェックを外すと、その分類を関係図と一覧から隠します。</p>
+      </div>
+      <div class="schema-controls">
+        <div class="schema-search-field">
+          <label for="schema-search">テーブル・カラムを検索</label>
+          <input id="schema-search" type="search" autocomplete="off" placeholder="例: household、person、外部キー先" aria-controls="schema-relation-table schema-table-catalog">
+        </div>
+        <fieldset class="schema-filter-fieldset">
+          <legend>表示する分類</legend>
+          <div class="schema-filter-options">
+            {% for group in database_schema.groups %}
+              {% if group.tables %}
+                <label class="schema-filter-choice">
+                  <input type="checkbox" value="{{ group.key }}" data-schema-group-control checked>
+                  <span>{{ group.label }}（{{ group.tables|length }}）</span>
+                </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </fieldset>
+        <div class="schema-toolbar">
+          <button type="button" data-schema-reset>絞り込みを解除</button>
+          <button type="button" data-schema-expand>表示中の定義を開く</button>
+          <button type="button" data-schema-collapse>すべて閉じる</button>
+          <div class="schema-filter-status" data-schema-status role="status" aria-live="polite">
+            テーブル・ビュー {{ database_schema.tables|length }} 件・外部キー {{ database_schema.relation_count }} 件を表示
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="schema-card" aria-labelledby="schema-overview-heading">
+      <div class="schema-heading">
+        <div class="eyebrow">Relationship Overview</div>
+        <h2 id="schema-overview-heading">テーブル間の関係</h2>
+        <p class="schema-note">外部キー制約だけを線で結んでいます。テーブルを選ぶと、下の定義へ移動します。テーブルに触れると直接繋がる線を強調します。</p>
+      </div>
+      <ul class="schema-legend" aria-label="関係線の凡例">
+        <li><span class="schema-legend-line"></span>必須の外部キー</li>
+        <li><span class="schema-legend-line is-optional"></span>NULLを許す外部キー</li>
+        <li><span class="schema-legend-line is-unique"></span>接続元も一意（1対1）</li>
+      </ul>
+      <div class="schema-graph-shell" data-schema-graph-shell>
+        <svg class="schema-graph" data-schema-graph role="img" aria-labelledby="schema-graph-title schema-graph-description">
+          <title id="schema-graph-title">データベースの物理外部キー関係図</title>
+          <desc id="schema-graph-description">現在接続中のデータベースに実在する外部キーだけを線で結んだ関係図です。</desc>
+        </svg>
+      </div>
+      <noscript><p class="schema-note">関係図の描画にはJavaScriptを使います。以下の外部キー一覧とテーブル定義はJavaScriptなしでも確認できます。</p></noscript>
+    </section>
+
+    <section class="schema-card" aria-labelledby="schema-relations-heading">
+      <div class="schema-heading">
+        <div class="eyebrow">Foreign Keys</div>
+        <h2 id="schema-relations-heading">外部キー一覧</h2>
+        <p class="schema-note">接続元のカラムが、接続先テーブルのどのカラムを参照しているかを示します。</p>
+      </div>
+      <div class="schema-relation-wrap">
+        <table class="schema-data-table" id="schema-relation-table">
+          <caption class="schema-visually-hidden">実データベースから取得した外部キー制約の一覧</caption>
+          <thead>
+            <tr>
+              <th scope="col">接続元</th>
+              <th scope="col">接続先</th>
+              <th scope="col">関係</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for relation in database_schema.relations %}
+              <tr data-schema-relation data-from-table="{{ relation.source_table }}" data-to-table="{{ relation.target_table }}">
+                <td>
+                  <div class="schema-relation-endpoint">
+                    <a class="schema-table-link" href="#table-{{ relation.source_table|slugify }}"><code>{{ relation.source_table }}</code></a>
+                    <span class="schema-column-name">{{ relation.source_columns|join:", " }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="schema-relation-endpoint">
+                    <a class="schema-table-link" href="#table-{{ relation.target_table|slugify }}"><code>{{ relation.target_table }}</code></a>
+                    <span class="schema-column-name">{{ relation.target_columns|join:", " }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="schema-relation-properties">
+                    <span class="schema-chip is-relation">{{ relation.relation_type }}</span>
+                    {% if relation.required %}<span class="schema-chip">必須</span>{% else %}<span class="schema-chip">NULL可</span>{% endif %}
+                    {% if relation.unique %}<span class="schema-chip is-key">一意</span>{% endif %}
+                    <span class="schema-chip"><code>{{ relation.name }}</code></span>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">外部キー制約はありません。</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="schema-card" id="schema-table-catalog" aria-labelledby="schema-tables-heading">
+      <div class="schema-heading">
+        <div class="eyebrow">Physical Tables</div>
+        <h2 id="schema-tables-heading">テーブル定義</h2>
+        <p class="schema-note">各テーブルを開くと、実DB上のカラム型、NULL可否、既定値、主キー・一意制約・外部キーを確認できます。</p>
+      </div>
+      <div class="schema-groups">
+        {% for group in database_schema.groups %}
+          {% if group.tables %}
+            <section class="schema-group-panel" data-schema-group-panel="{{ group.key }}" aria-labelledby="schema-group-{{ group.key|slugify }}">
+              <div class="schema-group-heading">
+                <h3 id="schema-group-{{ group.key|slugify }}">{{ group.label }}</h3>
+                <p>{{ group.tables|length }} オブジェクト</p>
+              </div>
+              <div class="schema-table-list">
+                {% for table in group.tables %}
+                <details class="schema-table-card" id="table-{{ table.name|slugify }}" data-schema-table data-table-name="{{ table.name }}" data-schema-group="{{ table.group_key }}">
+                  <summary>
+                    <span class="schema-table-name">
+                      <strong>{{ table.name }}</strong>
+                      <span>{{ table.kind_label }}・{{ table.constraint_count }} 制約</span>
+                    </span>
+                    <span class="schema-table-badges">
+                      <span class="schema-chip">{{ table.kind_label }}</span>
+                      <span class="schema-chip">{{ table.column_count }} カラム</span>
+                      <span class="schema-chip is-relation">外向 {{ table.outgoing_relation_count }}</span>
+                      <span class="schema-chip is-relation">内向 {{ table.incoming_relation_count }}</span>
+                    </span>
+                  </summary>
+                  <div class="schema-table-body">
+                    <section class="schema-table-section" aria-labelledby="columns-{{ table.name|slugify }}">
+                      <h4 id="columns-{{ table.name|slugify }}">カラム</h4>
+                      <div class="schema-columns-wrap">
+                        <table class="schema-data-table">
+                          <caption class="schema-visually-hidden">{{ table.name }} のカラム定義</caption>
+                          <thead>
+                            <tr>
+                              <th scope="col">カラム名</th>
+                              <th scope="col">型</th>
+                              <th scope="col">NULL</th>
+                              <th scope="col">既定値</th>
+                              <th scope="col">制約・参照先</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for column in table.columns %}
+                              <tr>
+                                <td><code>{{ column.name }}</code></td>
+                                <td><code>{{ column.type }}</code></td>
+                                <td>{% if column.nullable %}可{% else %}不可{% endif %}</td>
+                                <td><code>{{ column.default|default_if_none:"—" }}</code></td>
+                                <td>
+                                  <div class="schema-column-flags">
+                                    {% if column.primary_key %}<span class="schema-chip is-key">PK</span>{% endif %}
+                                    {% if column.unique and not column.primary_key %}<span class="schema-chip is-key">UNIQUE</span>{% endif %}
+                                    {% if column.indexed %}<span class="schema-chip">INDEX</span>{% endif %}
+                                    {% if column.checked %}<span class="schema-chip">CHECK</span>{% endif %}
+                                    {% for foreign_key in column.foreign_keys %}<span class="schema-chip is-relation">FK → {{ foreign_key.table }}.{{ foreign_key.column }}</span>{% endfor %}
+                                    {% if not column.primary_key and not column.unique and not column.indexed and not column.checked and not column.foreign_keys %}<span class="schema-note">—</span>{% endif %}
+                                  </div>
+                                </td>
+                              </tr>
+                            {% empty %}
+                              <tr><td colspan="5">カラム情報はありません。</td></tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+
+                    <section class="schema-table-section" aria-labelledby="constraints-{{ table.name|slugify }}">
+                      <h4 id="constraints-{{ table.name|slugify }}">制約・インデックス</h4>
+                      <div class="schema-columns-wrap">
+                        <table class="schema-data-table">
+                          <caption class="schema-visually-hidden">{{ table.name }} の制約とインデックス</caption>
+                          <thead>
+                            <tr>
+                              <th scope="col">名前</th>
+                              <th scope="col">カラム</th>
+                              <th scope="col">種別</th>
+                              <th scope="col">参照先</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for constraint in table.constraints %}
+                              <tr>
+                                <td><code>{{ constraint.name }}</code></td>
+                                <td><code>{{ constraint.columns|join:", " }}</code></td>
+                                <td>
+                                  <div class="schema-column-flags">
+                                    {% if constraint.primary_key %}<span class="schema-chip is-key">PK</span>{% endif %}
+                                    {% if constraint.unique and not constraint.primary_key %}<span class="schema-chip is-key">UNIQUE</span>{% endif %}
+                                    {% if constraint.index %}<span class="schema-chip">INDEX</span>{% endif %}
+                                    {% if constraint.check %}<span class="schema-chip">CHECK</span>{% endif %}
+                                    {% if constraint.foreign_key %}<span class="schema-chip is-relation">FK</span>{% endif %}
+                                    {% if constraint.type %}<span class="schema-chip">{{ constraint.type }}</span>{% endif %}
+                                    {% if not constraint.primary_key and not constraint.unique and not constraint.index and not constraint.check and not constraint.foreign_key and not constraint.type %}<span class="schema-note">—</span>{% endif %}
+                                  </div>
+                                </td>
+                                <td>{% if constraint.foreign_key %}<code>{{ constraint.foreign_key.table }}.{{ constraint.foreign_key.column }}</code>{% else %}—{% endif %}</td>
+                              </tr>
+                            {% empty %}
+                              <tr><td colspan="4">制約・インデックス情報はありません。</td></tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+
+                    <div class="schema-local-relations">
+                      <section class="schema-local-relation-box">
+                        <h4>このテーブルから参照</h4>
+                        <ul class="schema-local-relation-list">
+                          {% for relation in table.outgoing_relations %}
+                            <li>
+                              <code>{{ relation.source_columns|join:", " }}</code>
+                              →
+                              <a class="schema-table-link" href="#table-{{ relation.target_table|slugify }}"><code>{{ relation.target_table }}</code></a>
+                              <code>({{ relation.target_columns|join:", " }})</code>
+                            </li>
+                          {% empty %}
+                            <li>なし</li>
+                          {% endfor %}
+                        </ul>
+                      </section>
+                      <section class="schema-local-relation-box">
+                        <h4>このテーブルを参照</h4>
+                        <ul class="schema-local-relation-list">
+                          {% for relation in table.incoming_relations %}
+                            <li>
+                              <a class="schema-table-link" href="#table-{{ relation.source_table|slugify }}"><code>{{ relation.source_table }}</code></a>
+                              <code>({{ relation.source_columns|join:", " }})</code>
+                              → <code>{{ relation.target_columns|join:", " }}</code>
+                            </li>
+                          {% empty %}
+                            <li>なし</li>
+                          {% endfor %}
+                        </ul>
+                      </section>
+                    </div>
+                  </div>
+                </details>
+                {% endfor %}
+              </div>
+            </section>
+          {% endif %}
+        {% empty %}
+          <p class="schema-no-results">表示できるテーブル情報がありません。</p>
+        {% endfor %}
+        <p class="schema-no-results" data-schema-no-results hidden>条件に一致するテーブルはありません。</p>
+      </div>
+    </section>
+  </div>
+
+  {{ database_schema.graph_data|json_script:"database-schema-data" }}
+  <script src="{% static 'office/schema_map.js' %}" defer></script>
+{% endblock %}

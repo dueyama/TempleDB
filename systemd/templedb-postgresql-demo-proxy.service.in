@@ -1,0 +1,37 @@
+[Unit]
+Description=TempleDB PostgreSQL demo proxy (Caddy)
+Documentation=file://@WORKSPACE_ROOT@/docs/postgresql_demo_service.md
+After=templedb-postgresql-demo.service templedb-sqlite-demo.service tailscaled.service
+Wants=tailscaled.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=@PROXY_USER@
+Group=@PROXY_GROUP@
+WorkingDirectory=@PROXY_ROOT@
+Environment=TEMPLEDB_PROXY_HOST=127.0.0.1
+Environment=TEMPLEDB_PROXY_PORT=8011
+Environment=TEMPLEDB_STATIC_ROOT=@PROXY_ROOT@/static
+Environment=TEMPLEDB_GUNICORN_UPSTREAM=127.0.0.1:8012
+ExecStartPre=/usr/bin/caddy validate --config @PROXY_ROOT@/Caddyfile --adapter caddyfile
+ExecStart=/usr/bin/caddy run --config @PROXY_ROOT@/Caddyfile --adapter caddyfile
+ExecStartPost=/usr/bin/curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --max-time 3 --output /dev/null http://127.0.0.1:8011/login/
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+InaccessiblePaths=-/var/run/postgresql
+ReadWritePaths=/var/lib/caddy
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

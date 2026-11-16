@@ -1,0 +1,2244 @@
+{% extends analytics_base_template|default:"base.html" %}
+
+{% block title %}統計・分析 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .science-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .science-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .science-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .field input[type="date"] {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .csv-export-bar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(170px, 240px)) auto;
+      gap: 12px;
+      align-items: end;
+      margin-top: 14px;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+    .analysis-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+    .section-divider {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 6px;
+    }
+    .section-divider h2 {
+      margin: 4px 0 8px;
+    }
+    .analysis-card {
+      grid-column: span 6;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .analysis-card.full {
+      grid-column: 1 / -1;
+    }
+    .forecast-tail {
+      order: 200;
+    }
+    .forecast-model-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .forecast-model-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .forecast-status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: #efe6d8;
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+    .forecast-status-chip.is-available {
+      background: rgba(125, 143, 78, 0.14);
+      color: #52612d;
+    }
+    .forecast-status-chip.is-unavailable {
+      background: rgba(166, 82, 51, 0.12);
+      color: #8a341d;
+    }
+    .forecast-copy {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .forecast-copy p {
+      margin: 0;
+      line-height: 1.7;
+    }
+    .forecast-callout {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 12px 14px;
+    }
+    .forecast-callout strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .analysis-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+    .panel-filter {
+      display: grid;
+      gap: 6px;
+      min-width: 150px;
+    }
+    .panel-filter label {
+      color: var(--muted);
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .panel-filter select {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 10px;
+      font: inherit;
+      color: inherit;
+    }
+    .chart-frame {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 16px;
+      overflow: auto;
+      min-height: 360px;
+    }
+    .chart-frame svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .chart-frame.chart-frame-daily svg {
+      min-width: 980px;
+    }
+    .diagnostic-chart-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      margin-top: 14px;
+    }
+    .diagnostic-chart-grid-poisson {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+    .diagnostic-chart-grid-poisson .chart-frame {
+      min-height: 400px;
+    }
+    .chart-frame.chart-frame-wide {
+      grid-column: 1 / -1;
+    }
+    .heatmap-wrap {
+      margin-top: 14px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 12px;
+    }
+    table.heatmap-table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: separate;
+      border-spacing: 3px;
+    }
+    table.heatmap-table th,
+    table.heatmap-table td {
+      padding: 0;
+      border: 0;
+      text-align: center;
+      vertical-align: middle;
+    }
+    table.heatmap-table thead th {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 600;
+      padding-bottom: 4px;
+    }
+    .heatmap-month {
+      width: 52px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 600;
+      text-align: right;
+      padding-right: 6px;
+      white-space: nowrap;
+    }
+    .heatmap-cell {
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+    }
+    .heatmap-button,
+    .heatmap-empty,
+    .heatmap-invalid {
+      width: 100%;
+      min-width: 28px;
+      height: 28px;
+      border: 1px solid rgba(93, 70, 49, 0.1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .76rem;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    .heatmap-button {
+      cursor: pointer;
+      font: inherit;
+    }
+    .heatmap-empty {
+      background: rgba(201,110,47,0.08);
+      color: #8e765d;
+    }
+    .heatmap-invalid {
+      background: #eee7dc;
+      color: #b3a590;
+    }
+    .table-wrap {
+      overflow: auto;
+      margin-top: 14px;
+    }
+    .analysis-disclosure {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+    }
+    .analysis-disclosure > summary {
+      cursor: pointer;
+      padding: 12px 14px;
+      font-weight: 600;
+      list-style: none;
+    }
+    .analysis-disclosure > summary::-webkit-details-marker {
+      display: none;
+    }
+    .analysis-disclosure > summary::before {
+      content: "▸";
+      margin-right: 8px;
+      color: var(--muted);
+    }
+    .analysis-disclosure[open] > summary {
+      border-bottom: 1px solid var(--line);
+    }
+    .analysis-disclosure[open] > summary::before {
+      content: "▾";
+    }
+    .analysis-disclosure .table-wrap {
+      margin-top: 0;
+      padding: 0 14px 14px;
+    }
+    .missing-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .missing-month {
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 12px 14px;
+    }
+    .missing-month h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+    .inline-link-button {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #8b4527;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: .14em;
+    }
+    .table-sub-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: .8rem;
+      color: #8b4527;
+      text-decoration: underline;
+      text-underline-offset: .14em;
+      white-space: nowrap;
+    }
+    .table-main-link {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: .14em;
+    }
+    .day-modal {
+      width: min(960px, 92vw);
+      max-height: 86vh;
+      border: 1px solid var(--line);
+      padding: 0;
+      background: #fffdf8;
+      color: inherit;
+    }
+    .day-modal::backdrop {
+      background: rgba(63, 45, 31, 0.36);
+    }
+    .day-modal-shell {
+      padding: 18px 18px 14px;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+    .day-modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+    }
+    .day-modal-head h3 {
+      margin: 4px 0 6px;
+      font-size: 1.2rem;
+    }
+    .modal-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: end;
+    }
+    .missing-list {
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+    .year-detail-buttons {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .year-detail-button {
+      min-width: 88px;
+      justify-content: center;
+    }
+    table.compact {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.compact th,
+    table.compact td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+    .metric-stack {
+      display: grid;
+      gap: 4px;
+    }
+    .metric-subtext {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.5;
+    }
+    .analytics-inline-state {
+      min-height: min(420px, 55vh);
+      display: grid;
+      place-items: center;
+      padding: 24px 0;
+    }
+    .analytics-inline-state .analytics-loading-card {
+      width: min(560px, 100%);
+    }
+    @media (max-width: 980px) {
+      .section-divider h2,
+      .analysis-card h2 {
+        font-size: 1.05rem;
+        line-height: 1.45;
+      }
+      .analysis-card h3,
+      .missing-month h3,
+      .day-modal-head h3 {
+        font-size: .98rem;
+        line-height: 1.45;
+      }
+    }
+    @media (max-width: 760px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+      .csv-export-bar {
+        grid-template-columns: 1fr;
+      }
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+      .section-divider {
+        grid-column: 1 / -1;
+      }
+      .analysis-card,
+      .analysis-card.full {
+        grid-column: 1 / -1;
+      }
+      .chart-frame {
+        min-height: 0;
+        padding: 10px;
+      }
+    }
+    @media (max-width: 1100px) {
+      .diagnostic-chart-grid-poisson {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  {% if not analytics_fragment_only %}
+  <div class="science-shell">
+    {% include "includes/office_nav.html" with current_section="home" %}
+    {% include "includes/office_subnav.html" with current_page="data_science" %}
+    <section class="hero">
+      <div class="science-top">
+        <div>
+          <div class="eyebrow">Analytics</div>
+          <div class="hero-heading-row">
+            <h1>統計・分析</h1>
+            <div class="help-popover" data-help-popover>
+              <button
+                class="help-popover-button"
+                type="button"
+                aria-controls="data-science-help"
+                aria-expanded="false"
+                aria-label="統計・分析の説明"
+                data-help-popover-button
+              >?</button>
+              <div
+                class="help-popover-panel"
+                id="data-science-help"
+                hidden
+                data-help-popover-panel
+              >
+                <p>{{ tenant_copy.data_science.help_intro }}</p>
+                <p data-analytics-source-note {% if not available %}hidden{% endif %}>
+                  現行データ由来: <code data-analytics-source-text>{{ canonical_snapshot_id }}</code>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="science-actions">
+          <a class="ghost-button" href="{% url 'office:household_browser' %}">戸主ブラウザ</a>
+          <a class="ghost-button" href="{% url 'office:special_searches' %}">特殊検索</a>
+        </div>
+      </div>
+    </section>
+
+    <div
+      data-analytics-content
+      {% if analytics_deferred %}
+        data-analytics-fragment-url="{{ analytics_fragment_url }}"
+        aria-busy="true"
+      {% endif %}
+    >
+      {% if analytics_deferred %}
+        <div class="analytics-inline-state" data-analytics-inline-loading>
+          <section class="analytics-loading-card">
+            <div role="status" aria-live="polite" aria-atomic="true">
+              <div class="eyebrow">Analytics</div>
+              <h2>統計・分析を計算しています</h2>
+              <p>集計と複数のグラフを作成しています。そのままお待ちください。</p>
+            </div>
+            <progress
+              class="analytics-loading-progress"
+              aria-label="統計・分析を計算中"
+            ></progress>
+            <p class="analytics-loading-elapsed" aria-hidden="true">
+              <span data-analytics-inline-elapsed>0</span> 秒経過
+            </p>
+          </section>
+        </div>
+        <section class="panel" hidden data-analytics-inline-error role="alert">
+          <h2>統計・分析を読み込めませんでした</h2>
+          <p class="muted" data-analytics-inline-error-message>
+            通信状態を確認して、もう一度お試しください。
+          </p>
+          <div class="science-actions" style="margin-top: 14px;">
+            <button class="button" type="button" data-analytics-retry>再試行</button>
+            <a class="ghost-button" href="{{ analytics_full_url }}">同期表示で開く</a>
+          </div>
+        </section>
+        <noscript>
+          <style>
+            [data-analytics-inline-loading] { display: none; }
+          </style>
+          <section class="panel">
+            <h2>統計・分析を表示する</h2>
+            <p class="muted">JavaScriptを使わず、従来どおり同期して表示できます。</p>
+            <a class="button" href="{{ analytics_full_url }}">同期表示で開く</a>
+          </section>
+        </noscript>
+      {% endif %}
+  {% endif %}
+
+  {% if not analytics_deferred %}
+    <div
+      data-analytics-fragment-payload
+      data-analytics-available="{{ available|yesno:'true,false' }}"
+      data-analytics-source-id="{{ canonical_snapshot_id|default:'' }}"
+    >
+
+    {% if not available %}
+      <section class="panel">
+        <h2>まだ表示できません</h2>
+        <p class="muted">{{ message }}</p>
+      </section>
+    {% else %}
+      <section class="panel">
+        <form method="get" class="filter-bar">
+          <input type="hidden" name="month_cohort_mode" value="{{ selected_month_cohort_mode }}">
+          <input type="hidden" name="age_cohort_mode" value="{{ selected_age_cohort_mode }}">
+          {% if analytics_full_render %}
+            <input type="hidden" name="_render" value="full">
+          {% endif %}
+          <button class="button" type="submit">更新する</button>
+        </form>
+        <form method="get" action="{% url 'office:death_demographics_csv' %}" class="csv-export-bar">
+          <div class="field">
+            <label for="death_csv_start_date">開始日</label>
+            <input
+              type="date"
+              id="death_csv_start_date"
+              name="start_date"
+              required
+              {% if analysis_year_range.start %}value="{{ analysis_year_range.start }}-01-01"{% endif %}
+            >
+          </div>
+          <div class="field">
+            <label for="death_csv_end_date">終了日</label>
+            <input
+              type="date"
+              id="death_csv_end_date"
+              name="end_date"
+              required
+              {% if analysis_year_range.end %}value="{{ analysis_year_range.end }}-12-31"{% endif %}
+            >
+          </div>
+          <button class="button" type="submit">往生CSVを出力</button>
+        </form>
+      </section>
+
+      <div class="summary-grid">
+        <div class="summary-box">
+          <div class="label">過去帳</div>
+          <div class="value">{{ memorial_member_total }}</div>
+        </div>
+        <div class="summary-box">
+          <div class="label">命日あり</div>
+          <div class="value">{{ with_death_date_count }}</div>
+        </div>
+        <div class="summary-box">
+          <div class="label">享年あり</div>
+          <div class="value">{{ with_age_count }}</div>
+        </div>
+        <div class="summary-box">
+          <div class="label">分析用の完了年レンジ</div>
+          <div class="value">
+            {% if analysis_year_range.start %}
+              {{ analysis_year_range.start }} - {{ analysis_year_range.end }}
+            {% else %}
+              -
+            {% endif %}
+          </div>
+          <div class="muted" style="margin-top: 8px; font-size: .82rem;">
+            {{ analysis_year_rule_label }} / 途中年は年次比較から除外 / 範囲外 {{ historical_death_count }} 件
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="label">命日未解釈</div>
+          <div class="value">{{ unparsed_death_date_count }}</div>
+          <div class="muted" style="margin-top: 8px; font-size: .82rem;">
+            例: 1900-01-00 のような不完全日付
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="label">完了年の分析対象</div>
+          <div class="value">{{ analysis_record_count }}</div>
+          <div class="muted" style="margin-top: 8px; font-size: .82rem;">
+            年平均・傾向・Poisson 比較に使用
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="label">{{ partial_year }}年（途中経過）</div>
+          <div class="value">{{ partial_year_count }}</div>
+          <div class="muted" style="margin-top: 8px; font-size: .82rem;">
+            {{ as_of_date }} まで。年次比較には未使用
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="label">将来日の命日</div>
+          <div class="value">{{ future_death_date_count }}</div>
+          <div class="muted" style="margin-top: 8px; font-size: .82rem;">
+            本日より後の日付は命日を使う集計から除外
+          </div>
+        </div>
+      </div>
+
+      {% if future_death_date_count %}
+        <div class="callout" style="margin-top: 14px;">
+          将来日の命日が {{ future_death_date_count }} 件あります。入力内容を確認してください。
+        </div>
+      {% endif %}
+
+      <div class="analysis-grid">
+        <section class="section-divider">
+          <div class="eyebrow">Calendar</div>
+          <h2>暦の偏り</h2>
+          <p class="muted">
+            {{ calendar_observation_start }} から {{ calendar_observation_end }} までの
+            {{ calendar_analysis_count }} 件を対象に、月日・月別・曜日別の偏りをまとめて見ます。
+            分析レンジ外の古い命日は下部の監査表へ分けています。
+          </p>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Calendar</div>
+          <h2>命日ヒートマップ（月日）</h2>
+          <p class="muted">
+            分析レンジ開始日から本日までの命日について、年を落として月日だけを見た実件数です。
+            存在しない日付は灰色、件数が多い日ほど濃く表示しています。
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">観測された月日</div>
+              <div class="value">{{ month_day_stats.observed_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">命日の無い日</div>
+              <div class="value">{{ month_day_stats.missing_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">全月日</div>
+              <div class="value">{{ month_day_stats.total_count }}</div>
+            </div>
+          </div>
+          <div class="heatmap-wrap">
+            <table class="heatmap-table">
+              <thead>
+                <tr>
+                  <th class="heatmap-month">月/日</th>
+                  {% for day in month_day_grid_rows.0.cells %}
+                    <th>{{ day.day }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in month_day_grid_rows %}
+                  <tr>
+                    <th class="heatmap-month">{{ row.month_label }}</th>
+                    {% for cell in row.cells %}
+                      <td class="heatmap-cell">
+                        {% if not cell.valid %}
+                          <span class="heatmap-invalid"></span>
+                        {% elif cell.has_records %}
+                          <button
+                            type="button"
+                            class="heatmap-button"
+                            style="{{ cell.style }}"
+                            title="{{ cell.label }}: {{ cell.count }}件"
+                            data-day-modal-trigger="{{ cell.modal_id }}"
+                          >
+                            {{ cell.count }}
+                          </button>
+                        {% else %}
+                          <span class="heatmap-empty" title="{{ cell.label }}: 0件"></span>
+                        {% endif %}
+                      </td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <details class="analysis-disclosure">
+            <summary>命日の多い日を開く</summary>
+            <div class="table-wrap">
+              <table class="compact">
+                <thead>
+                  <tr>
+                    <th>命日の多い日</th>
+                    <th>件数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in top_month_day_rows %}
+                    <tr>
+                      <td>
+                        <button type="button" class="inline-link-button" data-day-modal-trigger="{{ row.modal_id }}">
+                          {{ row.label }}
+                        </button>
+                      </td>
+                      <td>{{ row.count }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="2" class="muted">表示できる集計がありません。</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Seasonality</div>
+          <h2>命日月別分布（日数補正）</h2>
+          <p class="muted">
+            月ごとの日数差と当年の途中経過を補正し、1,000暦日あたりの命日件数を男女内訳つきで見ています。
+            観測期間は {{ calendar_observation_day_count }} 日です。
+          </p>
+          <div class="chart-frame">
+            {{ charts.death_month_gender_svg|safe }}
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Calendar</div>
+          <h2>曜日別</h2>
+          <p class="muted">
+            曜日ごとの暦日数で補正した1,000暦日あたりの命日件数を、男女内訳つきの積み上げで見ています。
+          </p>
+          <div class="chart-frame">
+            {{ charts.weekday_gender_svg|safe }}
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Calendar</div>
+          <h2>月日セル件数の分布</h2>
+          <p class="muted">{{ month_day_overlap_distribution.stats.rule_label }}</p>
+          <p class="muted">
+            {% if analysis_year_range.start %}
+              対象は {{ analysis_year_range.start }} - {{ analysis_year_range.end }} の完了年
+              {{ analysis_record_count }} 件です。
+            {% else %}
+              比較できる完了年データはありません。
+            {% endif %}
+          </p>
+          {% if month_day_overlap_distribution.available %}
+            <div class="summary-grid" style="margin-top: 14px;">
+              <div class="summary-box">
+                <div class="label">有効セル数</div>
+                <div class="value">{{ month_day_overlap_distribution.stats.valid_day_count }}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">比較対象件数</div>
+                <div class="value">{{ month_day_overlap_distribution.stats.observed_total }}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">平均 λ / 日</div>
+                <div class="value">
+                  {% if month_day_overlap_distribution.stats.lambda_per_day is not None %}
+                    {{ month_day_overlap_distribution.stats.lambda_per_day|floatformat:3 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">分散 / セル</div>
+                <div class="value">
+                  {% if month_day_overlap_distribution.stats.variance_count is not None %}
+                    {{ month_day_overlap_distribution.stats.variance_count|floatformat:3 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Fano</div>
+                <div class="value">
+                  {% if month_day_overlap_distribution.stats.fano is not None %}
+                    {{ month_day_overlap_distribution.stats.fano|floatformat:3 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">2件以上の月日</div>
+                <div class="value">
+                  {{ month_day_overlap_distribution.stats.overlap_day_count }}
+                  {% if month_day_overlap_distribution.stats.overlap_day_share is not None %}
+                    <span class="metric-subtext">{{ month_day_overlap_distribution.stats.overlap_day_share|floatformat:2 }}%</span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Poisson 予測 2件以上</div>
+                <div class="value">
+                  {% if month_day_overlap_distribution.stats.predicted_overlap_day_share is not None %}
+                    {{ month_day_overlap_distribution.stats.predicted_overlap_day_share|floatformat:2 }}%
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">最大セル件数</div>
+                <div class="value">
+                  {% if month_day_overlap_distribution.stats.max_count is not None %}
+                    {{ month_day_overlap_distribution.stats.max_count }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="chart-frame">
+              {{ charts.month_day_overlap_distribution_svg|safe }}
+            </div>
+            <p class="muted" style="margin-top: 14px;">
+              ここでの「重なり日」は <strong>同じ月日に 2 件以上あるセル</strong> です。正規分布より先に、Poisson 近似からのズレを見る方が解釈しやすくなります。
+            </p>
+          {% else %}
+            <div class="callout" style="margin-top: 14px;">表示できる分布データがありません。</div>
+          {% endif %}
+        </section>
+
+        {% for detail in month_day_details %}
+          <dialog id="{{ detail.modal_id }}" class="day-modal">
+            <div class="day-modal-shell">
+              <div class="day-modal-head">
+                <div>
+                  <div class="eyebrow">Calendar</div>
+                  <h3>{{ detail.label }} の命日一覧</h3>
+                  <p class="muted">年はそのまま残して、新しい命日順に並べています。件数: {{ detail.count }}</p>
+                </div>
+                <form method="dialog">
+                  <button type="submit" class="ghost-button">閉じる</button>
+                </form>
+              </div>
+              <div class="table-wrap">
+                <table class="compact">
+                  <thead>
+                    <tr>
+                      <th>命日</th>
+                      <th>氏名</th>
+                      <th>性別</th>
+                      <th>享年</th>
+                      <th>戸主</th>
+                      <th>{{ identifier_labels.person }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in detail.rows %}
+                      <tr>
+                        <td>{{ row.death_date }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.gender }}</td>
+                        <td>
+                          {% if row.age_at_death %}
+                            {{ row.age_at_death }}
+                          {% else %}
+                            -
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{ row.household_name }}
+                          {% if row.household_id %}
+                            <br>
+                            <a class="table-sub-link" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">
+                              {{ identifier_labels.household }} {{ row.household_id }} を開く
+                            </a>
+                          {% endif %}
+                        </td>
+                        <td>{{ row.person_id }}</td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="6" class="muted">該当する命日はありません。</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </dialog>
+        {% endfor %}
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Calendar</div>
+          <h2>命日月日の偏り（均一分布との差）</h2>
+          <p class="muted">
+            各年の件数を、その年に観測できた暦日へ均等に配分した期待値との差です。
+            2月29日の少ない露出年数、月の日数差、当年の途中経過を補正しています。
+            暖色は期待より多い日、寒色は少ない日です。
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">期待件数 / 月日</div>
+              <div class="value">
+                {{ month_day_bias_stats.expected_min }} - {{ month_day_bias_stats.expected_max }}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">有効月日数</div>
+              <div class="value">{{ month_day_bias_stats.valid_day_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">露出補正期間</div>
+              <div class="value" style="font-size: 1rem;">
+                {{ month_day_bias_stats.observation_start }}<br>
+                - {{ month_day_bias_stats.observation_end }}
+              </div>
+            </div>
+          </div>
+          <div class="chart-frame">
+            {{ charts.month_day_bias_svg|safe }}
+          </div>
+          <details class="analysis-disclosure">
+            <summary>偏りの強い日を開く</summary>
+            <div class="table-wrap">
+              <table class="compact">
+                <thead>
+                  <tr>
+                    <th>偏りの強い日</th>
+                    <th>実件数</th>
+                    <th>期待件数</th>
+                    <th>差分</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in month_day_bias_top_rows %}
+                    <tr>
+                      <td>
+                        <button type="button" class="inline-link-button" data-day-modal-trigger="{{ row.modal_id }}">
+                          {{ row.label }}
+                        </button>
+                      </td>
+                      <td>{{ row.actual }}</td>
+                      <td>{{ row.expected }}</td>
+                      <td>{{ row.bias }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="4" class="muted">表示できる集計がありません。</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section id="month-cohort-panel" class="analysis-card full">
+          <div class="analysis-head">
+            <div>
+              <div class="eyebrow">Calendar</div>
+              <h2>死亡年代 x 命日月分布</h2>
+              <p class="muted">
+                死亡年代ごとに、どの月の命日が多いかをまとめています。いまの表示は <strong>{{ month_cohort_mode_label }}</strong> で、季節性が時代でどう変わったかを見るための俯瞰図です。
+              </p>
+            </div>
+            <form method="get" action="{% url 'office:data_science' %}#month-cohort-panel" class="panel-filter" data-panel-anchor="month-cohort-panel">
+              <input type="hidden" name="age_cohort_mode" value="{{ selected_age_cohort_mode }}">
+              {% if analytics_full_render %}
+                <input type="hidden" name="_render" value="full">
+              {% endif %}
+              <label for="month_cohort_mode">この図の表示</label>
+              <select id="month_cohort_mode" name="month_cohort_mode" onchange="submitPanelFilter(this.form)">
+                {% for option in month_cohort_mode_options %}
+                  <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">開始年代</div>
+              <div class="value">
+                {% if death_decade_month_stats.start_decade %}
+                  {{ death_decade_month_stats.start_decade }}年代
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">終了年代</div>
+              <div class="value">
+                {% if death_decade_month_stats.end_decade %}
+                  {{ death_decade_month_stats.end_decade }}年代
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="chart-frame">
+            {{ charts.death_decade_month_svg|safe }}
+          </div>
+          {% if death_decade_month_stats.cohort_counts %}
+            <p class="muted" style="margin-top: 12px;">
+              年代別母数（命日あり）:
+              {% for row in death_decade_month_stats.cohort_counts %}
+                {{ row.label }} n={{ row.count }}{% if not forloop.last %} / {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Calendar</div>
+          <h2>命日の無い日のリスト</h2>
+          <p class="muted">
+            年を無視した月日ベースで、まだ一度も出ていない日付です。閏日の <code>2/29</code> も含めています。
+          </p>
+          <div class="missing-grid">
+            {% for group in missing_month_day_groups %}
+              <section class="missing-month">
+                <h3>{{ group.month_label }}</h3>
+                <div class="missing-list">
+                  {% if group.dates %}
+                    {{ group.dates|join:", " }}
+                  {% else %}
+                    なし
+                  {% endif %}
+                </div>
+              </section>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="section-divider">
+          <div class="eyebrow">People</div>
+          <h2>人と家</h2>
+          <p class="muted">享年帯の出方、死亡年代ごとの変化、過去帳が集中している家を見ます。</p>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Longevity</div>
+          <h2>享年分布</h2>
+          <p class="muted">
+            享年あり {{ with_age_count }} 件を対象に、享年帯ごとの件数を男女別の並列バーで見ています。
+            将来日の命日が入った記録は除外しています。
+          </p>
+          <div class="chart-frame">
+            {{ charts.age_distribution_svg|safe }}
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Longevity</div>
+          <h2>平均享年の推移</h2>
+          <p class="muted">
+            男・女・合計の平均享年を、分析用命日年レンジ内で <strong>{{ average_age_trend_stats.window_years }}年移動平均</strong> にした折れ線です。
+            {{ average_age_trend_stats.window_rule_label }}
+            {{ average_age_trend_stats.trend_rule_label }}
+            {% if average_age_trend_stats.iqr_filter_applied %}
+              若年往生を含む分布端で平均線が大きく振られないよう、この画面の意図した分析方針として
+              <strong>IQR 法</strong> で外れ値を除外しています。
+            {% else %}
+              今回のデータでは、IQRによる外れ値除外は適用していません。
+            {% endif %}
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">平滑化</div>
+              <div class="value">{{ average_age_trend_stats.window_years }}年移動平均</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">除外前件数</div>
+              <div class="value">{{ average_age_trend_stats.input_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">採用件数</div>
+              <div class="value">{{ average_age_trend_stats.included_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">除外件数</div>
+              <div class="value">{{ average_age_trend_stats.excluded_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">除外前平均</div>
+              <div class="value">
+                {% if average_age_trend_stats.pre_iqr_mean_age is not None %}
+                  {{ average_age_trend_stats.pre_iqr_mean_age|floatformat:1 }}歳
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">除外前中央値</div>
+              <div class="value">
+                {% if average_age_trend_stats.pre_iqr_median_age is not None %}
+                  {{ average_age_trend_stats.pre_iqr_median_age|floatformat:1 }}歳
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">
+                {% if average_age_trend_stats.iqr_filter_applied %}IQR除外後平均{% else %}採用後平均（除外なし）{% endif %}
+              </div>
+              <div class="value">
+                {% if average_age_trend_stats.post_iqr_mean_age is not None %}
+                  {{ average_age_trend_stats.post_iqr_mean_age|floatformat:1 }}歳
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">
+                {% if average_age_trend_stats.iqr_filter_applied %}外れ値下限{% else %}採用最小{% endif %}
+              </div>
+              <div class="value">
+                {% if average_age_trend_stats.lower_bound is not None %}
+                  {{ average_age_trend_stats.lower_bound|floatformat:1 }}歳
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">
+                {% if average_age_trend_stats.iqr_filter_applied %}外れ値上限{% else %}採用最大{% endif %}
+              </div>
+              <div class="value">
+                {% if average_age_trend_stats.upper_bound is not None %}
+                  {{ average_age_trend_stats.upper_bound|floatformat:1 }}歳
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <p class="muted" style="margin-top: 14px;">
+            基準: {{ average_age_trend_stats.rule_label }}
+            {% if average_age_trend_stats.iqr_filter_applied %}
+              今回の採用範囲は {{ average_age_trend_stats.lower_bound|floatformat:1 }} - {{ average_age_trend_stats.upper_bound|floatformat:1 }} 歳です。
+              下限未満 {{ average_age_trend_stats.excluded_below_count }} 件、
+              上限超 {{ average_age_trend_stats.excluded_above_count }} 件を除外しています。
+            {% endif %}
+          </p>
+          {% if average_age_trend_stats.trend_rows %}
+            <div class="table-wrap">
+              <table class="compact">
+                <thead>
+                  <tr>
+                    <th>系列</th>
+                    <th>傾き</th>
+                    <th>10年換算</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in average_age_trend_stats.trend_rows %}
+                    <tr>
+                      <td>{{ row.label }}</td>
+                      <td>{{ row.slope_per_year_label }}</td>
+                      <td>{{ row.slope_per_decade_label }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <p class="muted" style="margin-top: 14px;">
+            以下の平均享年2図の縦軸は表示値に合わせて調整され、0始まりとは限りません。
+          </p>
+          <div class="chart-frame">
+            {{ charts.average_age_trend_svg|safe }}
+          </div>
+          <div style="margin-top: 22px;">
+            <div class="eyebrow">Annual Mean</div>
+            <h3 style="margin: 4px 0 8px;">単年平均</h3>
+            <p class="muted">
+              同じ採用範囲で、各年の往生者だけを平均した折れ線です。往生者がいない年は線が途切れます。
+            </p>
+            <div class="chart-frame">
+              {{ charts.annual_average_age_trend_svg|safe }}
+            </div>
+          </div>
+        </section>
+
+        <section id="age-cohort-panel" class="analysis-card full">
+          <div class="analysis-head">
+            <div>
+              <div class="eyebrow">Cohorts</div>
+              <h2>死亡年代 x 享年分布</h2>
+              <p class="muted">
+                どの死亡年代にどの享年帯が多いかをまとめています。いまの表示は <strong>{{ age_cohort_mode_label }}</strong> で、長寿化や早世の偏りを見るための俯瞰図です。
+              </p>
+            </div>
+            <form method="get" action="{% url 'office:data_science' %}#age-cohort-panel" class="panel-filter" data-panel-anchor="age-cohort-panel">
+              <input type="hidden" name="month_cohort_mode" value="{{ selected_month_cohort_mode }}">
+              {% if analytics_full_render %}
+                <input type="hidden" name="_render" value="full">
+              {% endif %}
+              <label for="age_cohort_mode">この図の表示</label>
+              <select id="age_cohort_mode" name="age_cohort_mode" onchange="submitPanelFilter(this.form)">
+                {% for option in age_cohort_mode_options %}
+                  <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">開始年代</div>
+              <div class="value">
+                {% if death_decade_age_stats.start_decade %}
+                  {{ death_decade_age_stats.start_decade }}年代
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">終了年代</div>
+              <div class="value">
+                {% if death_decade_age_stats.end_decade %}
+                  {{ death_decade_age_stats.end_decade }}年代
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="chart-frame">
+            {{ charts.death_decade_age_svg|safe }}
+          </div>
+          {% if death_decade_age_stats.cohort_counts %}
+            <p class="muted" style="margin-top: 12px;">
+              年代別母数（命日・享年あり）:
+              {% for row in death_decade_age_stats.cohort_counts %}
+                {{ row.label }} n={{ row.count }}{% if not forloop.last %} / {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+        </section>
+
+        <section class="analysis-card">
+          <div class="eyebrow">Households</div>
+          <h2>過去帳の多い家</h2>
+          <p class="muted">過去帳が多い家を見て、データの偏りや集中をつかみます。</p>
+          <div class="table-wrap">
+            <table class="compact">
+              <thead>
+                <tr>
+                  <th>戸主</th>
+                  <th>{{ identifier_labels.household }}</th>
+                  <th>件数</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in top_households %}
+                  <tr>
+                    <td>
+                      <a class="table-main-link" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">
+                        {{ row.household_name }}
+                      </a>
+                    </td>
+                    <td>{{ row.household_id }}</td>
+                    <td>{{ row.memorial_count }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3" class="muted">表示できる集計がありません。</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Households</div>
+          <h2>家ごとの集中度</h2>
+          <p class="muted">過去帳が1件以上ある家について、各家の過去帳件数が広く分散しているか、一部の家に偏っているかを見る指標です。Gini は 0 に近いほど均等、1 に近いほど集中で、上位10戸／20戸の占有率は件数上位の家で全体の何％を占めるかを表します。目安としては、Gini が 0.2 前後ならかなり均等、0.4 を超えると偏りが見え始め、0.6 以上ならかなり一部集中です。Lorenz curve は対角線から離れるほど偏りが強いと読めます。</p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">過去帳1件以上の家</div>
+              <div class="value">{{ household_concentration_analysis.total_households }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">総過去帳数</div>
+              <div class="value">{{ household_concentration_analysis.total_records }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Gini</div>
+              <div class="value">
+                {% if household_concentration_analysis.gini is not None %}
+                  {{ household_concentration_analysis.gini|floatformat:3 }}
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">上位10戸の占有率</div>
+              <div class="value">
+                {% if household_concentration_analysis.top10_share is not None %}
+                  {{ household_concentration_analysis.top10_share|floatformat:1 }}%
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">上位20戸の占有率</div>
+              <div class="value">
+                {% if household_concentration_analysis.top20_share is not None %}
+                  {{ household_concentration_analysis.top20_share|floatformat:1 }}%
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="chart-frame">
+            {{ charts.household_concentration_lorenz_svg|safe }}
+          </div>
+        </section>
+
+        <section class="section-divider">
+          <div class="eyebrow">Homyo</div>
+          <h2>{{ tenant_copy.data_science.homyo_section_title }}・院号</h2>
+          <p class="muted">{{ tenant_copy.data_science.homyo_character_description|safe }} そのうえで、院号の有無とタイプの偏りを見返します。</p>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Homyo</div>
+          <h2>{{ tenant_copy.data_science.homyo_character_title }}</h2>
+          <p class="muted">
+            {{ tenant_copy.data_science.homyo_character_description|safe }}
+            {{ tenant_terms.homyo_input_presence }}件数 {{ homyo_stats.homyo_count }}、院号あり {{ homyo_stats.with_ingo_count }}、出てきた文字種は {{ homyo_stats.unique_character_count }} です。
+          </p>
+          <div class="chart-frame">
+            {{ charts.homyo_character_svg|safe }}
+          </div>
+          <div class="table-wrap">
+            <table class="compact">
+              <thead>
+                <tr>
+                  <th>文字</th>
+                  <th>出現数</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in homyo_top_rows %}
+                  <tr>
+                    <td>{{ row.character }}</td>
+                    <td>{{ row.count }}</td>
+                    <td>
+                      {% if row.examples %}
+                        {{ row.examples|join:"、" }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3" class="muted">{{ tenant_copy.data_science.homyo_empty }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Homyo</div>
+          <h2>院号タイプ構成（死亡年代別）</h2>
+          <p class="muted">
+            <code>院</code> / <code>庵</code> / <code>軒</code> / <code>院号なし</code> の 100% 積み上げです。最近ほど <code>院</code> が中心かどうかを見やすくしています。
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">{{ tenant_terms.homyo_input_presence }}</div>
+              <div class="value">{{ homyo_ingo_stats.homyo_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">院号あり</div>
+              <div class="value">{{ homyo_ingo_stats.with_ingo_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">院号なし</div>
+              <div class="value">{{ homyo_ingo_stats.without_ingo_count }}</div>
+            </div>
+          </div>
+          <div class="chart-frame">
+            {{ charts.homyo_ingo_type_svg|safe }}
+          </div>
+          <div class="table-wrap">
+            <table class="compact">
+              <thead>
+                <tr>
+                  <th>死亡年代</th>
+                  <th>院</th>
+                  <th>庵</th>
+                  <th>軒</th>
+                  <th>院号なし</th>
+                  <th>母数</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in homyo_ingo_type_rows %}
+                  <tr>
+                    <td>{{ row.decade_label }}</td>
+                    <td>{{ row.in_share }}%</td>
+                    <td>{{ row.an_share }}%</td>
+                    <td>{{ row.ken_share }}%</td>
+                    <td>{{ row.none_share }}%</td>
+                    <td>{{ row.total_count }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="6" class="muted">表示できる院号タイプ分析がありません。</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section-divider">
+          <div class="eyebrow">Timeline</div>
+          <h2>年次推移と頻度</h2>
+          <p class="muted">年ごとの往生数、年 x 月の偏り、命日間隔の広がりを続けて見ます。</p>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Trend</div>
+          <h2>年別往生数</h2>
+          <p class="muted">
+            {% if analysis_year_range.start %}
+              {{ analysis_year_range.start }} - {{ analysis_year_range.end }} の往生数を、男女内訳つきの積み上げで見ています。各棒の上には合計人数を表示しています。
+            {% else %}
+              分析用命日年レンジの往生数を、男女内訳つきの積み上げで見ています。
+            {% endif %}
+          </p>
+          <div class="chart-frame">
+            {{ charts.death_year_gender_svg|safe }}
+          </div>
+          <div style="margin-top: 22px;">
+            <div class="eyebrow">Age Sum</div>
+            <h3 style="margin: 4px 0 8px;">年別享年合計</h3>
+            <p class="muted">
+              {{ annual_age_sum_trend_stats.rule_label }}
+              {% if annual_age_sum_trend_stats.max_year %}
+                最大は {{ annual_age_sum_trend_stats.max_year }}年の {{ annual_age_sum_trend_stats.max_sum|floatformat:0 }} 歳です。
+              {% endif %}
+            </p>
+            <p class="muted">
+              年別享年合計の縦軸は表示値に合わせて調整され、0始まりとは限りません。
+            </p>
+            <div class="chart-frame">
+              {{ charts.annual_age_sum_trend_svg|safe }}
+            </div>
+          </div>
+          {% if death_year_details %}
+            <div class="year-detail-buttons">
+              {% for row in death_year_details %}
+                <button
+                  type="button"
+                  class="button year-detail-button"
+                  data-day-modal-trigger="{{ row.modal_id }}"
+                >
+                  {{ row.label }}年
+                </button>
+              {% endfor %}
+            </div>
+            <p class="muted" style="margin-top: 10px;">
+              年ボタンを押すと、その年の往生者一覧をオーバーレイで確認できます。
+            </p>
+          {% endif %}
+          <div style="margin-top: 22px;">
+            <div class="eyebrow">Distribution</div>
+            <h3 style="margin: 4px 0 8px;">往生数の分布</h3>
+            <p class="muted">{{ year_count_distribution.stats.rule_label }}</p>
+            {% if year_count_distribution.available %}
+              <div class="summary-grid" style="margin-top: 14px;">
+                <div class="summary-box">
+                  <div class="label">分析年数</div>
+                  <div class="value">{{ year_count_distribution.stats.year_count }}</div>
+                </div>
+                <div class="summary-box">
+                  <div class="label">年平均件数</div>
+                  <div class="value">{{ year_count_distribution.stats.mean_count|floatformat:2 }}</div>
+                </div>
+                <div class="summary-box">
+                  <div class="label">年次標準偏差</div>
+                  <div class="value">{{ year_count_distribution.stats.std_count|floatformat:2 }}</div>
+                </div>
+                <div class="summary-box">
+                  <div class="label">Poisson λ</div>
+                  <div class="value">{{ year_count_distribution.stats.poisson_lambda|floatformat:2 }}</div>
+                </div>
+                <div class="summary-box">
+                  <div class="label">観測レンジ</div>
+                  <div class="value">
+                    {{ year_count_distribution.stats.min_count }} - {{ year_count_distribution.stats.max_count }}件
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+            <div class="chart-frame">
+              {{ charts.death_year_count_distribution_svg|safe }}
+            </div>
+          </div>
+        </section>
+
+        {% for detail in death_year_details %}
+          <dialog id="{{ detail.modal_id }}" class="day-modal">
+            <div class="day-modal-shell">
+              <div class="day-modal-head">
+                <div>
+                  <div class="eyebrow">Trend</div>
+                  <h3>{{ detail.label }}年の往生者一覧</h3>
+                  <p class="muted">新しい命日順です。件数: {{ detail.count }}</p>
+                </div>
+                <form method="dialog">
+                  <button type="submit" class="ghost-button">閉じる</button>
+                </form>
+              </div>
+              <div class="table-wrap">
+                <table class="compact">
+                  <thead>
+                    <tr>
+                      <th>命日</th>
+                      <th>氏名</th>
+                      <th>性別</th>
+                      <th>享年</th>
+                      <th>戸主</th>
+                      <th>{{ identifier_labels.person }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in detail.rows %}
+                      <tr>
+                        <td>{{ row.death_date }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.gender }}</td>
+                        <td>
+                          {% if row.age_at_death %}
+                            {{ row.age_at_death }}
+                          {% else %}
+                            -
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{ row.household_name }}
+                          {% if row.household_id %}
+                            <br>
+                            <a class="table-sub-link" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">
+                              {{ identifier_labels.household }} {{ row.household_id }} を開く
+                            </a>
+                          {% endif %}
+                        </td>
+                        <td>{{ row.person_id }}</td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="6" class="muted">該当する往生者はありません。</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </dialog>
+        {% endfor %}
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Calendar</div>
+          <h2>年 x 月ヒートマップ</h2>
+          <p class="muted">
+            {{ year_month_heatmap_analysis.stats.start_year }} - {{ year_month_heatmap_analysis.stats.end_year }} の各年について、命日月の件数をそのまま並べます。
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">対象年数</div>
+              <div class="value">{{ year_month_heatmap_analysis.stats.year_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">最大セル件数</div>
+              <div class="value">{{ year_month_heatmap_analysis.stats.max_count }}</div>
+            </div>
+          </div>
+          <div class="chart-frame">
+            {{ charts.death_year_month_heatmap_svg|safe }}
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Spacing</div>
+          <h2>命日間隔の分布</h2>
+          <p class="muted">
+            {{ death_interval_stats.start_year }}年以降の命日を時系列に並べたときの、連続レコード間の日数差です。 same-day は <code>0日</code> に入ります。
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">対象間隔数</div>
+              <div class="value">{{ death_interval_stats.count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">平均</div>
+              <div class="value">
+                {% if death_interval_stats.mean_days is not None %}
+                  {{ death_interval_stats.mean_days }}日
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">中央値</div>
+              <div class="value">
+                {% if death_interval_stats.median_days is not None %}
+                  {{ death_interval_stats.median_days }}日
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">標準偏差</div>
+              <div class="value">
+                {% if death_interval_stats.std_days is not None %}
+                  {{ death_interval_stats.std_days }}日
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">同日件数</div>
+              <div class="value">{{ death_interval_stats.same_day_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">最大間隔</div>
+              <div class="value">
+                {% if death_interval_stats.max_days is not None %}
+                  {{ death_interval_stats.max_days }}日
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% if poisson_consistency.available %}
+            <div class="analysis-head" style="margin-top: 18px;">
+              <div>
+                <div class="eyebrow">Poisson / Exponential</div>
+                <h3 style="margin: 4px 0 8px;">複数の見方での一致</h3>
+                <p class="muted">{{ poisson_consistency.rule_label }}</p>
+              </div>
+            </div>
+            <div class="summary-grid" style="margin-top: 14px;">
+              <div class="summary-box">
+                <div class="label">対象往生数</div>
+                <div class="value">{{ poisson_consistency.filtered_count }}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">間隔数</div>
+                <div class="value">{{ poisson_consistency.interval_count }}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">分析年数</div>
+                <div class="value">{{ poisson_consistency.year_count }}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">観測スパン</div>
+                <div class="value">{{ poisson_consistency.observed_span_days }}日</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">間隔由来 λ</div>
+                <div class="value">
+                  {% if poisson_consistency.interval_rate_per_year is not None %}
+                    {{ poisson_consistency.interval_rate_per_year|floatformat:2 }}件/年
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">年次平均 λ</div>
+                <div class="value">
+                  {% if poisson_consistency.yearly_rate_per_year is not None %}
+                    {{ poisson_consistency.yearly_rate_per_year|floatformat:2 }}件/年
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">CV</div>
+                <div class="value">
+                  {% if poisson_consistency.interval_cv is not None %}
+                    {{ poisson_consistency.interval_cv|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Fano</div>
+                <div class="value">
+                  {% if poisson_consistency.yearly_fano is not None %}
+                    {{ poisson_consistency.yearly_fano|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap" style="margin-top: 14px;">
+              <table class="compact">
+                <thead>
+                  <tr>
+                    <th>見方</th>
+                    <th>観測値</th>
+                    <th>比較値</th>
+                    <th>読み方</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in poisson_consistency.rows %}
+                    <tr>
+                      <td>{{ row.label }}</td>
+                      <td>{{ row.observed }}</td>
+                      <td>{{ row.reference }}</td>
+                      <td>{{ row.hint }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <div class="chart-frame">
+            {{ charts.death_interval_svg|safe }}
+          </div>
+          <div class="chart-frame" style="margin-top: 18px;">
+            {{ charts.death_interval_histogram_svg|safe }}
+          </div>
+          <p class="muted" style="margin-top: 18px;">
+            次の図は 0日から180日までを1日刻みで数えています。181日以上の間隔がある場合は最後の棒にまとめ、横軸の目盛り表示は読みやすさのため間引いています。
+          </p>
+          <div class="chart-frame chart-frame-daily">
+            {{ charts.death_interval_daily_histogram_svg|safe }}
+          </div>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Spacing</div>
+          <h2>同日複数件 cluster</h2>
+          <p class="muted">命日間隔の <code>0日</code> に入る同日重複の補助分析です。同日に 2 件以上ある日だけを拾い、cluster size と月別偏りを見ます。</p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">cluster day 数</div>
+              <div class="value">{{ same_day_cluster_analysis.stats.cluster_day_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">cluster に入る件数</div>
+              <div class="value">{{ same_day_cluster_analysis.stats.clustered_record_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">最大 cluster size</div>
+              <div class="value">
+                {% if same_day_cluster_analysis.stats.max_cluster_size is not None %}
+                  {{ same_day_cluster_analysis.stats.max_cluster_size }}
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">cluster day 比率</div>
+              <div class="value">
+                {% if same_day_cluster_analysis.stats.cluster_day_share is not None %}
+                  {{ same_day_cluster_analysis.stats.cluster_day_share|floatformat:2 }}%
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% if same_day_cluster_analysis.available %}
+            <div class="diagnostic-chart-grid">
+              <div class="chart-frame">
+                {{ charts.same_day_cluster_size_svg|safe }}
+              </div>
+              <div class="chart-frame">
+                {{ charts.same_day_cluster_month_svg|safe }}
+              </div>
+            </div>
+            <div class="table-wrap" style="margin-top: 14px;">
+              <table class="compact">
+                <thead>
+                  <tr>
+                    <th>命日</th>
+                    <th>件数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in same_day_cluster_analysis.rows %}
+                    <tr>
+                      <td>{{ row.death_date }}</td>
+                      <td>{{ row.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="callout" style="margin-top: 14px;">分析レンジ内に同日 2 件以上の命日はありません。</div>
+          {% endif %}
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Poisson / Time Series</div>
+          <h2>Poisson / 時系列診断</h2>
+          <p class="muted">
+            命日間隔の指数近似、年別往生数の moving average、QQ plot を並べて、同じ現象が別の見方でも近いかを見ます。
+          </p>
+          <div class="summary-grid" style="margin-top: 14px;">
+            <div class="summary-box">
+              <div class="label">対象年数</div>
+              <div class="value">{{ year_count_diagnostics.stats.year_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">年平均件数</div>
+              <div class="value">
+                {% if year_count_diagnostics.stats.mean_count is not None %}
+                  {{ year_count_diagnostics.stats.mean_count|floatformat:2 }}
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">年次分散</div>
+              <div class="value">
+                {% if year_count_diagnostics.stats.variance_count is not None %}
+                  {{ year_count_diagnostics.stats.variance_count|floatformat:2 }}
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Trend 除去後 Pearson dispersion</div>
+              <div class="value">
+                {% if year_count_diagnostics.stats.pearson_dispersion is not None %}
+                  {{ year_count_diagnostics.stats.pearson_dispersion|floatformat:2 }}
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <p class="muted" style="margin-top: 14px;">{{ year_count_diagnostics.stats.rule_label }}</p>
+          <div class="diagnostic-chart-grid diagnostic-chart-grid-poisson">
+            <div class="chart-frame">
+              {{ charts.death_interval_survival_svg|safe }}
+            </div>
+            <div class="chart-frame">
+              {{ charts.death_interval_qq_svg|safe }}
+            </div>
+            <div class="chart-frame chart-frame-wide">
+              {{ charts.death_year_trend_diagnostics_svg|safe }}
+            </div>
+          </div>
+        </section>
+
+        <section class="section-divider">
+          <div class="eyebrow">Reliability</div>
+          <h2>信頼性チェック</h2>
+          <p class="muted">入力 completeness と、分析レンジから外した古い命日を最後に見返します。</p>
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Data Quality</div>
+          <h2>項目 completeness の時代変化</h2>
+          <p class="muted">
+            {{ tenant_copy.data_science.completeness_description }} 命日 parse 失敗 {{ unparsed_death_date_count }} 件は overall stat のまま別扱いです。
+          </p>
+          {% if completeness_by_decade_analysis.available %}
+            <div class="chart-frame">
+              {{ charts.completeness_by_decade_svg|safe }}
+            </div>
+            <div class="table-wrap" style="margin-top: 14px;">
+              <table class="compact">
+                <thead>
+                  <tr>
+                    <th>死亡年代</th>
+                    <th>件数</th>
+                    <th>享年あり率</th>
+                    <th>{{ tenant_terms.homyo_presence_rate }}</th>
+                    <th>性別あり率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in completeness_by_decade_analysis.rows %}
+                    <tr>
+                      <td>{{ row.decade_label }}</td>
+                      <td>{{ row.total_count }}</td>
+                      <td>{{ row.age_rate|floatformat:1 }}%</td>
+                      <td>{{ row.homyo_rate|floatformat:1 }}%</td>
+                      <td>{{ row.gender_rate|floatformat:1 }}%</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="callout" style="margin-top: 14px;">年代別 completeness を出せる命日 record がありません。</div>
+          {% endif %}
+        </section>
+
+        <section class="analysis-card full">
+          <div class="eyebrow">Audit</div>
+          <h2>分析レンジ外の古い命日</h2>
+          <p class="muted">
+            {{ analysis_year_rule_label }}。全件のレンジは {{ death_year_range.oldest }} - {{ death_year_range.latest }} で、範囲外の古い命日は {{ historical_death_count }} 件あります。
+          </p>
+          <div class="table-wrap">
+            <table class="compact">
+              <thead>
+                <tr>
+                  <th>命日</th>
+                  <th>氏名</th>
+                  <th>戸主</th>
+                  <th>{{ identifier_labels.person }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in historical_death_records %}
+                  <tr>
+                    <td>{{ row.death_date }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>
+                      {{ row.household_name }}
+                      {% if row.household_id %}
+                        <br>
+                        <a class="table-sub-link" href="{% url 'office:household_browser' %}?household_id={{ row.household_id }}">
+                          {{ identifier_labels.household }} {{ row.household_id }} を開く
+                        </a>
+                      {% endif %}
+                    </td>
+                    <td>{{ row.person_id }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="muted">古い命日の候補はありません。</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    {% endif %}
+    </div>
+  {% endif %}
+
+  {% if not analytics_fragment_only %}
+    </div>
+      <script data-analytics-fragment-loader>
+        window.submitPanelFilter = (form) => {
+          const url = new URL(form.action || window.location.href, window.location.origin);
+          const params = new URLSearchParams(new FormData(form));
+          url.search = params.toString();
+          const anchor = form.dataset.panelAnchor;
+          if (anchor) {
+            url.hash = anchor;
+          }
+          document.dispatchEvent(new CustomEvent("temple:navigation-pending", {
+            detail: {url: url.toString()},
+          }));
+          window.location.assign(url.toString());
+        };
+
+        const syncDayModalScrollLock = () => {
+          document.body.classList.toggle(
+            "day-modal-open",
+            document.querySelector("dialog.day-modal[open]") !== null,
+          );
+        };
+
+        const initializeDayModals = () => {
+          document.querySelectorAll("dialog.day-modal").forEach((dialog) => {
+            if (dialog.dataset.analyticsCloseBound === "true") {
+              return;
+            }
+            dialog.dataset.analyticsCloseBound = "true";
+            dialog.addEventListener("close", syncDayModalScrollLock);
+          });
+          syncDayModalScrollLock();
+        };
+
+        document.addEventListener("click", function (event) {
+          if (!(event.target instanceof Element)) return;
+          const trigger = event.target.closest("[data-day-modal-trigger]");
+          if (!trigger) return;
+          const dialog = document.getElementById(trigger.dataset.dayModalTrigger);
+          if (dialog && typeof dialog.showModal === "function") {
+            dialog.showModal();
+            syncDayModalScrollLock();
+          }
+        });
+        document.addEventListener("click", function (event) {
+          if (!(event.target instanceof Element)) return;
+          const dialog = event.target.closest("dialog.day-modal");
+          if (!dialog) return;
+          if (event.target === dialog) {
+            dialog.close();
+          }
+        });
+
+        const analyticsContent = document.querySelector("[data-analytics-content]");
+        const sourceNote = document.querySelector("[data-analytics-source-note]");
+        const sourceIdElement = document.querySelector("[data-analytics-source-text]");
+
+        const updateSourceNote = () => {
+          if (
+            !(analyticsContent instanceof HTMLElement)
+            || !(sourceNote instanceof HTMLElement)
+            || !(sourceIdElement instanceof HTMLElement)
+          ) {
+            return;
+          }
+          const payload = analyticsContent.querySelector("[data-analytics-fragment-payload]");
+          const sourceId = payload instanceof HTMLElement
+            ? payload.dataset.analyticsSourceId || ""
+            : "";
+          const isAvailable = payload instanceof HTMLElement
+            && payload.dataset.analyticsAvailable === "true"
+            && sourceId !== "";
+          sourceIdElement.textContent = sourceId;
+          sourceNote.hidden = !isAvailable;
+        };
+
+        const scrollToCurrentHash = () => {
+          if (!window.location.hash) return;
+          let targetId = window.location.hash.slice(1);
+          try {
+            targetId = decodeURIComponent(targetId);
+          } catch {
+            return;
+          }
+          const target = document.getElementById(targetId);
+          if (target) {
+            target.scrollIntoView({block: "start"});
+          }
+        };
+
+        const fragmentPath = analyticsContent instanceof HTMLElement
+          ? analyticsContent.dataset.analyticsFragmentUrl || ""
+          : "";
+        const loginPath = "{% url 'login' %}";
+
+        if (fragmentPath && analyticsContent instanceof HTMLElement) {
+          const loadingState = analyticsContent.querySelector("[data-analytics-inline-loading]");
+          const errorState = analyticsContent.querySelector("[data-analytics-inline-error]");
+          const errorMessage = analyticsContent.querySelector(
+            "[data-analytics-inline-error-message]",
+          );
+          const elapsedElement = analyticsContent.querySelector("[data-analytics-inline-elapsed]");
+          let startedAt = 0;
+          let timerId = null;
+          let requestInProgress = false;
+
+          const updateElapsed = () => {
+            if (!(elapsedElement instanceof HTMLElement) || startedAt === 0) return;
+            elapsedElement.textContent = String(
+              Math.floor((Date.now() - startedAt) / 1000),
+            );
+          };
+
+          const startLoading = () => {
+            startedAt = Date.now();
+            updateElapsed();
+            if (timerId !== null) window.clearInterval(timerId);
+            timerId = window.setInterval(updateElapsed, 1000);
+            if (loadingState instanceof HTMLElement) loadingState.hidden = false;
+            if (errorState instanceof HTMLElement) errorState.hidden = true;
+            analyticsContent.setAttribute("aria-busy", "true");
+          };
+
+          const stopLoading = () => {
+            if (timerId !== null) {
+              window.clearInterval(timerId);
+              timerId = null;
+            }
+            startedAt = 0;
+          };
+
+          const showLoadError = () => {
+            stopLoading();
+            if (loadingState instanceof HTMLElement) loadingState.hidden = true;
+            if (errorState instanceof HTMLElement) errorState.hidden = false;
+            if (errorMessage instanceof HTMLElement) {
+              errorMessage.textContent = "通信状態を確認して、もう一度お試しください。";
+            }
+            analyticsContent.setAttribute("aria-busy", "false");
+          };
+
+          const loadAnalyticsContent = async () => {
+            if (requestInProgress) return;
+            requestInProgress = true;
+            startLoading();
+            try {
+              const fragmentUrl = new URL(fragmentPath, window.location.origin);
+              const query = new URLSearchParams(window.location.search);
+              query.delete("_render");
+              fragmentUrl.search = query.toString();
+              const response = await window.fetch(fragmentUrl, {
+                credentials: "same-origin",
+                headers: {
+                  "Accept": "text/html",
+                  "X-Requested-With": "XMLHttpRequest",
+                },
+              });
+              if (response.redirected) {
+                const redirectUrl = new URL(response.url, window.location.origin);
+                if (
+                  redirectUrl.origin === window.location.origin
+                  && redirectUrl.pathname === loginPath
+                ) {
+                  const nextUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+                  redirectUrl.searchParams.set("next", nextUrl);
+                }
+                window.location.assign(redirectUrl.toString());
+                return;
+              }
+              if (!response.ok) {
+                throw new Error(`analytics fragment returned ${response.status}`);
+              }
+              const html = await response.text();
+              const template = document.createElement("template");
+              template.innerHTML = html;
+              if (!template.content.querySelector("[data-analytics-fragment-payload]")) {
+                throw new Error("analytics fragment payload was missing");
+              }
+              stopLoading();
+              analyticsContent.replaceChildren(template.content);
+              analyticsContent.removeAttribute("data-analytics-fragment-url");
+              analyticsContent.setAttribute("aria-busy", "false");
+              updateSourceNote();
+              initializeDayModals();
+              window.requestAnimationFrame(scrollToCurrentHash);
+            } catch (error) {
+              console.error("Unable to load analytics content", error);
+              showLoadError();
+            } finally {
+              requestInProgress = false;
+            }
+          };
+
+          document.addEventListener("click", (event) => {
+            if (!(event.target instanceof Element)) return;
+            if (!event.target.closest("[data-analytics-retry]")) return;
+            loadAnalyticsContent();
+          });
+
+          loadAnalyticsContent();
+        } else {
+          updateSourceNote();
+          initializeDayModals();
+          window.requestAnimationFrame(scrollToCurrentHash);
+        }
+
+        window.addEventListener("pageshow", initializeDayModals);
+      </script>
+  </div>
+  {% endif %}
+{% endblock %}

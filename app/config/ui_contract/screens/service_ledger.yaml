@@ -1,0 +1,151 @@
+contract_type: screen
+version: 2
+dsl_version: 2
+screen_id: service_ledger
+title: 法要台帳
+route_name: service_ledger
+route_path: /services/
+template: office/service_ledger.html
+purpose: One-screen service schedule ledger for scheduled events, recently completed events, calculated candidates, overdue events, unscheduled events, and service creation targets.
+primary_models:
+  - imports.ServiceSchedule
+  - imports.Household
+  - imports.Person
+  - imports.DeceasedProfile
+layout:
+  density: card_ledger
+  structure:
+    - hero_with_help
+    - card_view_switch
+    - search_filter
+    - summary_counts
+    - event_sections
+    - target_people_section
+  desktop: Three-column section grid for event status buckets.
+  mobile: Hide panel-head switch if constrained; keep search and sections readable.
+regions:
+  - region_id: search_filter
+    role: filter ledger by household, deceased, service, or ledger id
+    priority: primary
+  - region_id: summary_counts
+    role: clickable counts for scheduled, completed, candidates, and search results
+    priority: secondary
+  - region_id: event_sections
+    role: grouped service cards by operational status
+    priority: primary
+  - region_id: target_people
+    role: search results for deceased people that can receive new service schedules
+    priority: primary
+actions:
+  - action_id: search_services
+    label: 検索
+    intent: filter service ledger and target people
+    method: GET
+    route_name: service_ledger
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: switch_card_view
+    label: カード表示切替
+    intent: switch compact versus expanded ledger cards
+    method: GET
+    route_name: service_ledger
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: create_service_for_person
+    label: この故人で法要追加
+    intent: start a new service schedule for the selected deceased person
+    method: GET
+    route_name: create_service_schedule
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: edit_service_schedule
+    label: 法要編集
+    intent: open an existing service schedule for edit or read-only review
+    method: GET
+    route_name: edit_service_schedule
+    mutating: false
+    risk_level: none
+    confirmation: none
+states:
+  - state_id: unavailable
+    trigger: no usable operational source or dataset
+    presentation: show まだ表示できません panel and message
+  - state_id: no_candidates
+    trigger: no calculated candidate events in range
+    presentation: keep section visible with empty message
+  - state_id: no_search_targets
+    trigger: target search has no people
+    presentation: show callout explaining search target behavior
+data_bindings:
+  - source: scheduled_events
+    target: event_sections.scheduled
+  - source: recent_completed_events
+    target: event_sections.completed
+  - source: candidate_card_entries
+    target: event_sections.candidates
+  - source: service_target_results
+    target: target_people.cards
+workflow_refs:
+  - service_schedule_lifecycle
+semantic_tree:
+  node_id: service_ledger.page
+  kind: page
+  role: service schedule ledger and service creation workspace
+  priority: primary
+  children:
+    - node_id: service_ledger.hero
+      kind: hero
+      role: title and help popover
+      priority: primary
+    - node_id: service_ledger.filter_panel
+      kind: form
+      component: filter_panel
+      role: search and card-view controls
+      actions:
+        - search_services
+        - switch_card_view
+    - node_id: service_ledger.summary_counts
+      kind: grid
+      role: status bucket count links
+      priority: secondary
+    - node_id: service_ledger.event_sections
+      kind: grid
+      role: scheduled, completed, candidate, overdue, and unscheduled buckets
+      priority: primary
+      component: entity_card
+    - node_id: service_ledger.target_people
+      kind: card_stack
+      role: deceased people that can receive new service schedules
+      priority: primary
+      actions:
+        - create_service_for_person
+visual_signature:
+  density: ledger cards arranged for repeated daily scanning
+  rhythm: filter, summary counts, three-column status buckets, target people
+  information_priority:
+    - scheduled and candidate sections appear before target people
+    - target person cards expose create-service action clearly
+  disclosure:
+    - card view can be compact or expanded
+    - candidate explanation stays in help popover
+  responsive_behavior: three columns on wide screens; single-column sections on narrow screens
+state_matrix:
+  - state_id: normal
+    required_nodes:
+      - service_ledger.filter_panel
+      - service_ledger.event_sections
+      - service_ledger.target_people
+  - state_id: unavailable
+    fallback_text: まだ表示できません
+  - state_id: no_candidates
+    required_behavior: candidate section remains visible with empty message
+evidence:
+  source_map_ref: source_map.json#/screens/service_ledger
+  template_paths:
+    - source/templates/base.html
+    - source/templates/office/service_ledger.html
+    - source/templates/office/_service_ledger_section.html
+    - source/templates/office/_service_ledger_card_styles.html

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}地区メンバー一覧 印刷イメージ | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .sheet-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .sheet-tools {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sheet-option-form {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+    }
+    .sheet-option-form label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-stack {
+      display: grid;
+      gap: 24px;
+      justify-content: center;
+    }
+    {% include "office/partials/district_member_sheet_styles.html" %}
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    @media print {
+      body {
+        background: #fff;
+        margin: 0;
+      }
+      .shell {
+        max-width: none;
+        padding: 0;
+      }
+      .session-bar,
+      .global-nav,
+      .office-subnav,
+      .hero,
+      .sheet-tools,
+      .sheet-screen-notice,
+      .flash-list {
+        display: none !important;
+      }
+      .sheet-shell {
+        display: block;
+      }
+      .preview-stack {
+        display: block;
+      }
+      .district-sheet {
+        width: 210mm;
+        height: 297mm;
+        min-height: 0;
+        padding: 14mm 16mm 14mm;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+        overflow: hidden;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .district-last-print-record {
+        display: none !important;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="sheet-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="district_member_sheets" %}
+    <section class="hero">
+      <div class="eyebrow">Settings / District</div>
+      <h1>地区メンバー一覧 印刷イメージ</h1>
+      <p>A4 縦、1ページ 1地区です。地区役員は氏名前に <strong>※</strong> を付けます。メモだけを印字します。</p>
+    </section>
+
+    {% if available %}
+      <section class="sheet-tools">
+        <form class="sheet-option-form" method="get">
+          <label>
+            <input type="checkbox" name="include_memorial_notice_marker" value="1" {% if include_memorial_notice_marker %}checked{% endif %}>
+            {{ marker_labels.memorial_notice }}がある人の右に「{{ marker_labels.memorial_notice }}」を出す
+          </label>
+          <button class="ghost-button" type="submit">反映</button>
+        </form>
+        <a class="ghost-button" href="{% url 'office:district_member_sheets' %}{% if include_memorial_notice_marker %}?include_memorial_notice_marker=1{% endif %}">メモ一覧へ戻る</a>
+        <form method="post" style="display: inline;">
+          {% csrf_token %}
+          {% if include_memorial_notice_marker %}
+            <input type="hidden" name="include_memorial_notice_marker" value="1">
+          {% endif %}
+          <button class="ghost-button" type="submit" name="action" value="mark_printed">今回を前回印刷として記録</button>
+        </form>
+        <button class="button" type="button" onclick="window.print()">印刷する</button>
+      </section>
+      {% if include_memorial_notice_marker %}
+        <p class="muted sheet-screen-notice">{{ memorial_notice_target_year }}年の{{ print_heading_labels.memorial_notice }}対象にだけ「{{ marker_labels.memorial_notice }}」を出します。</p>
+      {% endif %}
+      {% if memorial_notice_marker_warning %}
+        <p class="muted sheet-screen-notice">{{ memorial_notice_marker_warning }}</p>
+      {% endif %}
+
+      <div class="preview-stack">
+        {% for sheet in sheets %}
+          {% include "office/partials/district_member_sheet.html" %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="callout">{{ error_message }}</div>
+    {% endif %}
+  </div>
+{% endblock %}

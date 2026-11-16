@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .transition-shell {
+      display: grid;
+      gap: 22px;
+      max-width: 960px;
+    }
+    .transition-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.94);
+      padding: 22px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .transition-form {
+      display: grid;
+      gap: 18px;
+    }
+    .callout {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 14px 16px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin: 0;
+    }
+    .pair {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 12px 14px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="transition-shell">
+    <section class="hero">
+      <div class="eyebrow">Extinct Household</div>
+      <h1>{{ title }}</h1>
+      <p>{{ subtitle }}</p>
+    </section>
+
+    <section class="transition-card">
+      <h2>現在の状態</h2>
+      <dl class="pair-grid">
+        <div class="pair">
+          <dt>現在の戸主</dt>
+          <dd>{% if resolved_head_person %}{{ resolved_head_person.name }}{% else %}未解決{% endif %}</dd>
+        </div>
+        <div class="pair">
+          <dt>戸主の扱い</dt>
+          <dd>
+            {% if head_person_is_virtual %}
+              仮戸主
+            {% elif resolved_head_person and resolved_head_person.is_deceased %}
+              過去帳
+            {% else %}
+              現在帳
+            {% endif %}
+          </dd>
+        </div>
+        <div class="pair">
+          <dt>絶家後の表示名</dt>
+          <dd>{{ extinct_identity.display_name }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="transition-card">
+      <form method="post" class="transition-form" data-quicklink-guard-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <div class="callout">
+          {{ extinct_action_state.message|default:"この家を絶家に変更します。" }}
+          <div style="margin-top: 8px;">
+            household 自体は残し、戸主だけを <code>{{ extinct_identity.display_name }}</code> の synthetic head に置き換えます。
+            配達区分や年回要否の profile は自動では変えません。
+          </div>
+        </div>
+        {% if extinct_action_state.show_action %}
+          <div class="action-row">
+            <button class="button" type="submit" data-quicklink-save>この家を絶家にする</button>
+            <a class="ghost-button" href="{{ next_url }}">{{ return_label }}</a>
+          </div>
+        {% else %}
+          <div class="action-row">
+            <a class="ghost-button" href="{{ next_url }}">{{ return_label }}</a>
+          </div>
+        {% endif %}
+      </form>
+    </section>
+  </div>
+{% endblock %}

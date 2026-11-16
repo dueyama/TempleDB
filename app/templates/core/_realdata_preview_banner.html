@@ -1,0 +1,16 @@
+<aside id="realdata-preview-banner" class="realdata-preview-banner" aria-label="テスト環境の案内">
+  <strong class="realdata-preview-badge">テスト環境</strong>
+  <span class="realdata-preview-snapshot">{{ realdata_preview.snapshot_label }}</span>
+  <span class="realdata-preview-note">ここでの変更は本番へ反映されません。Google連携は停止中です。</span>
+  {% if realdata_preview.run_id and request.user.is_authenticated %}
+    {% if request.user.is_staff or request.user.is_superuser %}
+      <form class="realdata-preview-controls" method="post" action="{% url 'realdata_preview_exit' %}">
+        {% csrf_token %}
+        <input type="hidden" name="run_id" value="{{ realdata_preview.run_id }}">
+        <button type="submit" name="action" value="finish">確認OK・終了</button>
+        <button type="submit" name="action" value="stop">中断・終了</button>
+        <span>どちらも試験データを破棄</span>
+      </form>
+    {% endif %}
+  {% endif %}
+</aside>

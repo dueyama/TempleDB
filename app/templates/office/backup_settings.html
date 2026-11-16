@@ -1,0 +1,589 @@
+{% extends "base.html" %}
+
+{% block title %}バックアップ | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .backup-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-box,
+    .management-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box,
+    .management-card,
+    .management-card .table-wrap {
+      min-width: 0;
+    }
+    .management-card .table-wrap {
+      max-width: 100%;
+    }
+    .backup-summary-primary {
+      grid-column: span 4;
+    }
+    .backup-summary-compact {
+      grid-column: span 2;
+    }
+    .backup-summary-wide {
+      grid-column: span 6;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.1rem;
+    }
+    .backup-summary-path {
+      font-size: .9rem;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+    .backup-destination-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .backup-retention-row {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 18px;
+      align-items: end;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .backup-retention-help {
+      padding-bottom: 9px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .field > input:not([type="checkbox"]),
+    .field > select {
+      width: 100%;
+      min-width: 0;
+      height: 44px;
+      border: 1px solid var(--line);
+      background: var(--field-bg);
+      padding: 10px 12px;
+      color: inherit;
+    }
+    .field-help {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .field-errors {
+      margin: 0;
+      padding-left: 18px;
+      color: #9f4d3d;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: #f4ecdf;
+      font-size: .85rem;
+    }
+    .badge.ok {
+      border-color: #7a8e59;
+      background: #f1f8e8;
+    }
+    .badge.ng {
+      border-color: #9f4d3d;
+      background: #fff1ec;
+    }
+    .inline-form {
+      display: inline;
+    }
+    .backup-options {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .backup-option {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 4px 10px;
+      align-items: start;
+      line-height: 1.5;
+    }
+    .backup-option > input {
+      margin: .28em 0 0;
+    }
+    .backup-option-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .backup-option-title {
+      color: var(--ink);
+      font-size: .92rem;
+    }
+    .backup-data-table {
+      width: 100%;
+    }
+    .backup-runs-table {
+      min-width: 1020px;
+    }
+    .backup-verification-table {
+      min-width: 940px;
+    }
+    .backup-data-table th:nth-child(-n+3),
+    .backup-data-table td:nth-child(-n+3),
+    .backup-runs-table th:last-child,
+    .backup-runs-table td:last-child {
+      white-space: nowrap;
+    }
+    .backup-runs-table .action-row {
+      flex-wrap: wrap;
+    }
+    .backup-path-cell,
+    .backup-file-cell,
+    .backup-result-cell {
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+    .backup-path-cell,
+    .backup-file-cell {
+      font-size: .9rem;
+    }
+    .backup-runs-table .backup-path-cell,
+    .backup-runs-table .backup-file-cell {
+      min-width: 180px;
+    }
+    .backup-verification-table td:nth-child(4) {
+      min-width: 220px;
+    }
+    .backup-verification-table td:nth-child(5) {
+      min-width: 200px;
+    }
+    .backup-verification-table .backup-result-cell {
+      min-width: 230px;
+    }
+    .backup-verification-table code {
+      font-size: .78rem;
+    }
+    .backup-result-meta {
+      margin-top: 4px;
+    }
+    @media (max-width: 1100px) {
+      .backup-data-table {
+        display: block;
+        min-width: 0;
+      }
+      .backup-data-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .backup-data-table tbody {
+        display: grid;
+        gap: 12px;
+      }
+      .backup-data-table tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0 16px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 250, 240, .58);
+      }
+      .backup-data-table td,
+      .backup-verification-table td:nth-child(4),
+      .backup-verification-table td:nth-child(5),
+      .backup-verification-table .backup-result-cell {
+        display: block;
+        min-width: 0;
+        padding: 8px 0;
+        border: 0;
+        white-space: normal;
+      }
+      .backup-data-table td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 4px;
+        color: var(--muted);
+        font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+      }
+      .backup-data-table code {
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .backup-runs-table .action-row {
+        flex-wrap: wrap;
+      }
+    }
+    @media (max-width: 900px) {
+      .backup-summary-primary,
+      .backup-summary-compact,
+      .backup-summary-wide {
+        grid-column: span 6;
+      }
+    }
+    @media (max-width: 720px) {
+      .backup-destination-fields,
+      .backup-retention-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .backup-retention-help {
+        padding-bottom: 0;
+      }
+      .backup-data-table tr {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 620px) {
+      .backup-summary-primary,
+      .backup-summary-compact,
+      .backup-summary-wide {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 480px) {
+      .backup-data-table tr {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="backup-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="backup_settings" %}
+    <section class="hero">
+      <div class="eyebrow">Backup</div>
+      <h1>バックアップ</h1>
+      <p>正本DBの保存先、手動バックアップ、テスト復元を管理します。</p>
+      <p class="muted">現在の DB エンジン: <code>{{ database_engine }}</code></p>
+    </section>
+
+    <section class="summary-row">
+      <article class="summary-box backup-summary-primary">
+        <div class="label">保存先</div>
+        <div class="value backup-summary-path">
+          {% if backup_destination_status.configured %}
+            {{ backup_destination_status.path }}
+          {% else %}
+            未設定
+          {% endif %}
+          {% if backup_destination_status.source == "env" %}
+            <div class="field-help">この機器の設定ファイルを優先しています。</div>
+          {% endif %}
+          {% if backup_destination_status.error %}
+            <div class="field-help">{{ backup_destination_status.error }}</div>
+          {% endif %}
+        </div>
+      </article>
+      <article class="summary-box backup-summary-compact">
+        <div class="label">接続状態</div>
+        <div class="value">
+          {% if backup_destination_status.connected %}
+            接続中
+          {% elif backup_destination_status.configured %}
+            未接続
+          {% else %}
+            未設定
+          {% endif %}
+        </div>
+      </article>
+      <article class="summary-box backup-summary-compact">
+        <div class="label">保持世代</div>
+        <div class="value">{{ backup_setting.retention_count }}</div>
+      </article>
+      <article class="summary-box backup-summary-primary">
+        <div class="label">次回自動実行条件</div>
+        <div class="value" style="font-size: 0.95rem;">{{ backup_next_schedule_label }}</div>
+      </article>
+      <article class="summary-box backup-summary-wide">
+        <div class="label">次回自動テスト復元条件</div>
+        <div class="value" style="font-size: 0.95rem;">
+          {{ backup_next_verification_schedule_label }}
+        </div>
+      </article>
+      <article class="summary-box backup-summary-wide">
+        <div class="label">最新の週次自動テスト復元成功</div>
+        <div class="value" style="font-size: 0.95rem;">
+          {% if latest_scheduled_verification_success %}
+            <div>{{ latest_scheduled_verification_success.finished_at|date:"Y-m-d H:i" }}</div>
+            <div class="field-help">
+              対象: {{ latest_scheduled_verification_success.backup_run.backup_file_name|default:"-" }}
+            </div>
+            {% if latest_scheduled_verification_success.verification_summary %}
+              <div class="field-help">
+                戸主 {{ latest_scheduled_verification_success.verification_summary.imports_household }} / 人物 {{ latest_scheduled_verification_success.verification_summary.imports_person }} / 過去帳 {{ latest_scheduled_verification_success.verification_summary.imports_deceasedprofile }}
+              </div>
+            {% endif %}
+          {% else %}
+            まだありません
+          {% endif %}
+        </div>
+      </article>
+    </section>
+
+    {% if not backup_feature_enabled %}
+      <section class="management-card">
+        <div class="eyebrow">Unavailable</div>
+        <h2>本運用DBが必要です</h2>
+        <p class="muted">この機能は本運用の PostgreSQL または SQLite を使っているときだけ利用できます。デモDBとテストDBでは無効です。</p>
+      </section>
+    {% else %}
+      <section class="management-card">
+        <div class="eyebrow">Destination</div>
+        <h2>保存先設定</h2>
+        {% if backup_destination_status.source == "env" %}
+          <p class="muted">
+            現在の保存先は、この機器の
+            <code>TEMPLEDB_BACKUP_DESTINATION_PATH</code>
+            で固定されています。下の保存先設定は、この機器の設定を空にしたときに使われます。
+          </p>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="backup-destination-fields">
+            <label class="field" for="{{ backup_form.volume_name.id_for_label }}">
+              <span>{{ backup_form.volume_name.label }}</span>
+              {{ backup_form.volume_name }}
+              {% if backup_form.volume_name.help_text %}
+                <span class="field-help">{{ backup_form.volume_name.help_text }}</span>
+              {% endif %}
+              {% if backup_form.volume_name.errors %}
+                <ul class="field-errors">
+                  {% for error in backup_form.volume_name.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </label>
+            <label class="field" for="{{ backup_form.subdirectory_name.id_for_label }}">
+              <span>{{ backup_form.subdirectory_name.label }}</span>
+              {{ backup_form.subdirectory_name }}
+              {% if backup_form.subdirectory_name.help_text %}
+                <span class="field-help">{{ backup_form.subdirectory_name.help_text }}</span>
+              {% endif %}
+              {% if backup_form.subdirectory_name.errors %}
+                <ul class="field-errors">
+                  {% for error in backup_form.subdirectory_name.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </label>
+          </div>
+          <div class="backup-retention-row">
+            <label class="field" for="{{ backup_form.retention_count.id_for_label }}">
+              <span>{{ backup_form.retention_count.label }}</span>
+              {{ backup_form.retention_count }}
+              {% if backup_form.retention_count.errors %}
+                <ul class="field-errors">
+                  {% for error in backup_form.retention_count.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </label>
+            {% if backup_form.retention_count.help_text %}
+              <span class="field-help backup-retention-help">
+                {{ backup_form.retention_count.help_text }}
+              </span>
+            {% endif %}
+          </div>
+          <div class="backup-options">
+            <label class="backup-option">
+              {{ backup_form.daily_enabled }}
+              <span class="backup-option-copy">
+                <span class="backup-option-title">{{ backup_form.daily_enabled.label }}</span>
+              </span>
+            </label>
+            <label class="backup-option">
+              {{ backup_form.weekly_verification_enabled }}
+              <span class="backup-option-copy">
+                <span class="backup-option-title">{{ backup_form.weekly_verification_enabled.label }}</span>
+                {% if backup_form.weekly_verification_enabled.help_text %}
+                  <span class="field-help">
+                    {{ backup_form.weekly_verification_enabled.help_text }}
+                  </span>
+                {% endif %}
+              </span>
+            </label>
+          </div>
+          {% if backup_form.non_field_errors %}
+            <ul class="field-errors" style="margin-top: 12px;">
+              {% for error in backup_form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <div class="action-row" style="margin-top: 16px;">
+            <button class="button" type="submit">保存先を更新</button>
+            <button
+              class="ghost-button"
+              type="submit"
+              formaction="{% url 'office:run_backup_now' %}"
+              formmethod="post"
+            >
+              今すぐバックアップ
+            </button>
+            {% if latest_successful_backup_run and latest_successful_backup_run_artifact_exists %}
+              <a class="ghost-button" href="{{ backup_migration_guide_url }}">別のMacへ引越し</a>
+            {% endif %}
+          </div>
+        </form>
+      </section>
+    {% endif %}
+
+    <section class="management-card">
+      <div class="eyebrow">Runs</div>
+      <h2>直近バックアップ一覧</h2>
+      {% if recent_backup_runs %}
+        <div class="table-wrap">
+          <table class="backup-data-table backup-runs-table">
+            <thead>
+              <tr>
+                <th>開始</th>
+                <th>種別</th>
+                <th>状態</th>
+                <th>保存先</th>
+                <th>ファイル</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for run in recent_backup_runs %}
+                <tr>
+                  <td data-label="開始">{{ run.started_at|date:"Y-m-d H:i" }}</td>
+                  <td data-label="種別">{{ run.get_trigger_kind_display }}</td>
+                  <td data-label="状態">
+                    <span class="badge{% if run.status == 'succeeded' %} ok{% elif run.status == 'failed' %} ng{% endif %}">
+                      {{ run.get_status_display }}
+                    </span>
+                  </td>
+                  <td class="backup-path-cell" data-label="保存先">{{ run.destination_path|default:"-" }}</td>
+                  <td class="backup-file-cell" data-label="ファイル">
+                    {% if run.backup_file_name %}
+                      {{ run.backup_file_name }}
+                    {% else %}
+                      -
+                    {% endif %}
+                    {% if run.error_message %}
+                      <div class="muted" style="margin-top: 6px;">{{ run.error_message }}</div>
+                    {% endif %}
+                  </td>
+                  <td data-label="操作">
+                    {% if backup_feature_enabled and run.status == "succeeded" and run.artifact_exists %}
+                      <div class="action-row">
+                        <form method="post" action="{% url 'office:verify_backup_now' %}">
+                          {% csrf_token %}
+                          <input type="hidden" name="run_id" value="{{ run.id }}">
+                          <button class="ghost-button" type="submit">別DBへテスト復元</button>
+                        </form>
+                        <a class="ghost-button" href="{% url 'office:backup_migration_guide' %}?run_id={{ run.id }}">このバックアップで引越し</a>
+                      </div>
+                    {% else %}
+                      <span class="muted">-</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top: 12px;">「別DBへテスト復元」は現在の TempleDB を上書きせず、{% if database_engine_kind == "sqlite" %}一時的な検証DBファイル{% else %}一時的な検証DB{% endif %}へ復元して確認後に削除します。</p>
+      {% else %}
+        <p class="muted">まだバックアップはありません。</p>
+      {% endif %}
+    </section>
+
+    <section class="management-card">
+      <div class="eyebrow">Verification</div>
+      <h2>直近テスト復元結果</h2>
+      {% if recent_verification_runs %}
+        <div class="table-wrap">
+          <table class="backup-data-table backup-verification-table">
+            <thead>
+              <tr>
+                <th>開始</th>
+                <th>種別</th>
+                <th>状態</th>
+                <th>検証DB</th>
+                <th>対象バックアップ</th>
+                <th>結果</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for run in recent_verification_runs %}
+                <tr>
+                  <td data-label="開始">{{ run.started_at|date:"Y-m-d H:i" }}</td>
+                  <td data-label="種別">{{ run.get_trigger_kind_display }}</td>
+                  <td data-label="状態">
+                    <span class="badge{% if run.status == 'succeeded' %} ok{% elif run.status == 'failed' %} ng{% endif %}">
+                      {{ run.get_status_display }}
+                    </span>
+                  </td>
+                  <td data-label="検証DB"><code>{{ run.verification_database_name|default:"-" }}</code></td>
+                  <td data-label="対象バックアップ">{{ run.backup_run.backup_file_name|default:"-" }}</td>
+                  <td class="backup-result-cell" data-label="結果">
+                    {% if run.status == "failed" and run.error_message %}
+                      {{ run.error_message }}
+                    {% elif run.verification_summary %}
+                      <div>
+                        戸主 {{ run.verification_summary.imports_household|default:"-" }} /
+                        人物 {{ run.verification_summary.imports_person|default:"-" }} /
+                        過去帳 {{ run.verification_summary.imports_deceasedprofile|default:"-" }}
+                      </div>
+                      <div class="field-help backup-result-meta">
+                        認証ユーザー {{ run.verification_summary.auth_user|default:"-" }} /
+                        適用 migration {{ run.verification_summary.django_migrations|default:"-" }}
+                      </div>
+                    {% elif run.error_message %}
+                      {{ run.error_message }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">まだテスト復元はありません。</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

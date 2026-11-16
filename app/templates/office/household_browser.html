@@ -1,0 +1,1736 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Household Browser | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .browser-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .browser-shell.preview-tablet .preview-frame {
+      max-width: 834px;
+      margin: 0 auto;
+    }
+    .browser-shell.preview-mobile .preview-frame {
+      max-width: 430px;
+      margin: 0 auto;
+    }
+    .preview-panel {
+      display: grid;
+      gap: 12px;
+    }
+    .preview-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .preview-head p {
+      margin: 0;
+    }
+    .preview-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .preview-pill {
+      min-width: 88px;
+    }
+    .preview-pills .ghost-button.is-current {
+      border-color: var(--accent);
+      background: var(--current-bg-soft);
+    }
+    .browser-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .browser-top p { margin: 6px 0 0; }
+    .browser-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: var(--ghost-bg);
+      text-decoration: none;
+    }
+    .danger-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--danger);
+      background: var(--danger-bg);
+      color: var(--danger-ink);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .filter-bar {
+      display: grid;
+      gap: 16px;
+    }
+    .filter-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+      align-items: start;
+    }
+    .filter-panel {
+      border: 1px solid var(--line);
+      background: var(--panel-bg-subtle);
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+    .filter-panel h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .filter-panel p {
+      margin: 0;
+    }
+    .filter-fields {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+      align-items: end;
+    }
+    .filter-fields.filter-fields-dates {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .filter-fields.filter-fields-dates .field,
+    .filter-fields.filter-fields-dates input[type="date"] {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .filter-fields.filter-fields-dates .field {
+      width: 100%;
+      min-inline-size: 0;
+    }
+    .filter-fields.filter-fields-dates .field-input-shell {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: var(--field-bg);
+    }
+    .filter-fields.filter-fields-dates input[type="date"] {
+      display: block;
+      inline-size: 100%;
+      max-inline-size: 100%;
+      min-inline-size: 0;
+      min-height: 42px;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .kana-toolbar {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .kana-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .kana-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      text-decoration: none;
+      color: inherit;
+    }
+    .kana-pill.active {
+      border-color: var(--accent);
+      background: var(--current-bg);
+    }
+    .kana-pill .count {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .kana-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .result-caption {
+      margin: -4px 0 12px;
+      color: var(--muted);
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: var(--field-bg);
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding-top: 26px;
+    }
+    .checkbox-field input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+    .checkbox-field label {
+      margin: 0;
+      color: inherit;
+      font-size: .92rem;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .browser-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .household-list {
+      display: grid;
+      gap: 10px;
+      max-height: calc(100vh - 220px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .household-link {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-soft);
+    }
+    .household-link.active {
+      border-color: var(--accent);
+      background: var(--current-bg);
+    }
+    .household-link h3 {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+    }
+    .household-link-title {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .household-link-id-inline {
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .04em;
+      margin-left: auto;
+      padding-left: 12px;
+      white-space: nowrap;
+      font-weight: 400;
+    }
+    .household-link-badges {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .household-role-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      background: var(--current-bg-soft);
+      font-size: .78rem;
+      line-height: 1.1;
+    }
+    .household-name-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .household-link-title,
+    .household-name-heading,
+    .mobile-selected h2,
+    .detail-section h2,
+    .detail-section h3,
+    .detail-section h4,
+    .record-card h3,
+    .card-meta,
+    .postal-summary-addressee,
+    .postal-summary-meta,
+    .postal-summary-address {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .help-heading-row > *,
+    .household-link-title > *,
+    .household-name-heading > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .household-meta {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: .93rem;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      margin-bottom: 18px;
+    }
+    .summary-box {
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+    .detail-grid {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+    .detail-grid > * {
+      min-width: 0;
+    }
+    .detail-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: -4px 0 2px;
+    }
+    .detail-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      text-decoration: none;
+      font-size: .92rem;
+    }
+    .detail-section {
+      border: 1px solid var(--line);
+      background: var(--panel-bg);
+      padding: 18px;
+      box-shadow: var(--shadow-card);
+      scroll-margin-top: 18px;
+    }
+    .detail-section h2,
+    .detail-section h3 {
+      margin-top: 0;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .pair {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .contact-link {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: .14em;
+    }
+    .contact-link:hover {
+      text-decoration-thickness: 2px;
+    }
+    .contact-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .postal-summary {
+      border: 2px solid var(--accent);
+      background: var(--current-bg-soft);
+      padding: 16px 18px;
+      margin: 0 0 16px;
+    }
+    .postal-summary.is-warning {
+      border-color: var(--warning);
+      background: var(--warning-bg);
+    }
+    .postal-summary-eyebrow {
+      color: var(--muted);
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .postal-summary-addressee {
+      margin-top: 6px;
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+    .postal-summary-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+    .postal-summary-note {
+      margin: 10px 0 0;
+      color: var(--warning);
+      font-weight: 600;
+    }
+    .postal-summary-address {
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    .card-stack {
+      display: grid;
+      gap: 14px;
+    }
+    .payment-section-meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+    .payment-filter-state {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: -2px 0 14px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .payment-filter-chip,
+    .payment-filter-clear {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      color: inherit;
+      text-decoration: none;
+    }
+    .payment-table-wrap {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-width: 100%;
+      max-height: 342px;
+      border: 1px solid var(--line);
+      background: var(--panel-bg-subtle);
+      -webkit-overflow-scrolling: touch;
+    }
+    .payment-table {
+      width: 100%;
+      min-width: 880px;
+      border-collapse: collapse;
+    }
+    .payment-table th,
+    .payment-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--table-line);
+      vertical-align: top;
+      text-align: left;
+    }
+    .payment-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--table-head-bg);
+      color: var(--muted);
+      font-size: .82rem;
+      letter-spacing: .04em;
+    }
+    .payment-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+    .payment-table td.amount-cell {
+      text-align: right;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+    .payment-table td.notes-cell {
+      min-width: 16ch;
+      color: var(--muted);
+    }
+    .payment-filter-link {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .payment-kind-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+    .record-card {
+      border: 1px solid var(--line);
+      background: var(--card-bg-strong);
+      padding: 16px;
+    }
+    .record-card.is-target-highlight {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 6px rgba(166, 82, 51, 0.14);
+    }
+    .record-card h3 {
+      margin-bottom: 10px;
+    }
+    .record-card h3.member-card-name {
+      font-size: 1.22rem;
+      line-height: 1.4;
+    }
+    .action-row,
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .action-row {
+      margin: 0 0 14px;
+    }
+    .action-row-tight,
+    .card-actions-tight {
+      margin-top: 0;
+    }
+    .card-actions {
+      margin-top: 14px;
+    }
+    .action-row form,
+    .card-actions form {
+      margin: 0;
+    }
+    .household-core-actions,
+    .card-action-menu,
+    .event-history-panel,
+    .raw-inspection-panel {
+      margin: 0 0 14px;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+    }
+    .card-action-menu {
+      margin-top: 14px;
+      margin-bottom: 0;
+    }
+    .event-history-panel,
+    .raw-inspection-panel {
+      margin-bottom: 0;
+    }
+    .household-core-actions summary,
+    .card-action-menu summary,
+    .event-history-panel summary,
+    .raw-inspection-panel summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+      margin: 0;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: var(--accent);
+      list-style: none;
+    }
+    .household-core-actions summary::-webkit-details-marker,
+    .card-action-menu summary::-webkit-details-marker,
+    .event-history-panel summary::-webkit-details-marker,
+    .raw-inspection-panel summary::-webkit-details-marker {
+      display: none;
+    }
+    .household-core-actions summary::after,
+    .card-action-menu summary::after,
+    .event-history-panel summary::after,
+    .raw-inspection-panel summary::after {
+      content: "+";
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .household-core-actions[open] summary::after,
+    .card-action-menu[open] summary::after,
+    .event-history-panel[open] summary::after,
+    .raw-inspection-panel[open] summary::after {
+      content: "-";
+    }
+    .household-core-actions[open] summary,
+    .card-action-menu[open] summary,
+    .event-history-panel[open] summary,
+    .raw-inspection-panel[open] summary {
+      border-bottom: 1px solid var(--line);
+    }
+    .household-core-action-list,
+    .card-action-menu-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px 16px;
+    }
+    .household-core-action-list > *,
+    .card-action-menu-list > * {
+      min-width: 0;
+    }
+    .event-history-list {
+      display: grid;
+      gap: 14px;
+      padding: 14px 16px 16px;
+    }
+    .household-core-action-list .ghost-button,
+    .card-action-menu-list .ghost-button,
+    .card-action-menu-list .button,
+    .card-action-menu-list .danger-button {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .inline-status {
+      align-self: center;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .card-meta {
+      color: var(--muted);
+      margin: -4px 0 12px;
+    }
+    .inspection-stack {
+      display: grid;
+      gap: 12px;
+    }
+    .raw-inspection-panel .inspection-stack {
+      padding: 14px 16px 16px;
+    }
+    .inspection-block {
+      border: 1px solid var(--line);
+      background: var(--card-bg-strong);
+      padding: 14px 16px;
+    }
+    .inspection-block h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+    .compact-layout {
+      display: grid;
+      gap: 18px;
+    }
+    .compact-layout.layout-tablet,
+    .compact-layout.layout-mobile {
+      display: none;
+    }
+    .compact-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .compact-toolbar p {
+      margin: 0;
+    }
+    .compact-chooser {
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      padding: 16px;
+    }
+    .compact-chooser[open] summary {
+      margin-bottom: 12px;
+    }
+    .compact-chooser summary {
+      cursor: pointer;
+      color: var(--accent);
+      margin: 0;
+    }
+    .browser-shell .global-nav,
+    .browser-shell .office-subnav-links,
+    .preview-pills,
+    .detail-nav {
+      scrollbar-width: thin;
+    }
+    .mobile-backbar {
+      display: grid;
+      gap: 10px;
+    }
+    .mobile-selected {
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      padding: 16px;
+    }
+    .mobile-selected h2,
+    .mobile-list-panel h2 {
+      margin-bottom: 8px;
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+    .mobile-list-panel .household-list,
+    .compact-chooser .household-list {
+      max-height: none;
+      padding-right: 0;
+    }
+    .browser-shell.preview-tablet .browser-grid,
+    .browser-shell.preview-tablet .filter-grid,
+    .browser-shell.preview-tablet .filter-fields,
+    .browser-shell.preview-mobile .browser-grid,
+    .browser-shell.preview-mobile .filter-grid,
+    .browser-shell.preview-mobile .filter-fields {
+      grid-template-columns: 1fr;
+    }
+    .browser-shell.preview-tablet .household-list,
+    .browser-shell.preview-mobile .household-list {
+      max-height: none;
+    }
+    .browser-shell.preview-mobile .preview-head,
+    .browser-shell.preview-mobile .browser-top,
+    .browser-shell.preview-mobile .filter-actions,
+    .browser-shell.preview-mobile .detail-nav {
+      align-items: stretch;
+    }
+    .browser-shell.preview-mobile .browser-actions,
+    .browser-shell.preview-mobile .filter-actions,
+    .browser-shell.preview-mobile .action-row,
+    .browser-shell.preview-mobile .card-actions,
+    .browser-shell.preview-mobile .mobile-backbar,
+    .browser-shell.preview-mobile .household-core-action-list,
+    .browser-shell.preview-mobile .card-action-menu-list {
+      display: grid;
+    }
+    .browser-shell.preview-mobile .filter-actions > *,
+    .browser-shell.preview-mobile .action-row > *,
+    .browser-shell.preview-mobile .card-actions > *,
+    .browser-shell.preview-mobile .mobile-backbar > *,
+    .browser-shell.preview-mobile .household-core-action-list > *,
+    .browser-shell.preview-mobile .card-action-menu-list > * {
+      width: 100%;
+    }
+    .browser-shell.preview-mobile .preview-pills,
+    .browser-shell.preview-mobile .global-nav,
+    .browser-shell.preview-mobile .office-subnav-links,
+    .browser-shell.preview-mobile .detail-nav {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .browser-shell.preview-mobile .preview-pill,
+    .browser-shell.preview-mobile .global-nav .ghost-button,
+    .browser-shell.preview-mobile .office-subnav-links .ghost-button,
+    .browser-shell.preview-mobile .detail-nav a {
+      width: auto;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    .browser-shell.preview-mobile .kana-nav {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      max-width: 100%;
+      min-width: 0;
+    }
+    .browser-shell.preview-mobile .kana-pill {
+      width: 100%;
+      min-width: 0;
+      padding: 8px 6px;
+      justify-content: center;
+      text-align: center;
+    }
+    .browser-shell.preview-mobile .summary-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .browser-shell.preview-mobile .preview-frame,
+    .browser-shell.preview-mobile .panel,
+    .browser-shell.preview-mobile .filter-panel,
+    .browser-shell.preview-mobile .kana-toolbar,
+    .browser-shell.preview-mobile .mobile-list-panel,
+    .browser-shell.preview-mobile .mobile-selected,
+    .browser-shell.preview-mobile .household-list,
+    .browser-shell.preview-mobile .household-link {
+      min-width: 0;
+    }
+    .browser-shell.preview-mobile .filter-panel h3,
+    .browser-shell.preview-mobile .household-link h3,
+    .browser-shell.preview-mobile .compact-toolbar h2,
+    .browser-shell.preview-mobile .mobile-selected h2,
+    .browser-shell.preview-mobile .mobile-list-panel h2,
+    .browser-shell.preview-mobile .detail-section h2,
+    .browser-shell.preview-mobile .detail-section h3,
+    .browser-shell.preview-mobile .detail-section h4,
+    .browser-shell.preview-mobile .record-card h3,
+    .browser-shell.preview-mobile .inspection-block h3 {
+      line-height: 1.45;
+    }
+    .browser-shell.preview-mobile .filter-panel h3,
+    .browser-shell.preview-mobile .detail-section h3,
+    .browser-shell.preview-mobile .detail-section h4,
+    .browser-shell.preview-mobile .record-card h3,
+    .browser-shell.preview-mobile .inspection-block h3 {
+      font-size: .98rem;
+    }
+    .browser-shell.preview-mobile .record-card h3.member-card-name {
+      font-size: 1.12rem;
+    }
+    .browser-shell.preview-mobile .household-link h3,
+    .browser-shell.preview-mobile .compact-toolbar h2,
+    .browser-shell.preview-mobile .mobile-selected h2,
+    .browser-shell.preview-mobile .mobile-list-panel h2,
+    .browser-shell.preview-mobile .detail-section h2 {
+      font-size: 1.02rem;
+    }
+    .browser-shell.preview-mobile .household-link h3.household-link-title {
+      font-size: 1.08rem;
+      line-height: 1.45;
+    }
+    .browser-shell.preview-mobile .compact-toolbar h2.household-name-heading,
+    .browser-shell.preview-mobile .mobile-selected h2.household-name-heading,
+    .browser-shell.preview-mobile .detail-section h2.household-name-heading {
+      font-size: 1.28rem;
+      line-height: 1.4;
+    }
+    @media (max-width: 1024px) and (min-width: 641px) {
+      .layout-desktop,
+      .layout-mobile {
+        display: none;
+      }
+      .layout-tablet {
+        display: grid;
+      }
+    }
+    @media (max-width: 640px) {
+      .preview-frame,
+      .panel,
+      .filter-panel,
+      .kana-toolbar,
+      .mobile-list-panel,
+      .mobile-selected,
+      .household-list,
+      .household-link,
+      .detail-grid,
+      .detail-grid > *,
+      .detail-section,
+      .detail-section > *,
+      .record-card,
+      .inspection-block,
+      .household-core-actions,
+      .card-action-menu,
+      .event-history-panel,
+      .raw-inspection-panel,
+      .event-history-list,
+      .payment-table-wrap {
+        min-width: 0;
+        max-width: 100%;
+      }
+      .pair-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .payment-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .preview-head,
+      .browser-top,
+      .filter-actions,
+      .detail-nav {
+        align-items: stretch;
+      }
+      .browser-actions,
+      .filter-actions,
+      .action-row,
+      .card-actions,
+      .mobile-backbar {
+        display: grid;
+      }
+      .filter-actions > *,
+      .action-row > *,
+      .card-actions > *,
+      .mobile-backbar > * {
+        width: 100%;
+      }
+      .preview-pills,
+      .global-nav,
+      .office-subnav-links,
+      .detail-nav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .preview-pill,
+      .global-nav .ghost-button,
+      .office-subnav-links .ghost-button,
+      .detail-nav a {
+        width: auto;
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+      .kana-nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        max-width: 100%;
+        min-width: 0;
+      }
+      .kana-pill {
+        width: 100%;
+        min-width: 0;
+        padding: 8px 6px;
+        justify-content: center;
+        text-align: center;
+      }
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .hero,
+      .panel,
+      .detail-section {
+        padding: 18px;
+      }
+      .filter-panel h3,
+      .detail-section h3,
+      .detail-section h4,
+      .record-card h3,
+      .inspection-block h3 {
+        font-size: .98rem;
+        line-height: 1.45;
+      }
+      .record-card h3.member-card-name {
+        font-size: 1.12rem;
+      }
+      .household-link h3,
+      .compact-toolbar h2,
+      .mobile-selected h2,
+      .mobile-list-panel h2,
+      .detail-section h2 {
+        font-size: 1.02rem;
+        line-height: 1.45;
+      }
+      .household-link h3.household-link-title {
+        font-size: 1.08rem;
+        line-height: 1.45;
+      }
+      .compact-toolbar h2.household-name-heading,
+      .mobile-selected h2.household-name-heading,
+      .detail-section h2.household-name-heading {
+        font-size: 1.28rem;
+        line-height: 1.4;
+      }
+      .preview-head {
+        gap: 10px;
+      }
+      .layout-desktop,
+      .layout-tablet {
+        display: none;
+      }
+      .layout-mobile {
+        display: grid;
+      }
+    }
+    .browser-shell.preview-desktop .layout-desktop {
+      display: grid;
+    }
+    .browser-shell.preview-desktop .layout-tablet,
+    .browser-shell.preview-desktop .layout-mobile {
+      display: none;
+    }
+    .browser-shell.preview-tablet .layout-desktop,
+    .browser-shell.preview-tablet .layout-mobile {
+      display: none;
+    }
+    .browser-shell.preview-tablet .layout-tablet {
+      display: grid;
+    }
+    .browser-shell.preview-mobile .layout-desktop,
+    .browser-shell.preview-mobile .layout-tablet {
+      display: none;
+    }
+    .browser-shell.preview-mobile .layout-mobile {
+      display: grid;
+    }
+    details summary {
+      cursor: pointer;
+      color: var(--accent);
+      margin-top: 10px;
+    }
+    @media (max-width: 920px) {
+      .browser-grid,
+      .filter-grid,
+      .filter-fields {
+        grid-template-columns: 1fr;
+      }
+      .filter-fields.filter-fields-dates {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .household-list {
+        max-height: none;
+      }
+    }
+  </style>
+  <script src="{% static 'office/household_panel_navigation.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const storageKey = "household-browser-scroll-state";
+      const panelSelector = "[data-household-browser-panel]";
+      const memorialPersonHashPrefix = "#memorial-person-";
+      const parser = new DOMParser();
+
+      const householdLists = () => Array.from(document.querySelectorAll("[data-household-list]"));
+      const cssAttributeSelectorValue = (value) => {
+        const rawValue = String(value);
+        if (window.CSS && typeof window.CSS.escape === "function") {
+          return window.CSS.escape(rawValue);
+        }
+        return rawValue.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      };
+      const isVisibleLayoutElement = (element) => {
+        const layout = element.closest("[data-layout]");
+        const visibleRoot = layout || element;
+        const style = window.getComputedStyle(visibleRoot);
+        return (
+          visibleRoot.getClientRects().length > 0
+          && style.display !== "none"
+          && style.visibility !== "hidden"
+        );
+      };
+      const scrollToMemorialPersonFromHash = () => {
+        let currentHash = window.location.hash || "";
+        try {
+          currentHash = decodeURIComponent(currentHash);
+        } catch (_error) {
+          return;
+        }
+        if (!currentHash.startsWith(memorialPersonHashPrefix)) {
+          return;
+        }
+        const personId = currentHash.slice(memorialPersonHashPrefix.length);
+        if (!personId) {
+          return;
+        }
+        const selector = `[data-memorial-person-card="${cssAttributeSelectorValue(personId)}"]`;
+        const cards = Array.from(document.querySelectorAll(selector));
+        const card = cards.find(isVisibleLayoutElement) || cards[0];
+        if (!(card instanceof HTMLElement)) {
+          return;
+        }
+        try {
+          card.focus({ preventScroll: true });
+        } catch (_error) {
+          card.focus();
+        }
+        card.scrollIntoView({ block: "start", behavior: "auto" });
+        card.classList.add("is-target-highlight");
+        window.setTimeout(() => {
+          card.classList.remove("is-target-highlight");
+        }, 1600);
+      };
+      const currentStateKey = (search = window.location.search) => {
+        const currentParams = new URLSearchParams(search);
+        return JSON.stringify({
+          path: window.location.pathname,
+          q: currentParams.get("q") || "",
+          include_memorial_search: currentParams.get("include_memorial_search") || "",
+          kana_group: currentParams.get("kana_group") || "all",
+          candidate_from: currentParams.get("candidate_from") || "",
+          candidate_to: currentParams.get("candidate_to") || "",
+          preview: currentParams.get("preview") || "auto",
+        });
+      };
+
+      const captureScrollState = (sourceLink = null) => {
+        const nearestList = sourceLink instanceof Element ? sourceLink.closest("[data-household-list]") : null;
+        const lists = householdLists();
+        return {
+          stateKey: currentStateKey(),
+          windowScrollTop: window.scrollY,
+          listScrollTop: nearestList ? nearestList.scrollTop : (lists[0] ? lists[0].scrollTop : 0),
+          listScrollTops: lists.map((list) => list.scrollTop),
+        };
+      };
+
+      const restoreLiveScrollState = (state) => {
+        if (!state) {
+          return;
+        }
+        window.scrollTo({ top: state.windowScrollTop || 0, left: 0, behavior: "auto" });
+        const nextLists = householdLists();
+        if (Array.isArray(state.listScrollTops) && state.listScrollTops.length > 0) {
+          nextLists.forEach((list, index) => {
+            list.scrollTop = state.listScrollTops[index] ?? state.listScrollTop ?? 0;
+          });
+          return;
+        }
+        if (typeof state.listScrollTop === "number") {
+          nextLists.forEach((list) => {
+            list.scrollTop = state.listScrollTop;
+          });
+        }
+      };
+
+      const restoreScroll = () => {
+        const rawState = sessionStorage.getItem(storageKey);
+        if (!rawState) {
+          return;
+        }
+        sessionStorage.removeItem(storageKey);
+        try {
+          const state = JSON.parse(rawState);
+          if (state.stateKey !== currentStateKey()) {
+            return;
+          }
+          restoreLiveScrollState(state);
+        } catch (_error) {
+          sessionStorage.removeItem(storageKey);
+        }
+      };
+
+      restoreScroll();
+      scrollToMemorialPersonFromHash();
+      window.addEventListener("load", () => {
+        restoreScroll();
+        scrollToMemorialPersonFromHash();
+      }, { once: true });
+      window.addEventListener("hashchange", scrollToMemorialPersonFromHash);
+
+      const shouldHandleInPageNavigation = (link) => (
+        link instanceof HTMLAnchorElement
+        && link.hasAttribute("data-household-link")
+        && link.origin === window.location.origin
+        && link.pathname === window.location.pathname
+        && !link.hash
+        && (!link.target || link.target === "_self")
+        && !link.hasAttribute("download")
+      );
+
+      const saveReloadScrollState = (link) => {
+        sessionStorage.setItem(storageKey, JSON.stringify(captureScrollState(link)));
+      };
+
+      const replacePanelFromHtml = (html, preservedState) => {
+        const nextDocument = parser.parseFromString(html, "text/html");
+        const nextPanel = nextDocument.querySelector(panelSelector);
+        const currentPanel = document.querySelector(panelSelector);
+        if (!(nextPanel instanceof HTMLElement) || !(currentPanel instanceof HTMLElement)) {
+          return false;
+        }
+        currentPanel.replaceWith(nextPanel);
+        if (typeof window.templeInitHelpPopovers === "function") {
+          window.templeInitHelpPopovers(nextPanel);
+        }
+        restoreLiveScrollState(preservedState);
+        scrollToMemorialPersonFromHash();
+        return true;
+      };
+
+      const loadHouseholdPanel = window.TempleDBHouseholdNavigation.createLoader(replacePanelFromHtml);
+
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) {
+          return;
+        }
+        const link = target.closest("a");
+        if (!(link instanceof HTMLAnchorElement)) {
+          return;
+        }
+        if (
+          event.defaultPrevented
+          || event.button !== 0
+          || event.metaKey
+          || event.ctrlKey
+          || event.shiftKey
+          || event.altKey
+        ) {
+          return;
+        }
+
+        if (link.hasAttribute("data-preserve-scroll")) {
+          saveReloadScrollState(link);
+        }
+        if (!shouldHandleInPageNavigation(link)) {
+          return;
+        }
+        event.preventDefault();
+        const preservedState = captureScrollState(link);
+        link.classList.add("is-pending");
+        loadHouseholdPanel(link.href, { pushHistory: true, preservedState })
+          .finally(() => {
+            link.classList.remove("is-pending");
+          });
+      });
+
+      window.addEventListener("popstate", () => {
+        const currentPanel = document.querySelector(panelSelector);
+        if (!(currentPanel instanceof HTMLElement)) {
+          return;
+        }
+        const preservedState = captureScrollState();
+        loadHouseholdPanel(window.location.href, {
+          pushHistory: false, preservedState, reloadOnFailure: true,
+        });
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block body %}
+  <div
+    class="browser-shell{% if preview_mode != 'auto' %} preview-{{ preview_mode }}{% endif %}"
+    data-household-browser-panel
+  >
+    {% comment %}Preview 切替 UI は一旦非表示。preview ロジック自体は残しておく。{% endcomment %}
+    {% comment %}
+    <section class="panel preview-panel">
+      <div class="preview-head">
+        <div>
+          <div class="help-heading-row">
+            <div class="eyebrow">Preview</div>
+            <div class="help-popover" data-help-popover>
+              <button
+                class="help-popover-button help-popover-button-compact"
+                type="button"
+                aria-controls="household-browser-preview-help"
+                aria-expanded="false"
+                aria-label="preview の説明"
+                data-help-popover-button
+              >?</button>
+              <div
+                class="help-popover-panel"
+                id="household-browser-preview-help"
+                hidden
+                data-help-popover-panel
+              >
+                <p>同じページ内で擬似的に <code>iPad / iPhone</code> 幅を確認します。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-pills">
+          {% for mode in preview_modes %}
+            {% if mode.key == "tablet" or mode.key == "mobile" %}
+            <a
+              class="ghost-button preview-pill{% if mode.selected %} is-current{% endif %}"
+              {% if mode.selected %}aria-current="page"{% endif %}
+              href="{% url 'office:household_browser' %}?{% if query %}q={{ query|urlencode }}&{% endif %}{% if include_memorial_search %}include_memorial_search=1&{% endif %}kana_group={{ kana_group }}{% if candidate_from %}&candidate_from={{ candidate_from|urlencode }}{% endif %}{% if candidate_to %}&candidate_to={{ candidate_to|urlencode }}{% endif %}{% if selected_household %}&household_id={{ selected_household }}{% endif %}{% if household_focus_mode == 'detail' %}&focus=detail{% endif %}{% if mode.key != 'auto' %}&preview={{ mode.key }}{% endif %}"
+            >
+              {{ mode.label }}
+            </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endcomment %}
+
+    <div class="preview-frame">
+      <section class="hero">
+        <div class="browser-top">
+          <div>
+            <div class="eyebrow">Structure check</div>
+            <div class="hero-heading-row">
+              <h1>戸主ブラウザ</h1>
+              <div class="help-popover" data-help-popover>
+                <button
+                  class="help-popover-button"
+                  type="button"
+                  aria-controls="household-browser-help"
+                  aria-expanded="false"
+                  aria-label="戸主ブラウザの説明"
+                  data-help-popover-button
+                >?</button>
+                <div
+                  class="help-popover-panel"
+                  id="household-browser-help"
+                  hidden
+                  data-help-popover-panel
+                >
+                  <p><code>五十音で戸主を探す -> 家を選ぶ -> 家族/過去帳/予定を見る</code> を確認する画面です。</p>
+                  <p>表示は常に PostgreSQL の DB を使います。</p>
+                  {% if available %}
+                    <p>現行データ由来: <code>{{ canonical_snapshot_id }}</code></p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if available %}
+            <div class="browser-actions">
+              <a
+                class="ghost-button"
+                href="{% url 'office:create_household' %}?next={{ current_url|urlencode }}"
+              >
+                新しい家を作成
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      {% if not available %}
+        <section class="panel">
+          <h2>まだ表示できません</h2>
+          <p class="muted">{{ message }}</p>
+        </section>
+      {% else %}
+        <section class="panel">
+          <div class="filter-bar">
+            <div class="filter-grid">
+              <form method="get" class="filter-panel">
+                <input type="hidden" name="preview" value="{{ preview_mode }}">
+                {% if household_focus_mode == "detail" %}<input type="hidden" name="focus" value="detail">{% endif %}
+                <div>
+                  <div class="eyebrow">List filters</div>
+                  <div class="help-heading-row">
+                    <h3>台帳検索</h3>
+                    <div class="help-popover" data-help-popover>
+                      <button
+                        class="help-popover-button help-popover-button-compact"
+                        type="button"
+                        aria-controls="household-browser-search-help"
+                        aria-expanded="false"
+                        aria-label="台帳検索の説明"
+                        data-help-popover-button
+                      >?</button>
+                      <div
+                        class="help-popover-panel"
+                        id="household-browser-search-help"
+                        hidden
+                        data-help-popover-panel
+                      >
+                        <p>通常は戸主で絞り込みます。<code>人検索</code> をオンにすると、現在帳・過去帳の人名や続柄でも家を引けます。</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="filter-fields">
+                  <div class="field">
+                    <label for="q">search</label>
+                    <input id="q" name="q" value="{{ query }}" placeholder="戸主名 / フリガナ / 台帳ID / 住所 / 電話"{% if household_focus_mode != "detail" %} autofocus{% endif %}>
+                  </div>
+                  <div class="checkbox-field">
+                    <input
+                      id="include_memorial_search"
+                      name="include_memorial_search"
+                      type="checkbox"
+                      value="1"
+                      {% if include_memorial_search %}checked{% endif %}
+                    >
+                    <label for="include_memorial_search">人検索</label>
+                  </div>
+                </div>
+                <input type="hidden" name="kana_group" value="{{ kana_group }}">
+                {% if candidate_from %}<input type="hidden" name="candidate_from" value="{{ candidate_from }}">{% endif %}
+                {% if candidate_to %}<input type="hidden" name="candidate_to" value="{{ candidate_to }}">{% endif %}
+                {% if selected_household %}<input type="hidden" name="household_id" value="{{ selected_household }}">{% endif %}
+                <div class="filter-actions">
+                  <button class="button" type="submit">絞り込む</button>
+                  <a class="ghost-button" href="{% url 'office:household_browser' %}{% if preview_mode != 'auto' %}?preview={{ preview_mode }}{% endif %}">クリア</a>
+                </div>
+              </form>
+
+              <form method="get" class="filter-panel">
+                <input type="hidden" name="preview" value="{{ preview_mode }}">
+                {% if household_focus_mode == "detail" %}<input type="hidden" name="focus" value="detail">{% endif %}
+                <div>
+                  <div class="eyebrow">Candidate window</div>
+                  <div class="help-heading-row">
+                    <h3>年忌候補期間</h3>
+                    <div class="help-popover" data-help-popover>
+                      <button
+                        class="help-popover-button help-popover-button-compact"
+                        type="button"
+                        aria-controls="household-browser-candidate-help"
+                        aria-expanded="false"
+                        aria-label="年忌候補期間の説明"
+                        data-help-popover-button
+                      >?</button>
+                      <div
+                        class="help-popover-panel"
+                        id="household-browser-candidate-help"
+                        hidden
+                        data-help-popover-panel
+                      >
+                        <p>選択中の家に対する年忌・初盆候補の対象期間だけを更新します。</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="filter-fields filter-fields-dates">
+                  <div class="field">
+                    <label for="candidate_from">開始日</label>
+                    <div class="field-input-shell">
+                      <input id="candidate_from" name="candidate_from" type="date" value="{{ candidate_from }}">
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="candidate_to">終了日</label>
+                    <div class="field-input-shell">
+                      <input id="candidate_to" name="candidate_to" type="date" value="{{ candidate_to }}">
+                    </div>
+                  </div>
+                </div>
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                {% if include_memorial_search %}<input type="hidden" name="include_memorial_search" value="1">{% endif %}
+                <input type="hidden" name="kana_group" value="{{ kana_group }}">
+                {% if selected_household %}<input type="hidden" name="household_id" value="{{ selected_household }}">{% endif %}
+                <div class="filter-actions">
+                  <button class="button" type="submit">期間を更新</button>
+                  <a class="ghost-button" href="{% url 'office:household_browser' %}?{% if query %}q={{ query|urlencode }}&{% endif %}{% if include_memorial_search %}include_memorial_search=1&{% endif %}kana_group={{ kana_group }}{% if selected_household %}&household_id={{ selected_household }}{% endif %}{% if household_focus_mode == 'detail' %}&focus=detail{% endif %}{% if preview_mode != 'auto' %}&preview={{ preview_mode }}{% endif %}">期間を既定値へ戻す</a>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="kana-toolbar">
+            <div>
+              <div class="eyebrow">Gojuon</div>
+              <div class="kana-nav">
+                {% for group in kana_groups %}
+                  <a
+                    class="kana-pill{% if group.selected %} active{% endif %}"
+                    href="{% url 'office:household_browser' %}?kana_group={{ group.key }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if include_memorial_search %}&include_memorial_search=1{% endif %}{% if candidate_from %}&candidate_from={{ candidate_from|urlencode }}{% endif %}{% if candidate_to %}&candidate_to={{ candidate_to|urlencode }}{% endif %}{% if household_focus_mode == 'detail' %}&focus=detail{% endif %}{% if preview_mode != 'auto' %}&preview={{ preview_mode }}{% endif %}"
+                  >
+                    <span>{{ group.label }}</span>
+                    <span class="count">{{ group.count }}</span>
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="kana-summary">
+              <div>現在の行: <strong>{{ selected_group_label }}</strong></div>
+              <div>表示件数: <strong>{{ result_count }}</strong></div>
+              {% if query %}
+                <div>検索語: <code>{{ query }}</code></div>
+              {% endif %}
+              {% if include_memorial_search %}
+                <div>人検索: <strong>含む</strong></div>
+              {% endif %}
+            </div>
+          </div>
+        </section>
+
+        <div class="browser-grid layout-desktop" data-layout="desktop">
+          <section class="panel">
+            <div class="eyebrow">Households</div>
+            <h2>{{ result_count }} 件</h2>
+            <p class="result-caption">
+              {% if kana_group == "all" %}
+                全体をフリガナ順で表示しています。
+              {% else %}
+                {{ selected_group_label }} の戸主を表示しています。
+              {% endif %}
+            </p>
+            {% include "office/_household_browser_list_items.html" %}
+          </section>
+
+          <section class="detail-grid">
+            {% include "office/_household_browser_detail_content.html" with section_prefix="desktop" empty_detail_message="左の一覧からクリックすると、その家に紐づく現在帳、過去帳、予定レコードを確認できます。" %}
+          </section>
+        </div>
+
+        <div class="compact-layout layout-tablet" data-layout="tablet">
+          <section class="panel">
+            <div class="compact-toolbar">
+              <div>
+                <div class="eyebrow">Tablet layout</div>
+                {% if detail %}
+                  <div class="help-heading-row">
+                    <h2 class="household-name-heading">
+                      <span>{{ detail.summary.name }}</span>
+                      {% if detail.summary.role_badges %}
+                        <span class="household-link-badges">
+                          {% for badge in detail.summary.role_badges %}
+                            <span class="household-role-badge">{{ badge }}</span>
+                          {% endfor %}
+                        </span>
+                      {% endif %}
+                    </h2>
+                    <div class="help-popover" data-help-popover>
+                      <button
+                        class="help-popover-button help-popover-button-compact"
+                        type="button"
+                        aria-controls="household-browser-tablet-help"
+                        aria-expanded="false"
+                        aria-label="tablet layout の説明"
+                        data-help-popover-button
+                      >?</button>
+                      <div
+                        class="help-popover-panel"
+                        id="household-browser-tablet-help"
+                        hidden
+                        data-help-popover-panel
+                      >
+                        <p>詳細を見ながら、必要なときだけ戸主一覧を開く想定です。</p>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="help-heading-row">
+                    <h2>戸主を選んでください</h2>
+                    <div class="help-popover" data-help-popover>
+                      <button
+                        class="help-popover-button help-popover-button-compact"
+                        type="button"
+                        aria-controls="household-browser-tablet-help"
+                        aria-expanded="false"
+                        aria-label="tablet layout の説明"
+                        data-help-popover-button
+                      >?</button>
+                      <div
+                        class="help-popover-panel"
+                        id="household-browser-tablet-help"
+                        hidden
+                        data-help-popover-panel
+                      >
+                        <p>まず一覧を開いて、確認したい家を選びます。</p>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+              <a class="ghost-button" href="#tablet-chooser">戸主一覧へ</a>
+            </div>
+          </section>
+
+          <section class="panel" id="tablet-chooser">
+            <details class="compact-chooser" {% if not detail or query %}open{% endif %}>
+              <summary>戸主一覧を開く</summary>
+              <p class="result-caption">
+                {% if kana_group == "all" %}
+                  全体をフリガナ順で表示しています。
+                {% else %}
+                  {{ selected_group_label }} の戸主を表示しています。
+                {% endif %}
+              </p>
+              {% include "office/_household_browser_list_items.html" %}
+            </details>
+          </section>
+
+          <section class="detail-grid">
+            {% include "office/_household_browser_detail_content.html" with section_prefix="tablet" empty_detail_message="上の戸主一覧から選ぶと、その家の詳細をここに表示します。" %}
+          </section>
+        </div>
+
+        <div class="compact-layout layout-mobile" data-layout="mobile">
+          {% if detail and mobile_detail_first %}
+            <section class="panel mobile-backbar">
+              <a
+                class="ghost-button"
+                href="{% url 'office:household_browser' %}?kana_group={{ kana_group }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if include_memorial_search %}&include_memorial_search=1{% endif %}{% if candidate_from %}&candidate_from={{ candidate_from|urlencode }}{% endif %}{% if candidate_to %}&candidate_to={{ candidate_to|urlencode }}{% endif %}{% if preview_mode != 'auto' %}&preview={{ preview_mode }}{% endif %}"
+              >
+                一覧に戻る
+              </a>
+              <div class="mobile-selected">
+                <div class="eyebrow">Mobile detail</div>
+                <div class="help-heading-row">
+                  <h2 class="household-name-heading">
+                    <span>{{ detail.summary.name }}</span>
+                    {% if detail.summary.role_badges %}
+                      <span class="household-link-badges">
+                        {% for badge in detail.summary.role_badges %}
+                          <span class="household-role-badge">{{ badge }}</span>
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </h2>
+                  <div class="help-popover" data-help-popover>
+                    <button
+                      class="help-popover-button help-popover-button-compact"
+                      type="button"
+                      aria-controls="household-browser-mobile-detail-help"
+                      aria-expanded="false"
+                      aria-label="mobile detail の説明"
+                      data-help-popover-button
+                    >?</button>
+                    <div
+                      class="help-popover-panel"
+                      id="household-browser-mobile-detail-help"
+                      hidden
+                      data-help-popover-panel
+                    >
+                      <p>別の戸主を見たいときは、下の戸主一覧を開いて選び直します。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="detail-grid">
+              {% include "office/_household_browser_detail_content.html" with section_prefix="mobile" empty_detail_message="一覧から選ぶと詳細を表示します。" %}
+            </section>
+
+            <section class="panel mobile-list-panel" id="mobile-results">
+              <div class="help-heading-row">
+                <div class="eyebrow">Mobile list</div>
+                <div class="help-popover" data-help-popover>
+                  <button
+                    class="help-popover-button help-popover-button-compact"
+                    type="button"
+                    aria-controls="household-browser-mobile-list-help"
+                    aria-expanded="false"
+                    aria-label="mobile list の説明"
+                    data-help-popover-button
+                  >?</button>
+                  <div
+                    class="help-popover-panel"
+                    id="household-browser-mobile-list-help"
+                    hidden
+                    data-help-popover-panel
+                  >
+                    <p>必要なときだけ一覧を開いて、別の家へ移れます。</p>
+                  </div>
+                </div>
+              </div>
+              <details class="compact-chooser">
+                <summary>戸主一覧を開く</summary>
+                <p class="result-caption">
+                  {% if kana_group == "all" %}
+                    全体をフリガナ順で表示しています。
+                  {% else %}
+                    {{ selected_group_label }} の戸主を表示しています。
+                  {% endif %}
+                </p>
+                {% include "office/_household_browser_list_items.html" %}
+              </details>
+            </section>
+          {% else %}
+            <section class="panel mobile-list-panel" id="mobile-results">
+              <div class="eyebrow">Mobile list</div>
+              <div class="help-heading-row">
+                <h2>戸主一覧</h2>
+                <div class="help-popover" data-help-popover>
+                  <button
+                    class="help-popover-button help-popover-button-compact"
+                    type="button"
+                    aria-controls="household-browser-mobile-list-help"
+                    aria-expanded="false"
+                    aria-label="mobile list の説明"
+                    data-help-popover-button
+                  >?</button>
+                  <div
+                    class="help-popover-panel"
+                    id="household-browser-mobile-list-help"
+                    hidden
+                    data-help-popover-panel
+                  >
+                    {% if detail %}
+                      <p>検索結果はこの一覧からそのまま選び直せます。</p>
+                    {% else %}
+                      <p>iPhone では一覧から戸主を選び、次の画面で詳細を見る流れを想定しています。</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <p class="result-caption">
+                {% if kana_group == "all" %}
+                  全体をフリガナ順で表示しています。
+                {% else %}
+                  {{ selected_group_label }} の戸主を表示しています。
+                {% endif %}
+              </p>
+              {% include "office/_household_browser_list_items.html" %}
+            </section>
+
+            {% if detail %}
+              <section class="panel mobile-backbar">
+                <a
+                  class="ghost-button"
+                  href="{% url 'office:household_browser' %}?kana_group={{ kana_group }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if include_memorial_search %}&include_memorial_search=1{% endif %}{% if candidate_from %}&candidate_from={{ candidate_from|urlencode }}{% endif %}{% if candidate_to %}&candidate_to={{ candidate_to|urlencode }}{% endif %}{% if preview_mode != 'auto' %}&preview={{ preview_mode }}{% endif %}"
+                >
+                  一覧に戻る
+                </a>
+                <div class="mobile-selected">
+                  <div class="eyebrow">Mobile detail</div>
+                  <div class="help-heading-row">
+                    <h2 class="household-name-heading">
+                      <span>{{ detail.summary.name }}</span>
+                      {% if detail.summary.role_badges %}
+                        <span class="household-link-badges">
+                          {% for badge in detail.summary.role_badges %}
+                            <span class="household-role-badge">{{ badge }}</span>
+                          {% endfor %}
+                        </span>
+                      {% endif %}
+                    </h2>
+                    <div class="help-popover" data-help-popover>
+                      <button
+                        class="help-popover-button help-popover-button-compact"
+                        type="button"
+                        aria-controls="household-browser-mobile-detail-help"
+                        aria-expanded="false"
+                        aria-label="mobile detail の説明"
+                        data-help-popover-button
+                      >?</button>
+                      <div
+                        class="help-popover-panel"
+                        id="household-browser-mobile-detail-help"
+                        hidden
+                        data-help-popover-panel
+                      >
+                        <p>別の戸主を見たいときは一覧へ戻って選び直します。</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            {% endif %}
+
+            {% if detail %}
+              <section class="detail-grid">
+                {% include "office/_household_browser_detail_content.html" with section_prefix="mobile" empty_detail_message="一覧から選ぶと詳細を表示します。" %}
+              </section>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

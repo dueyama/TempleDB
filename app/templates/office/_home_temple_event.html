@@ -1,0 +1,10 @@
+<div class="event-card ledger-card">
+  <a class="ledger-card-summary summary-link-text" href="{% url 'office:edit_temple_event' item.event_id %}?next={{ current_url|urlencode }}">
+    <div class="summary-heading">
+      <div class="summary-date">{{ item.scheduled_date }}{% if item.scheduled_time %} {{ item.scheduled_time }}{% endif %}{% if show_relative_days %} / {{ item.days_until_label }}{% endif %}{% if item.location %} / {{ item.location }}{% endif %}</div>
+      <div class="summary-title">{{ item.service_label }}</div>
+      {% if item.subject_name %}<div class="card-meta">{{ item.subject_name }}</div>{% endif %}
+    </div>
+    <div class="badge-row summary-badges"><span class="badge">寺の予定</span></div>
+  </a>
+</div>

@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}Record History | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .history-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .history-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .history-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(180px, 240px) minmax(160px, 220px) minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .history-list {
+      display: grid;
+      gap: 16px;
+    }
+    .history-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+      display: grid;
+      gap: 14px;
+    }
+    .history-card-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+    }
+    .history-card-title {
+      display: grid;
+      gap: 8px;
+      min-width: min(100%, 560px);
+    }
+    .history-card h2 {
+      margin: 0;
+      font-size: 1.16rem;
+      line-height: 1.45;
+    }
+    .history-summary {
+      margin: 0;
+      line-height: 1.7;
+      color: #4d3f31;
+    }
+    .history-kicker {
+      color: var(--muted);
+      font-size: .82rem;
+      letter-spacing: .04em;
+      line-height: 1.5;
+    }
+    .history-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: .92rem;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: #fffaf0;
+      font-size: .86rem;
+    }
+    .badge.update {
+      border-color: #9d8d6f;
+      background: #fff8ee;
+    }
+    .badge.delete {
+      border-color: #c98a79;
+      background: #fff0ea;
+      color: #7a2d1e;
+    }
+    .badge.restore {
+      border-color: #8aa87b;
+      background: #eff8ea;
+      color: #2f5a2d;
+    }
+    .history-diff {
+      display: grid;
+      gap: 10px;
+    }
+    .history-diff-row {
+      border: 1px solid rgba(122, 96, 70, 0.18);
+      background: #fffdf8;
+      padding: 12px 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .history-diff-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .history-diff-row strong {
+      display: block;
+    }
+    .history-diff-values {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+    .history-diff-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .history-diff-value {
+      border: 1px dashed rgba(122, 96, 70, 0.24);
+      background: #fff;
+      padding: 10px 12px;
+      min-height: 70px;
+    }
+    .history-diff-value span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: .74rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .history-diff-value div {
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+    }
+    .history-note {
+      border-left: 4px solid #cbb48b;
+      background: rgba(255,250,240,.9);
+      padding: 12px 14px;
+    }
+    .history-note p {
+      margin: 6px 0 0;
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+    .history-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .history-section-label {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .history-fact-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+    }
+    .history-fact {
+      border: 1px solid rgba(122, 96, 70, 0.16);
+      background: #fffdf8;
+      padding: 10px 12px;
+    }
+    .history-fact .label {
+      display: block;
+      color: var(--muted);
+      font-size: .74rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .history-fact strong {
+      display: block;
+      margin-top: 6px;
+      font-size: .98rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .history-extra summary,
+    .history-snapshot summary {
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .history-extra {
+      display: grid;
+      gap: 10px;
+    }
+    .snapshot-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 12px;
+    }
+    .snapshot-block {
+      border: 1px solid rgba(122, 96, 70, 0.16);
+      background: #fffdf8;
+      padding: 12px;
+    }
+    .snapshot-block pre {
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    @media (max-width: 980px) {
+      .history-card h2 {
+        font-size: 1.02rem;
+        line-height: 1.45;
+      }
+    }
+    @media (max-width: 920px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+      .history-card-head {
+        display: grid;
+      }
+      .history-diff-values {
+        grid-template-columns: 1fr;
+      }
+      .history-diff-arrow {
+        min-height: 24px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="history-shell">
+    {% include "includes/office_nav.html" with current_section="memorials" %}
+    <section class="hero">
+      <div class="history-top">
+        <div>
+          <div class="eyebrow">Audit</div>
+          <div class="hero-heading-row">
+            <h1>変更・削除履歴</h1>
+            <div class="help-popover" data-help-popover>
+              <button
+                class="help-popover-button"
+                type="button"
+                aria-controls="record-history-help"
+                aria-expanded="false"
+                aria-label="変更・削除履歴の説明"
+                data-help-popover-button
+              >?</button>
+              <div
+                class="help-popover-panel"
+                id="record-history-help"
+                hidden
+                data-help-popover-panel
+              >
+                <p>DB 上で行った更新、削除、復元の履歴です。上から新しい順に、対象、操作内容、変更点、理由の順で確認できます。</p>
+                <p>履歴から現在の最新レコードへ移動できます。</p>
+                {% if canonical_snapshot_id %}
+                  <p>現行データ由来: <code>{{ canonical_snapshot_id }}</code></p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="history-actions">
+          <a class="ghost-button" href="{% url 'office:service_ledger' %}">法要台帳</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form method="get" class="filter-bar">
+        <div class="field">
+          <label for="action">操作種別</label>
+          <select id="action" name="action">
+            {% for item in action_options %}
+              <option value="{{ item.key }}"{% if item.selected %} selected{% endif %}>{{ item.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="q">検索</label>
+          <input id="q" name="q" value="{{ query }}" placeholder="氏名 / 台帳ID / 編集者 / メモ">
+        </div>
+        <button class="button" type="submit">絞り込む</button>
+        <a class="ghost-button" href="{% url 'office:record_history' %}">クリア</a>
+      </form>
+      {% if not has_current_batch %}
+        <p class="muted" style="margin-top: 12px;">現行台帳が見つからないため、履歴リンク先を解決できない場合があります。</p>
+      {% endif %}
+    </section>
+
+    <div class="summary-grid">
+      <div class="summary-box">
+        <div class="label">表示件数</div>
+        <div class="value">{{ entry_count }}</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">更新</div>
+        <div class="value">{{ update_count }}</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">削除</div>
+        <div class="value">{{ delete_count }}</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">復元</div>
+        <div class="value">{{ restore_count }}</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">source 操作</div>
+        <div class="value">{{ source_operation_count }}</div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="eyebrow">Source Operations</div>
+      <h2>source 操作履歴</h2>
+      {% if source_operation_entries %}
+        <div class="history-list">
+          {% for entry in source_operation_entries %}
+            <article class="history-card">
+              <div class="history-card-head">
+                <div class="history-card-title">
+                  <div class="badge-row">
+                    <span class="badge">{{ entry.operation_label }}</span>
+                    {% if entry.target_label %}
+                      <span class="badge">{{ entry.target_label }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="history-kicker">source {{ entry.log.source.source_id }}</div>
+                  <h2>{{ entry.headline }}</h2>
+                  <p class="history-summary">{{ entry.summary }}</p>
+                </div>
+                <div class="history-meta">
+                  <span>{{ entry.log.created_at|date:"Y-m-d H:i:s" }}</span>
+                  {% if entry.log.editor_label %}<span>記録者 {{ entry.log.editor_label }}</span>{% endif %}
+                </div>
+              </div>
+
+              {% if entry.payload_changes %}
+                <div>
+                  <div class="history-section-label">変更内容</div>
+                  <div class="history-diff">
+                    {% for change in entry.payload_changes %}
+                      <div class="history-diff-row">
+                        <div class="history-diff-head">
+                          <strong>{{ change.label }}</strong>
+                        </div>
+                        <div class="history-diff-values">
+                          <div class="history-diff-value">
+                            <span>変更前</span>
+                            <div>{{ change.before }}</div>
+                          </div>
+                          <div class="history-diff-arrow">→</div>
+                          <div class="history-diff-value">
+                            <span>変更後</span>
+                            <div>{{ change.after }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              <details class="history-snapshot">
+                <summary>before / after payload を確認</summary>
+                <div class="snapshot-grid">
+                  <div class="snapshot-block">
+                    <strong>before</strong>
+                    <pre>{{ entry.before_payload_json }}</pre>
+                  </div>
+                  <div class="snapshot-block">
+                    <strong>after</strong>
+                    <pre>{{ entry.after_payload_json }}</pre>
+                  </div>
+                </div>
+              </details>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">source 操作履歴はまだありません。</p>
+      {% endif %}
+    </section>
+
+    <section class="history-list">
+      {% for entry in entries %}
+        <article class="history-card">
+          <div class="history-card-head">
+            <div class="history-card-title">
+              <div class="badge-row">
+                <span class="badge {{ entry.action.css_class }}">{{ entry.action.label }}</span>
+                <span class="badge">{{ entry.record_type_label }}</span>
+                <span class="badge">{{ entry.current_state_label }}</span>
+              </div>
+              <div class="history-kicker">{{ entry.record_type_label }} の履歴</div>
+              <h2>{{ entry.headline }}</h2>
+              <p class="history-summary">{{ entry.summary }}</p>
+            </div>
+            <div class="history-meta">
+              <span>{{ entry.log.created_at|date:"Y-m-d H:i:s" }}</span>
+              {% if entry.log.editor_label %}<span>編集者 {{ entry.log.editor_label }}</span>{% endif %}
+            </div>
+          </div>
+
+          <div class="history-fact-grid">
+            {% for fact in entry.target_facts %}
+              <div class="history-fact">
+                <span class="label">{{ fact.label }}</span>
+                <strong>{{ fact.value }}</strong>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% if entry.primary_field_changes %}
+            <div>
+              <div class="history-section-label">変更内容</div>
+              <div class="history-diff">
+                {% for change in entry.primary_field_changes %}
+                  <div class="history-diff-row">
+                    <div class="history-diff-head">
+                      <strong>{{ change.label }}</strong>
+                    </div>
+                    <div class="history-diff-values">
+                      <div class="history-diff-value">
+                        <span>変更前</span>
+                        <div>{{ change.before }}</div>
+                      </div>
+                      <div class="history-diff-arrow">→</div>
+                      <div class="history-diff-value">
+                        <span>変更後</span>
+                        <div>{{ change.after }}</div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if entry.extra_field_changes %}
+            <details class="history-extra">
+              <summary>残り {{ entry.extra_field_changes|length }} 件の変更を開く</summary>
+              <div class="history-diff">
+                {% for change in entry.extra_field_changes %}
+                  <div class="history-diff-row">
+                    <div class="history-diff-head">
+                      <strong>{{ change.label }}</strong>
+                    </div>
+                    <div class="history-diff-values">
+                      <div class="history-diff-value">
+                        <span>変更前</span>
+                        <div>{{ change.before }}</div>
+                      </div>
+                      <div class="history-diff-arrow">→</div>
+                      <div class="history-diff-value">
+                        <span>変更後</span>
+                        <div>{{ change.after }}</div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </details>
+          {% endif %}
+
+          {% if entry.log.change_note %}
+            <div class="history-note">
+              <div class="history-section-label">理由・メモ</div>
+              <p>{{ entry.log.change_note }}</p>
+            </div>
+          {% endif %}
+
+          <div class="history-card-actions">
+            {% if entry.edit_url %}
+              <a class="ghost-button" href="{{ entry.edit_url }}">最新レコードを開く</a>
+            {% else %}
+              <span class="muted">現行台帳に対応するレコードが見つかりません。</span>
+            {% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <section class="panel">
+          <h2>履歴はありません</h2>
+          <p class="muted">条件に合う変更履歴がまだありません。</p>
+        </section>
+      {% endfor %}
+    </section>
+  </div>
+{% endblock %}

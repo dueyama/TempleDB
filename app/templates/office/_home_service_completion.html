@@ -1,0 +1,26 @@
+<form method="post" action="{% url 'office:complete_service_from_home' quick.schedule_id %}" class="callout home-service-completion" style="display: grid; gap: 10px;">
+  {% csrf_token %}
+  {{ quick.form.state }}
+  {{ quick.form.non_field_errors }}
+  {% if quick.has_payments %}
+    <p class="muted" style="margin: 0;">入金登録済み：{{ quick.payment_total }}円。追加・訂正は「この法要を編集」から行えます。</p>
+  {% else %}
+    <label for="{{ quick.form.amount.id_for_label }}">{{ quick.form.amount.label }}</label>
+    {{ quick.form.amount }}{{ quick.form.amount.errors }}
+    <span class="muted">空欄なら入金を追加せず、完了だけ保存します。</span>
+  {% endif %}
+  {% if quick.member_count > 1 %}
+    <span class="muted">一緒に勤める{{ quick.member_count }}件を完了します。{% if not quick.has_payments %}お布施を入力した場合はまとめて1件記録します。{% endif %}</span>
+  {% endif %}
+  <button class="button" type="submit">完了して保存</button>
+  <details>
+    <summary>実施・入金日：{{ quick.form.completed_on.value }} ／ 受領方法の変更</summary>
+    <div style="display: grid; gap: 8px; margin-top: 8px;">
+      <label for="{{ quick.form.completed_on.id_for_label }}">{{ quick.form.completed_on.label }}</label>
+      {{ quick.form.completed_on }}{{ quick.form.completed_on.errors }}
+      <label for="{{ quick.form.payment_method.id_for_label }}">{{ quick.form.payment_method.label }}</label>
+      {{ quick.form.payment_method }}{{ quick.form.payment_method.errors }}
+    </div>
+  </details>
+  <span class="muted">受領方法は初期値「現金」。</span>
+</form>

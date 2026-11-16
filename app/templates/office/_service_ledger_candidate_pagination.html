@@ -1,0 +1,20 @@
+<div class="candidate-pagination">
+  <p class="muted">
+    {% if navigation.page.paginator.count %}
+      全{{ navigation.page.paginator.count }}件中 {{ navigation.page.start_index }}〜{{ navigation.page.end_index }}件を表示
+    {% else %}
+      全0件
+    {% endif %}
+  </p>
+  {% if navigation.page.has_other_pages %}
+    <nav class="candidate-pagination-links" aria-label="法要候補のページ切替">
+      {% if navigation.previous_url %}
+        <a class="ghost-button" href="{{ navigation.previous_url }}">前の{{ navigation.page.paginator.per_page }}件</a>
+      {% endif %}
+      <span>{{ navigation.page.number }} / {{ navigation.page.paginator.num_pages }}ページ</span>
+      {% if navigation.next_url %}
+        <a class="ghost-button" href="{{ navigation.next_url }}">次の{{ navigation.page.paginator.per_page }}件</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</div>

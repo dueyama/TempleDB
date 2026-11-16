@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}{{ role_document_labels.district_officer_delivery_labels }}印刷 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .label-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .label-tools,
+    .label-summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .label-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box,
+    .skip-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .skip-list {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 6px;
+    }
+    .preview-stack {
+      display: grid;
+      gap: 24px;
+      justify-content: center;
+    }
+    .delivery-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 21.2mm 18.6mm 22mm;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(68, 50, 33, 0.08);
+    }
+    .delivery-grid {
+      width: 172.8mm;
+      min-height: 253.8mm;
+      display: grid;
+      grid-template-columns: repeat(2, 86.4mm);
+      grid-template-rows: repeat(6, 42.3mm);
+    }
+    .delivery-label {
+      width: 86.4mm;
+      height: 42.3mm;
+      padding: 4.8mm 5.5mm 4.2mm;
+      border: 1px dashed rgba(108, 98, 88, 0.24);
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+      gap: 2.4mm;
+    }
+    .delivery-label.is-empty {
+      border-color: rgba(108, 98, 88, 0.08);
+      background: rgba(245, 241, 232, 0.16);
+    }
+    .delivery-meta {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 2.2mm;
+      flex-wrap: wrap;
+    }
+    .delivery-district {
+      font-size: 4.4mm;
+      line-height: 1.1;
+      letter-spacing: .04em;
+      word-break: break-word;
+    }
+    .delivery-officer {
+      font-family: var(--font-display);
+      font-size: 7.1mm;
+      line-height: 1.08;
+      letter-spacing: .03em;
+      word-break: break-word;
+    }
+    .delivery-count {
+      font-size: 4.2mm;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 21.2mm 18.6mm 22mm;
+    }
+    @media print {
+      body {
+        background: #fff;
+      }
+      .shell {
+        max-width: none;
+        padding: 0;
+      }
+      .session-bar,
+      .global-nav,
+      .office-subnav,
+      .hero,
+      .label-tools,
+      .label-summary,
+      .skip-box,
+      .flash-list {
+        display: none !important;
+      }
+      .label-shell,
+      .preview-stack {
+        gap: 0;
+      }
+      .delivery-sheet {
+        width: 172.8mm;
+        min-height: 253.8mm;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+        break-after: page;
+        page-break-after: always;
+      }
+      .delivery-sheet:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+      .delivery-label {
+        border: 0;
+      }
+      .delivery-label.is-empty {
+        background: transparent;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="label-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="district_officer_delivery_labels" %}
+    <section class="hero">
+      <div class="eyebrow">Settings / District Officers</div>
+      <h1>{{ role_document_labels.district_officer_delivery_labels }}印刷</h1>
+      <p>地区名、役員名、その地区の配り物対象数を A4 2列 × 6行のラベルにまとめて印刷します。数は地区所属の配り物対象世帯数です。</p>
+    </section>
+
+    {% if available %}
+      <section class="label-tools">
+        <button class="button" type="button" onclick="window.print()">印刷する</button>
+        <a class="ghost-button" href="{% url 'office:district_officer_delivery_labels' %}?format=pdf">PDFを開く</a>
+        <a class="ghost-button" href="{% url 'office:district_officer_roster' %}">{{ role_document_labels.district_officer_roster }}</a>
+        <a class="ghost-button" href="{% url 'office:districts' %}">地区定義</a>
+        <a class="ghost-button" href="{% url 'office:household_districts' %}">戸主地区・送付区分</a>
+      </section>
+
+      <section class="label-summary">
+        <article class="summary-box">
+          <div class="label">配り物ラベル件数</div>
+          <div class="value">{{ total_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">印刷ページ数</div>
+          <div class="value">{{ page_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">印刷対象外</div>
+          <div class="value">{{ skipped_count }}</div>
+        </article>
+      </section>
+
+      {% if skipped_rows %}
+        <section class="skip-box">
+          <div class="eyebrow">Skipped</div>
+          <h2>印刷対象外の地区</h2>
+          <ul class="skip-list">
+            {% for row in skipped_rows %}
+              <li>{{ row.district_name }}{% if row.officer_name %} / {{ row.officer_name }}{% endif %} : {{ row.reason }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      <div class="preview-stack">
+        {% for page in label_pages %}
+          <section class="delivery-sheet" aria-label="{{ role_document_labels.district_officer_delivery_labels }} {{ forloop.counter }} ページ目">
+            <div class="delivery-grid">
+              {% for label in page %}
+                <article class="delivery-label{% if not label %} is-empty{% endif %}">
+                  {% if label %}
+                    <div class="delivery-meta">
+                      <div class="delivery-district">{{ label.district_short_name }}</div>
+                      <div class="delivery-count">{{ label.delivery_count }}名</div>
+                    </div>
+                    <div class="delivery-officer">{{ label.officer_name }} 様</div>
+                  {% endif %}
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="callout">{{ error_message }}</div>
+    {% endif %}
+  </div>
+{% endblock %}

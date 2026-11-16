@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}郵送名簿照合 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .review-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .review-actions,
+    .summary-grid,
+    .candidate-list {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box,
+    .section-card,
+    .row-card,
+    .candidate-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .row-list {
+      display: grid;
+      gap: 14px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    .pair {
+      border-top: 1px solid var(--line);
+      padding-top: 8px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .candidate-card {
+      min-width: 220px;
+      flex: 1 1 220px;
+    }
+    .row-card.processed {
+      border-color: #7da273;
+      background: rgba(242, 251, 240, .94);
+    }
+    .processed-banner {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border: 1px solid #8fb786;
+      background: rgba(236, 247, 233, .96);
+      display: grid;
+      gap: 4px;
+    }
+    .resolve-form {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .resolve-form label {
+      display: grid;
+      gap: 6px;
+      min-width: 260px;
+      flex: 1 1 260px;
+    }
+    .resolve-form input[type="text"] {
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.88);
+    }
+    .resolve-panel {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .danger-button {
+      border-color: #c58f63;
+      background: rgba(255, 242, 232, .96);
+      color: #7b3d16;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="review-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="postal_review" %}
+    <section class="hero">
+      <div class="eyebrow">Settings / Auxiliary CSV</div>
+      <h1>郵送名簿の照合結果</h1>
+      {% if analysis.available %}
+        <p>{{ analysis.csv_path }}</p>
+      {% else %}
+        <p>郵送名簿 CSV が見つかりません。</p>
+      {% endif %}
+    </section>
+
+    {% if analysis.available %}
+      <section class="summary-grid">
+        <article class="summary-box">
+          <div class="label">一致</div>
+          <div class="value">{{ analysis.matched_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">未一致</div>
+          <div class="value">{{ analysis.unmatched_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">処理済み</div>
+          <div class="value">{{ analysis.processed_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">未一致のうち処理済み</div>
+          <div class="value">{{ analysis.processed_unmatched_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">未一致のうち未処理</div>
+          <div class="value">{{ analysis.pending_unmatched_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">同名曖昧</div>
+          <div class="value">{{ analysis.ambiguous_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">スキップ</div>
+          <div class="value">{{ analysis.skipped_count }}</div>
+        </article>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">Unmatched</div>
+        <h2>戸主と一致しなかった行</h2>
+        <div class="row-list">
+          {% for item in analysis.review_rows %}
+            <article class="row-card{% if item.is_processed %} processed{% endif %}">
+              <div class="pair-grid">
+                <div class="pair"><dt>行</dt><dd>{{ item.row_number }}</dd></div>
+                <div class="pair"><dt>氏名</dt><dd>{{ item.head_name }}</dd></div>
+                <div class="pair"><dt>区分</dt><dd>{{ item.classification|default:"-" }}</dd></div>
+                <div class="pair"><dt>郵便番号</dt><dd>{{ item.postal_code|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所1</dt><dd>{{ item.address_line1|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所2</dt><dd>{{ item.address_line2|default:"-" }}</dd></div>
+                <div class="pair"><dt>電話</dt><dd>{{ item.phone|default:"-" }}</dd></div>
+                <div class="pair"><dt>備考</dt><dd>{{ item.note|default:"-" }}</dd></div>
+              </div>
+              {% if item.is_processed and item.resolution %}
+                <div class="processed-banner">
+                  <strong>処理済み: {{ item.resolution.label }}</strong>
+                  <div>
+                    台帳ID {{ item.resolution.legacy_household_id|default:"-" }}
+                    {% if item.resolution.target_household_name_snapshot %}
+                      / {{ item.resolution.target_household_name_snapshot }}
+                    {% endif %}
+                  </div>
+                  {% if item.resolution.note %}
+                    <div>{{ item.resolution.note }}</div>
+                  {% endif %}
+                  <div class="muted">
+                    {% if item.resolution.editor_label %}{{ item.resolution.editor_label }} / {% endif %}{{ item.resolution.updated_at }}
+                  </div>
+                  {% if item.resolution.kind == "create_household" %}
+                    <form method="post" action="{% url 'office:rollback_created_postal_review_household' %}" style="margin-top: 10px;">
+                      {% csrf_token %}
+                      {% if analysis.selected_folder_name %}
+                        <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                      {% endif %}
+                      <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                      <button
+                        class="ghost-button danger-button"
+                        type="submit"
+                        onclick="return confirm('この新しい家作成を取り消しますか？\\n作成された家と戸主 person は非表示になります。');"
+                      >
+                        この新しい家作成を取り消す
+                      </button>
+                    </form>
+                  {% endif %}
+                </div>
+              {% endif %}
+              <form class="resolve-form" method="get">
+                {% if analysis.selected_folder_name %}
+                  <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                {% endif %}
+                <input type="hidden" name="resolve_row" value="{{ item.row_number }}">
+                <label>
+                  <span class="muted">入れ替え先の戸主を検索</span>
+                  <input
+                    type="text"
+                    name="resolve_query"
+                    value="{% if resolve_row == item.row_number|stringformat:'s' %}{{ resolve_query }}{% endif %}"
+                    placeholder="台帳ID・住所・現在戸主名"
+                  >
+                </label>
+                <button class="ghost-button" type="submit">検索</button>
+              </form>
+              {% if not item.is_processed %}
+                <form method="post" action="{% url 'office:create_postal_review_household' %}" style="margin-top: 10px;">
+                  {% csrf_token %}
+                  {% if analysis.selected_folder_name %}
+                    <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                  {% endif %}
+                  <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                  <button
+                    class="ghost-button danger-button"
+                    type="submit"
+                    onclick="return confirm('新しい家を作って新戸主にしますか？\\n押し間違いに注意してください。処理後はこの画面から作成取消できます。');"
+                  >
+                    新しい家を作って新戸主にする
+                  </button>
+                </form>
+              {% endif %}
+              {% if resolve_row == item.row_number|stringformat:'s' %}
+                <div class="resolve-panel">
+                  <div class="eyebrow">Replacement Candidates</div>
+                  {% if replacement_candidates %}
+                    <div class="candidate-list">
+                      {% for candidate in replacement_candidates %}
+                        <article class="candidate-card">
+                          <strong>{{ candidate.name }}</strong>
+                          <div class="muted">台帳ID {{ candidate.household_id }}</div>
+                          <div>{{ candidate.postal_code|default:"-" }}</div>
+                          <div>{{ candidate.address_line1|default:"-" }}</div>
+                          <div>{{ candidate.address_line2|default:"" }}</div>
+                          <div>{{ candidate.phone|default:"-" }}</div>
+                          <form method="post" action="{% url 'office:replace_postal_household_head' %}" style="margin-top: 12px;">
+                            {% csrf_token %}
+                            {% if analysis.selected_folder_name %}
+                              <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                            {% endif %}
+                            <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                            <input type="hidden" name="household_id" value="{{ candidate.household_id }}">
+                            <button class="ghost-button" type="submit">この家の戸主を差し替える</button>
+                          </form>
+                          <form method="post" action="{% url 'office:replace_postal_household_head' %}" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            {% if analysis.selected_folder_name %}
+                              <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                            {% endif %}
+                            <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                            <input type="hidden" name="household_id" value="{{ candidate.household_id }}">
+                            <input type="hidden" name="keep_old_head_current" value="1">
+                            <button class="ghost-button" type="submit">いまの戸主を現在帳へ残して差し替える</button>
+                          </form>
+                          <form method="post" action="{% url 'office:assign_postal_override' %}" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            {% if analysis.selected_folder_name %}
+                              <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                            {% endif %}
+                            <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                            <input type="hidden" name="household_id" value="{{ candidate.household_id }}">
+                            <button class="ghost-button" type="submit">この家の別郵送先にする</button>
+                          </form>
+                        </article>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="callout">検索結果がありません。住所や現在戸主名で探してください。</div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </article>
+          {% endfor %}
+          {% if not analysis.review_rows %}
+            <div class="callout">未一致の行はありません。</div>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">Matched</div>
+        <div class="help-heading-row">
+          <h2>一致した行</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="postal-review-matched-help"
+              aria-expanded="false"
+              aria-label="一致した行の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="postal-review-matched-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>自動一致していますが、別の家へ戸主差し替えや別郵送先設定をしたいときはここから選び直せます。</p>
+            </div>
+          </div>
+        </div>
+        <div class="row-list">
+          {% for item in analysis.matched_rows %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>行</dt><dd>{{ item.row_number }}</dd></div>
+                <div class="pair"><dt>氏名</dt><dd>{{ item.head_name }}</dd></div>
+                <div class="pair"><dt>一致先</dt><dd>{{ item.matched_household_display.name }} / 台帳ID {{ item.matched_household_display.household_id }}</dd></div>
+                <div class="pair"><dt>区分</dt><dd>{{ item.classification|default:"-" }}</dd></div>
+                <div class="pair"><dt>郵便番号</dt><dd>{{ item.postal_code|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所1</dt><dd>{{ item.address_line1|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所2</dt><dd>{{ item.address_line2|default:"-" }}</dd></div>
+                <div class="pair"><dt>電話</dt><dd>{{ item.phone|default:"-" }}</dd></div>
+              </div>
+              <form class="resolve-form" method="get">
+                {% if analysis.selected_folder_name %}
+                  <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                {% endif %}
+                <input type="hidden" name="resolve_row" value="{{ item.row_number }}">
+                <label>
+                  <span class="muted">別の家を検索</span>
+                  <input
+                    type="text"
+                    name="resolve_query"
+                    value="{% if resolve_row == item.row_number|stringformat:'s' %}{{ resolve_query }}{% endif %}"
+                    placeholder="台帳ID・住所・現在戸主名"
+                  >
+                </label>
+                <button class="ghost-button" type="submit">検索</button>
+              </form>
+              {% if resolve_row == item.row_number|stringformat:'s' %}
+                <div class="resolve-panel">
+                  <div class="eyebrow">Replacement Candidates</div>
+                  {% if replacement_candidates %}
+                    <div class="candidate-list">
+                      {% for candidate in replacement_candidates %}
+                        <article class="candidate-card">
+                          <strong>{{ candidate.name }}</strong>
+                          <div class="muted">台帳ID {{ candidate.household_id }}</div>
+                          <div>{{ candidate.postal_code|default:"-" }}</div>
+                          <div>{{ candidate.address_line1|default:"-" }}</div>
+                          <div>{{ candidate.address_line2|default:"" }}</div>
+                          <div>{{ candidate.phone|default:"-" }}</div>
+                          <form method="post" action="{% url 'office:replace_postal_household_head' %}" style="margin-top: 12px;">
+                            {% csrf_token %}
+                            {% if analysis.selected_folder_name %}
+                              <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                            {% endif %}
+                            <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                            <input type="hidden" name="household_id" value="{{ candidate.household_id }}">
+                            <button class="ghost-button" type="submit">この家の戸主を差し替える</button>
+                          </form>
+                          <form method="post" action="{% url 'office:replace_postal_household_head' %}" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            {% if analysis.selected_folder_name %}
+                              <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                            {% endif %}
+                            <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                            <input type="hidden" name="household_id" value="{{ candidate.household_id }}">
+                            <input type="hidden" name="keep_old_head_current" value="1">
+                            <button class="ghost-button" type="submit">いまの戸主を現在帳へ残して差し替える</button>
+                          </form>
+                          <form method="post" action="{% url 'office:assign_postal_override' %}" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            {% if analysis.selected_folder_name %}
+                              <input type="hidden" name="postal_folder" value="{{ analysis.selected_folder_name }}">
+                            {% endif %}
+                            <input type="hidden" name="row_number" value="{{ item.row_number }}">
+                            <input type="hidden" name="household_id" value="{{ candidate.household_id }}">
+                            <button class="ghost-button" type="submit">この家の別郵送先にする</button>
+                          </form>
+                        </article>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="callout">検索結果がありません。住所や現在戸主名で探してください。</div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </article>
+          {% empty %}
+            <div class="callout">一致した行はありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">Ambiguous</div>
+        <h2>同名で曖昧な行</h2>
+        <div class="row-list">
+          {% for item in analysis.ambiguous_rows %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>行</dt><dd>{{ item.row_number }}</dd></div>
+                <div class="pair"><dt>氏名</dt><dd>{{ item.head_name }}</dd></div>
+                <div class="pair"><dt>区分</dt><dd>{{ item.classification|default:"-" }}</dd></div>
+                <div class="pair"><dt>郵便番号</dt><dd>{{ item.postal_code|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所1</dt><dd>{{ item.address_line1|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所2</dt><dd>{{ item.address_line2|default:"-" }}</dd></div>
+                <div class="pair"><dt>電話</dt><dd>{{ item.phone|default:"-" }}</dd></div>
+                <div class="pair"><dt>備考</dt><dd>{{ item.note|default:"-" }}</dd></div>
+              </div>
+              <div class="eyebrow" style="margin-top: 16px;">候補戸主</div>
+              <div class="candidate-list">
+                {% for candidate in item.candidate_households %}
+                  <article class="candidate-card">
+                    <strong>{{ candidate.name }}</strong>
+                    <div class="muted">台帳ID {{ candidate.household_id }}</div>
+                    <div>{{ candidate.postal_code|default:"-" }}</div>
+                    <div>{{ candidate.address_line1|default:"-" }}</div>
+                    <div>{{ candidate.address_line2|default:"" }}</div>
+                    <div>{{ candidate.phone|default:"-" }}</div>
+                  </article>
+                {% endfor %}
+              </div>
+            </article>
+          {% empty %}
+            <div class="callout">曖昧な行はありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">Skipped</div>
+        <h2>スキップした行</h2>
+        <div class="row-list">
+          {% for item in analysis.skipped_rows %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>行</dt><dd>{{ item.row_number }}</dd></div>
+                <div class="pair"><dt>氏名</dt><dd>{{ item.head_name|default:"-" }}</dd></div>
+                <div class="pair"><dt>区分</dt><dd>{{ item.classification|default:"-" }}</dd></div>
+                <div class="pair"><dt>理由</dt><dd>{{ item.skip_reason }}</dd></div>
+              </div>
+            </article>
+          {% empty %}
+            <div class="callout">スキップ行はありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+contract_type: workflow
+version: 2
+workflow_id: service_schedule_lifecycle
+title: 法要予定運用
+entry_points:
+  - home
+  - service_ledger
+  - household_detail
+steps:
+  - step_id: identify_service_need
+    intent: Use service ledger candidates, household detail, or current service sections to find a needed schedule.
+    screen_id: service_ledger
+  - step_id: create_or_open_schedule
+    intent: Start schedule creation for a deceased person or open existing schedule.
+    screen_id: service_ledger
+  - step_id: edit_schedule
+    intent: Save date, service label, status, notes, and optional linked payment rows.
+    screen_id: record_edit
+  - step_id: print_or_sync
+    intent: Use print and Google Calendar sync affordances where enabled.
+    screen_id: record_edit
+completion: Service schedule appears in the correct ledger bucket and household detail.
+guardrails:
+  - Completed services may open read-only first.
+  - Google Calendar is downstream; TempleDB remains source of truth.

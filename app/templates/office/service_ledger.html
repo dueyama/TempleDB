@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}法要台帳 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .ledger-shell {
+      display: grid;
+      gap: 22px;
+    }
+    #section-candidates {
+      scroll-margin-top: 5rem;
+    }
+    body[data-realdata-preview="true"] #section-candidates {
+      scroll-margin-top: 11rem;
+    }
+    .candidate-pagination {
+      margin: 14px 0;
+    }
+    .candidate-pagination-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .ledger-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .ledger-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+    .ledger-view-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .view-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: var(--ghost-bg);
+      color: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .view-pill.is-current {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--button-text);
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: var(--ghost-bg);
+      text-decoration: none;
+      color: inherit;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 12px;
+      align-items: end;
+    }
+    .filter-bar > .field {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .filter-bar > .button,
+    .filter-bar > .ghost-button {
+      flex: 0 0 auto;
+      width: auto;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: var(--field-bg);
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box {
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      padding: 14px 16px;
+    }
+    .summary-link {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+    .summary-link:hover {
+      background: var(--hover-bg);
+    }
+    .summary-box.search-summary {
+      background: var(--search-summary-bg);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .summary-box .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+    .section-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      align-items: start;
+    }
+    .section-column {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+    @media (min-width: 1100px) {
+      .section-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+{% include "office/_service_ledger_card_styles.html" %}
+    @media (max-width: 920px) {
+      .filter-bar {
+        flex-wrap: wrap;
+      }
+      .filter-bar > .field {
+        flex-basis: 100%;
+      }
+    }
+    @media (max-width: 720px) {
+      .panel-head {
+        display: none;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="ledger-shell">
+    <section class="hero">
+      <div class="ledger-top">
+        <div>
+          <div class="eyebrow">Service ledger</div>
+          <div class="hero-heading-row">
+            <h1>法要台帳</h1>
+            {% if available %}
+              <div class="help-popover" data-help-popover>
+                <button
+                  class="help-popover-button"
+                  type="button"
+                  aria-controls="service-ledger-help"
+                  aria-expanded="false"
+                  aria-label="法要台帳の説明"
+                  data-help-popover-button
+                >?</button>
+                <div
+                  class="help-popover-panel"
+                  id="service-ledger-help"
+                  hidden
+                  data-help-popover-panel
+                >
+                  <p>電話で受けた法要日程を入れ、今日・近日・未定・完了を一画面で見るための台帳です。</p>
+                  <p>現行データ由来: <code>{{ canonical_snapshot_id }}</code></p>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          {% if available %}
+          {% else %}
+            <p>{{ message }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    {% if not available %}
+      <section class="panel">
+        <h2>まだ表示できません</h2>
+        <p class="muted">{{ message }}</p>
+      </section>
+    {% else %}
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="help-heading-row">
+              <div class="eyebrow">Card view</div>
+              <div class="help-popover" data-help-popover>
+                <button
+                  class="help-popover-button help-popover-button-compact"
+                  type="button"
+                  aria-controls="service-ledger-card-view-help"
+                  aria-expanded="false"
+                  aria-label="法要台帳の一覧説明"
+                  data-help-popover-button
+                >?</button>
+                <div
+                  class="help-popover-panel"
+                  id="service-ledger-card-view-help"
+                  hidden
+                  data-help-popover-panel
+                >
+                  <p>主要情報だけを見るか、最初から全文を開くかを切り替えます。</p>
+                  <p>下の一覧は、登録済みの法要と、命日からその場で計算した未登録候補をまとめて出します。必要なものだけ予定化して使います。</p>
+                  <p>上段の登録済み一覧は、新DBで登録した実法要だけを出します。登録済み法要は {{ today_label }} から {{ future_period_to }} まで、予定日超過は、予定日を過ぎても <code>完了</code> または <code>中止</code> になっていない法要です。表示範囲は {{ overdue_period_from }} から {{ today_label }} の前日までです。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ledger-view-switch" aria-label="カード表示切替">
+            {% for mode in card_view_modes %}
+              <a class="view-pill{% if mode.selected %} is-current{% endif %}" href="{{ mode.url }}">{{ mode.label }}</a>
+            {% endfor %}
+          </div>
+        </div>
+        <form method="get" class="filter-bar">
+          <input type="hidden" name="card_view" value="{{ card_view_mode }}">
+          <div class="field">
+            <label for="q">search</label>
+            <input id="q" name="q" value="{{ query }}" placeholder="戸主 / 故人 / 法要 / 台帳ID">
+          </div>
+          <button class="button" type="submit">検索</button>
+          <a class="ghost-button" href="{{ clear_url }}">クリア</a>
+        </form>
+      </section>
+
+      <div class="summary-grid">
+        <a class="summary-box summary-link" href="#section-next-week">
+          <div class="label">今後1年の予定済み法要</div>
+          <div class="value">{{ scheduled_count }}</div>
+        </a>
+        <a class="summary-box summary-link" href="#section-completed">
+          <div class="label">最近完了</div>
+          <div class="value">{{ completed_count }}</div>
+        </a>
+        <a class="summary-box summary-link" href="#section-candidates">
+          <div class="label">未予定の近い法要候補</div>
+          <div class="value">{{ candidate_count }}</div>
+        </a>
+        {% if query %}
+          <div class="summary-box search-summary">
+            <div class="label">検索件数</div>
+            <div class="value">{{ search_result_count }}</div>
+            <div class="meta">「{{ query }}」で画面に出た件数</div>
+          </div>
+        {% endif %}
+      </div>
+      <div class="section-grid">
+        <div class="section-column">
+          {% include "office/_service_ledger_section.html" with section_id="section-next-week" section_class="featured" title="今後1年の予定済み法要" eyebrow="Scheduled actual events / next year" entries=scheduled_events empty_message="今後1年の登録済み法要はありません。" current_url=current_url show_completed_on=False target_date_label="命日基準日" %}
+          {% include "office/_service_ledger_section.html" with section_id="section-completed" title="最近完了" eyebrow="Recently completed" entries=recent_completed_events empty_message="最近完了した法要はまだありません。" current_url=current_url show_completed_on=True target_date_label="命日基準日" section_collapsible=True %}
+        </div>
+        <div class="section-column">
+          {% include "office/_service_ledger_section.html" with section_id="section-candidates" title="未予定の近い法要候補" eyebrow="Calculated candidates" entries=candidate_card_entries empty_message="この期間に近い回忌候補はありません。" current_url=current_url show_completed_on=False target_date_label="命日基準日" section_help_id="service-ledger-candidates-help" section_help_text=candidate_help_text section_pagination=candidate_navigation %}
+        </div>
+        <div class="section-column">
+          {% include "office/_service_ledger_section.html" with section_id="section-overdue" title="予定日を過ぎた未完了法要" eyebrow="Past 6 months overdue" entries=overdue_events empty_message="過去半年に予定日を過ぎた未完了法要はありません。" current_url=current_url show_completed_on=False target_date_label="命日基準日" %}
+          {% include "office/_service_ledger_section.html" with section_id="section-unscheduled" title="登録済みだが日程未定" eyebrow="Unscheduled actual events" entries=unscheduled_events empty_message="日程未定の実イベントはありません。" current_url=current_url show_completed_on=False target_date_label="命日基準日" %}
+          {% include "office/_service_ledger_section.html" with section_id="section-past-unperformed" title="過去1年の勤まらなかった法要" title_count=past_unperformed_count eyebrow="Past year unperformed / actual + calculated" entries=past_unperformed_entries empty_message="過去1年に未完了の登録済み法要や未登録候補はありません。" current_url=current_url show_completed_on=False target_date_label="命日基準日" section_collapsible=True %}
+        </div>
+      </div>
+
+      <section class="section-card" id="section-targets">
+        <div class="eyebrow">Search targets</div>
+        <h2>故人を選んで法要を追加</h2>
+        <div class="card-stack">
+          {% for item in service_target_results %}
+            <details class="target-card ledger-card"{% if card_view_mode == "expanded" %} open{% endif %}>
+              <summary class="ledger-card-summary">
+                <div class="summary-heading">
+                  {% if item.death_date %}<div class="summary-date">命日 {{ item.death_date }}</div>{% endif %}
+                  <div class="summary-title">
+                    <a
+                      class="summary-link-text"
+                      data-summary-link="1"
+                      onclick="event.preventDefault(); event.stopPropagation(); window.location.assign(this.href);"
+                      href="{% url 'office:edit_person' item.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                    >
+                      {{ item.person_name }}
+                    </a>
+                  </div>
+                  <div class="summary-subtitle">
+                    {% if item.household_id and item.household_name %}
+                      <a
+                        class="summary-link-text"
+                        onclick="event.preventDefault(); event.stopPropagation(); window.location.assign(this.href);"
+                        href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail"
+                      >
+                        {{ item.household_name }}
+                      </a>
+                    {% else %}
+                      {{ item.household_name }}
+                    {% endif %}
+                    / 台帳ID {{ item.household_id }}
+                  </div>
+                </div>
+                <div class="badge-row summary-badges">
+                  {% if item.relationship %}<span class="badge">{{ item.relationship }}</span>{% endif %}
+                  {% if item.family_category_label %}<span class="badge">{{ item.family_category_label }}</span>{% endif %}
+                </div>
+                <span class="summary-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="ledger-card-body">
+                <dl class="pair-grid">
+                  {% if item.relationship %}
+                    <div class="pair">
+                      <dt>続柄</dt>
+                      <dd>{{ item.relationship }}</dd>
+                    </div>
+                  {% endif %}
+                  {% if item.death_date %}
+                    <div class="pair">
+                      <dt>命日</dt>
+                      <dd>{{ item.death_date }}</dd>
+                    </div>
+                  {% endif %}
+                  {% if item.kaimyo %}
+                    <div class="pair">
+                      <dt>{{ deceased_labels.kaimyo }}</dt>
+                      <dd>{{ item.kaimyo }}</dd>
+                    </div>
+                  {% endif %}
+                  {% if item.family_category_label %}
+                    <div class="pair">
+                      <dt>家族区分</dt>
+                      <dd>{{ item.family_category_label }}</dd>
+                    </div>
+                  {% endif %}
+                </dl>
+                <div class="card-actions">
+                  <a
+                    class="button"
+                    href="{% url 'office:create_service_schedule' item.household_id item.person_id %}?next={{ current_url|urlencode }}"
+                  >
+                    この故人で法要追加
+                  </a>
+                  <a
+                    class="ghost-button"
+                    href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}&focus=detail"
+                  >
+                    この家を開く
+                  </a>
+                </div>
+              </div>
+            </details>
+          {% empty %}
+            <div class="callout">検索すると、ここに法要追加対象の故人候補が出ます。</div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

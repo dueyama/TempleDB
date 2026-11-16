@@ -1,0 +1,12 @@
+{
+  "default_source_id": "starter-source",
+  "sources": [
+    {
+      "source_id": "starter-source",
+      "label": "未登録（導入準備）",
+      "path": "data/private/sources/register-your-source.mdb",
+      "status": "placeholder",
+      "notes": "Logical bootstrap only. No source file is bundled. Register the actual source when preparing an import."
+    }
+  ]
+}

@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}特殊検索 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .search-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .search-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
+    }
+    .search-actions,
+    .search-shortcuts,
+    .search-pills,
+    .entry-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .entry-actions form {
+      margin: 0;
+    }
+    .ghost-button,
+    .search-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .search-pill.active {
+      border-color: var(--accent);
+      background: rgba(122,59,29,.12);
+    }
+    .danger-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid #9f4d3d;
+      background: #fff0ea;
+      color: #7a2d1e;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+    }
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(180px, 220px) minmax(160px, 200px) minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box,
+    .section-card,
+    .result-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+    }
+    .summary-box {
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .section-card {
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .result-list {
+      display: grid;
+      gap: 14px;
+    }
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+    .result-card {
+      padding: 16px;
+    }
+    .issue-card {
+      border: 1px solid var(--line);
+      background: #fffcf6;
+      padding: 16px;
+    }
+    .result-card h3 {
+      margin: 0 0 6px;
+    }
+    .card-meta {
+      color: var(--muted);
+      margin: 0 0 12px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin-bottom: 14px;
+    }
+    .pair {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .same-name-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .same-name-compare-block {
+      margin-bottom: 14px;
+    }
+    .same-name-section-label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 0 0 10px;
+    }
+    .same-name-household-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    .same-name-household {
+      border: 1px solid var(--line);
+      background: #fff7ee;
+      padding: 14px;
+    }
+    .same-name-member {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 14px;
+    }
+    @media (max-width: 980px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+      .section-card h2 {
+        font-size: 1.05rem;
+        line-height: 1.45;
+      }
+      .result-card h3 {
+        font-size: .98rem;
+        line-height: 1.45;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  {% include "includes/office_nav.html" with current_section="households" %}
+  {% include "includes/office_subnav.html" with current_page="special_searches" %}
+  <section class="hero">
+    <div class="search-top">
+      <div>
+        <div class="hero-heading-row">
+          <h1>特殊検索</h1>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button"
+              type="button"
+              aria-controls="special-searches-help"
+              aria-expanded="false"
+              aria-label="特殊検索の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="special-searches-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>実務でよく見返す条件を、通常検索とは別にまとめる画面です。</p>
+              <p>実務で確認頻度の高い一覧を、ここに順次まとめています。</p>
+            </div>
+          </div>
+        </div>
+        <div class="search-shortcuts">
+          <a class="ghost-button" href="{% url 'office:person_search' %}">人検索へ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% if not available %}
+    <section class="panel">
+      <h2>まだ表示できません</h2>
+      <p class="muted">{{ message }}</p>
+    </section>
+  {% else %}
+    <div class="search-shell">
+      <section class="section-card">
+        <form method="get" class="filter-bar">
+          <div class="field">
+            <label for="q">search</label>
+            <input id="q" name="q" value="{{ query }}" placeholder="{{ tenant_copy.special_searches.search_placeholder }}">
+          </div>
+          <input type="hidden" name="search" value="{{ selected_search_key }}">
+          <button class="button" type="submit">絞り込む</button>
+          <a class="ghost-button" href="{% url 'office:special_searches' %}?search={{ selected_search_key }}">クリア</a>
+        </form>
+      </section>
+
+      <section class="section-card">
+        <div class="search-pills">
+          {% for option in search_options %}
+            <a class="search-pill{% if option.selected %} active{% endif %}" href="{% url 'office:special_searches' %}?search={{ option.key }}{% if query %}&q={{ query|urlencode }}{% endif %}">
+              {{ option.label }} ({{ option.result_count }})
+            </a>
+          {% endfor %}
+        </div>
+        {% for option in search_options %}
+          {% if option.selected %}
+            <p class="muted" style="margin-top: 12px;">{{ option.description }}</p>
+          {% endif %}
+        {% endfor %}
+      </section>
+
+      {% if selected_search_key == "data_quality" %}
+        {% include "office/_data_quality_sections.html" %}
+      {% else %}
+        <section class="summary-grid">
+          <article class="summary-box">
+            <div class="label">現在の検索</div>
+            <div class="value">
+              {% for option in search_options %}
+                {% if option.selected %}{{ option.label }}{% endif %}
+              {% endfor %}
+            </div>
+          </article>
+          <article class="summary-box">
+            <div class="label">結果件数</div>
+            <div class="value">{{ result_count }}</div>
+          </article>
+        </section>
+
+        <section class="section-card">
+          <h2>検索結果</h2>
+          {% if results %}
+            <div class="result-list">
+              {% for entry in results %}
+                <article class="result-card">
+                  {% if entry.result_kind == "schedule" %}
+                    <h3>{{ entry.service_label }}</h3>
+                    <p class="card-meta">
+                      {{ entry.household_name }} / {{ identifier_labels.household }} {{ entry.household_id }} / 予定ID {{ entry.event_id }}
+                      {% if entry.person_id %} / {{ identifier_labels.person }} {{ entry.person_id }}{% endif %}
+                    </p>
+                  {% else %}
+                    <h3>{{ entry.person_name }}</h3>
+                    <p class="card-meta">{{ entry.household_name }} / {{ identifier_labels.household }} {{ entry.household_id }} / {{ identifier_labels.person }} {{ entry.person_id }}</p>
+                  {% endif %}
+                  <dl class="pair-grid">
+                    {% if entry.result_kind == "schedule" %}
+                      <div class="pair"><dt>状態</dt><dd>{{ entry.status_label }}</dd></div>
+                      <div class="pair"><dt>対象</dt><dd>{{ entry.person_name|default:"-" }}</dd></div>
+                      <div class="pair"><dt>続柄</dt><dd>{{ entry.relationship|default:"-" }}</dd></div>
+                      <div class="pair"><dt>予定日</dt><dd>{{ entry.scheduled_date|default:"-" }}</dd></div>
+                      <div class="pair"><dt>基準日</dt><dd>{{ entry.target_date|default:"-" }}</dd></div>
+                      <div class="pair"><dt>場所</dt><dd>{{ entry.location|default:"-" }}</dd></div>
+                    {% else %}
+                      <div class="pair"><dt>状態</dt><dd>{{ entry.status_label }}</dd></div>
+                      <div class="pair"><dt>ふりがな</dt><dd>{{ entry.kana|default:"-" }}</dd></div>
+                      <div class="pair"><dt>続柄</dt><dd>{{ entry.relationship|default:"-" }}</dd></div>
+                      <div class="pair"><dt>命日</dt><dd>{{ entry.death_date|default:"-" }}</dd></div>
+                      <div class="pair"><dt>{{ deceased_labels.kaimyo }}</dt><dd>{{ entry.kaimyo|default:"-" }}</dd></div>
+                      <div class="pair"><dt>享年</dt><dd>{% if entry.age_at_death %}{{ entry.age_at_death }}{{ entry.age_unit }}{% else %}-{% endif %}</dd></div>
+                      <div class="pair"><dt>内部メモ</dt><dd>{{ entry.note|default:"-" }}</dd></div>
+                    {% endif %}
+                  </dl>
+                  <div class="entry-actions">
+                    {% if entry.household_deleted %}
+                      <a class="ghost-button" href="{% url 'office:edit_household' entry.household_id %}?next={{ current_url|urlencode }}">削除済み HOUSEHOLD CORE を開く</a>
+                    {% else %}
+                      <a class="ghost-button" href="{% url 'office:household_browser' %}?household_id={{ entry.household_id }}">この家を開く</a>
+                    {% endif %}
+                    {% if entry.allow_household_delete and data_backend == "db" %}
+                      <form method="post" action="{% url 'office:edit_household' entry.household_id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ current_url }}">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="change_note" value="特殊検索「削除済み person が戸主」から HOUSEHOLD CORE を削除">
+                        <button
+                          class="danger-button"
+                          type="submit"
+                          onclick="return confirm('この HOUSEHOLD CORE を削除済みにします。よろしいですか？');"
+                        >
+                          この家を削除
+                        </button>
+                      </form>
+                    {% endif %}
+                    {% if entry.result_kind == "schedule" %}
+                      <a class="ghost-button" href="{% url 'office:edit_service_schedule' entry.household_id entry.event_id %}?source_table={{ entry.source_table|urlencode }}">この予定を修正</a>
+                    {% else %}
+                      <a class="ghost-button" href="{% url 'office:edit_person' entry.household_id entry.person_id %}">この人を修正</a>
+                    {% endif %}
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="muted">該当するレコードはありません。</p>
+          {% endif %}
+        </section>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

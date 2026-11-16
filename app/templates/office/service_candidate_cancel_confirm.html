@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}法要候補を中止記録 | TempleDB{% endblock %}
+
+{% block body %}
+  {% include "includes/office_nav.html" with current_section="memorials" %}
+  <section class="hero">
+    <div class="eyebrow">Memorial candidate</div>
+    <h1>この法要候補を中止として記録</h1>
+    <p>
+      計算候補そのものを消すのではなく、<code>{{ person.name }}</code> の <code>{{ service_label }}</code> を
+      「やらない法要」として残します。記録後は法要台帳の未予定候補から外れます。
+    </p>
+  </section>
+
+  <div class="stack">
+    <section class="panel">
+      <div class="eyebrow">Candidate</div>
+      <h2>{{ person.name }}</h2>
+      <dl class="pair-grid">
+        <div class="pair">
+          <dt>家</dt>
+          <dd>{{ household_label }} <span class="muted">#{{ household_id }}</span></dd>
+        </div>
+        <div class="pair">
+          <dt>法要名</dt>
+          <dd>{{ service_label }}</dd>
+        </div>
+        <div class="pair">
+          <dt>種別</dt>
+          <dd>{{ candidate_type }}</dd>
+        </div>
+        <div class="pair">
+          <dt>対象日</dt>
+          <dd>{{ target_date|default:"未設定" }}</dd>
+        </div>
+      </dl>
+      <form method="post" style="display: grid; gap: 14px; margin-top: 18px;" data-quicklink-guard-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <input type="hidden" name="service_label" value="{{ service_label }}">
+        <input type="hidden" name="target_date" value="{{ target_date }}">
+        <input type="hidden" name="candidate_type" value="{{ candidate_type }}">
+        <div class="field">
+          <label for="id_cancel_note">理由メモ（任意）</label>
+          <textarea id="id_cancel_note" name="cancel_note" rows="4" placeholder="例: 今年は勤めないため中止"></textarea>
+        </div>
+        <div class="actions">
+          <button class="button" type="submit" data-quicklink-save>中止として記録</button>
+          <a class="ghost-button" href="{{ next_url }}">戻る</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

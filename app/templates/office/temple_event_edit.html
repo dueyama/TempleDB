@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load imports_extras %}
+
+{% block title %}寺の予定{% if event.pk %}：{{ event.service_label }}{% endif %} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  {% include "office/_temple_event_styles.html" %}
+{% endblock %}
+
+{% block body %}
+  <div class="temple-events-page">
+    <section class="hero">
+      <h1>{% if event.pk %}{{ event.service_label }}{% else %}寺の予定を追加{% endif %}</h1>
+      <p>家の登録は不要です。予定の関連先と、各入金の納入者は別々に記録できます。</p>
+      <div class="actions">
+        <a class="ghost-button" href="{% url 'office:temple_events' %}">寺の予定一覧</a>
+        <a class="ghost-button" href="{% url 'office:home' %}">ホーム</a>
+        <a class="ghost-button" href="{% url 'office:accounting' %}">会計</a>
+      </div>
+    </section>
+
+    {% if event.pk %}
+      <section class="panel">
+        <h2>入金の内訳</h2>
+        <p>合計 {{ total|floatformat:"0g" }}円 / {{ receipts|length }}件</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>入金日</th>
+                <th>納入者</th>
+                <th>区分</th>
+                <th>金額</th>
+                <th>受領者</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in receipts %}
+                <tr>
+                  <td>{{ payment.received_on|date:"Y/m/d" }}</td>
+                  <td>
+                    {% if payment.payer_name %}
+                      {{ payment.payer_name }}
+                    {% elif payment.household %}
+                      {{ payment.household_name_snapshot }}
+                    {% else %}
+                      匿名
+                    {% endif %}
+                    {% if payment.payer_name and payment.household %}
+                      <br><span class="muted">{{ payment.household_name_snapshot }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ payment.get_payment_category_display }}</td>
+                  <td>{{ payment.amount|floatformat:"0g" }}円</td>
+                  <td>{{ payment.received_by|default:"—" }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5">入金はまだありません。</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
+
+    <form method="post" class="temple-event-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      {{ form.non_field_errors }}
+      {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {{ hidden.errors }}
+      {% endfor %}
+
+      <section class="panel">
+        <h2>予定</h2>
+        <div class="temple-form-grid">
+          {% for field in form.visible_fields %}
+            <div class="temple-field">
+              {{ field.label_tag }}
+              {{ field }}
+              {{ field.errors }}
+              {% if field.help_text %}
+                <span class="muted">{{ field.help_text }}</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>入金を登録・編集</h2>
+        <p class="muted">納入者はお金を納めた方、受領者は受け取った寺側の担当者です。入金のない空欄は保存されません。「削除」にチェックした入金は保存時に削除し、変更履歴に残します。</p>
+        {{ payment_formset.management_form }}
+        {{ payment_formset.non_form_errors }}
+        <div id="temple-payments">
+          {% for payment_form in payment_formset %}
+            {% include "office/_temple_event_payment_form.html" %}
+          {% endfor %}
+        </div>
+        <template id="temple-payment-empty">
+          {% include "office/_temple_event_payment_form.html" with payment_form=payment_formset.empty_form %}
+        </template>
+        <button type="button" class="ghost-button" id="temple-add-payment">入金欄を追加</button>
+      </section>
+
+      <section class="panel">
+        <div class="temple-field">
+          <label for="change-note">変更メモ（任意）</label>
+          <input id="change-note" name="change_note" maxlength="1000" value="{{ request.POST.change_note }}">
+        </div>
+        <div class="actions temple-panel-actions">
+          <button type="submit" class="button">保存</button>
+          <button type="submit" class="button" name="save_action" value="complete">完了して保存</button>
+          <a class="ghost-button" href="{{ next_url }}">戻る</a>
+        </div>
+      </section>
+    </form>
+
+    {% if history %}
+      <section class="panel">
+        <h2>予定の変更履歴（直近10件）</h2>
+        <ul>
+          {% for log in history %}
+            <li>
+              {{ log.created_at|date:"Y/m/d H:i" }} / {{ log.editor_label }} / {{ log.get_action_kind_display }}
+              {% if log.change_note %} — {{ log.change_note }}{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <a href="{% url 'office:record_history' %}?q={{ event.schedule_uid|urlencode }}">変更履歴を開く</a>
+      </section>
+    {% endif %}
+  </div>
+
+  <script>
+    document.getElementById('temple-add-payment').addEventListener('click', function () {
+      const total = document.getElementById('id_payments-TOTAL_FORMS');
+      const index = Number(total.value);
+      if (index >= 1000) return;
+      const html = document.getElementById('temple-payment-empty').innerHTML.replaceAll('__prefix__', String(index));
+      document.getElementById('temple-payments').insertAdjacentHTML('beforeend', html);
+      total.value = index + 1;
+    });
+  </script>
+{% endblock %}

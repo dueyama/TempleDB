@@ -1,0 +1,17 @@
+contract_type: component
+version: 2
+component_id: record_edit_form
+purpose: Shared audited edit form pattern for canonical records.
+structure:
+  - hero with title and subtitle
+  - warning or read-only callout
+  - visible fields from server-side form
+  - optional change memo
+  - optional formset section
+  - save/delete/restore/return action row
+usage:
+  - record_edit.edit_form
+rules:
+  - Preserve hidden fields needed for provenance and next-url navigation.
+  - Field validation errors stay next to the field.
+  - Save records field changes in audit history.

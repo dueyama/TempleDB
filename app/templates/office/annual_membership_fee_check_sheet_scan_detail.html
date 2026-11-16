@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}保存済み受領チェックシート原本 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .scan-original-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .scan-original-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .scan-original-card {
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, .92);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, .05);
+    }
+    .scan-original-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .scan-original-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 0 0 14px;
+    }
+    .scan-original-meta div {
+      min-width: 0;
+    }
+    .scan-original-meta dt {
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .scan-original-meta dd {
+      margin: 4px 0 0;
+      overflow-wrap: anywhere;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="scan-original-shell">
+    {% include "includes/office_nav.html" with current_section="accounting" %}
+    {% include "includes/office_subnav.html" with current_page="annual_membership_fees" %}
+
+    <section class="hero">
+      <div class="eyebrow">Membership Fees / Saved Original</div>
+      <h1>{{ scan.year }}年 保存済み受領チェックシート原本</h1>
+      <p>TempleDBの画面内で原本を確認します。iPhoneでも上の操作を残したまま閲覧できます。</p>
+    </section>
+
+    <section class="scan-original-actions">
+      <a class="button" href="{{ review_url }}">受領チェック読取へ戻る</a>
+      <a class="ghost-button" href="{{ fees_url }}">護持会費へ戻る</a>
+    </section>
+
+    <section class="scan-original-card">
+      <dl class="scan-original-meta">
+        <div>
+          <dt>原本ファイル</dt>
+          <dd>{{ scan.original_filename }}</dd>
+        </div>
+        <div>
+          <dt>読取日時</dt>
+          <dd>{{ scan.created_at|date:"Y-m-d H:i" }}</dd>
+        </div>
+        <div>
+          <dt>状態</dt>
+          <dd>{{ scan.get_status_display }}</dd>
+        </div>
+      </dl>
+      {% url 'office:annual_membership_fee_check_sheet_scan_file' scan.id as scan_file_url %}
+      <img
+        class="scan-original-image"
+        src="{{ scan_file_url }}{% if is_pdf %}?preview=1{% endif %}"
+        alt="{{ scan.year }}年 受領チェックシート原本"
+      >
+      {% if is_pdf %}
+        <p class="muted">PDF原本の1ページを、閲覧用画像として表示しています。</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

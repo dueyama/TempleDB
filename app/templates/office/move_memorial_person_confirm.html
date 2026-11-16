@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .move-confirm-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .move-confirm-card {
+      max-width: 720px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.94);
+      padding: 24px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .move-confirm-card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+    .move-confirm-meta {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 18px;
+      color: var(--muted);
+    }
+    .move-confirm-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    @media (max-width: 720px) {
+      .move-confirm-card {
+        padding: 18px;
+      }
+      .move-confirm-actions {
+        display: grid;
+      }
+      .move-confirm-actions > * {
+        width: 100%;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="move-confirm-shell">
+    <section class="hero">
+      <div class="eyebrow">Memorial Move</div>
+      <h1>{{ title }}</h1>
+      <p>{{ person.name }} / 個人ID {{ person.person_uid }}</p>
+    </section>
+
+    <section class="move-confirm-card">
+      <h2>故人を移しました。</h2>
+      <p>{{ person.name }} を {{ target_household_label }} / 台帳ID {{ target_household_id }} へ移しました。</p>
+      <div class="move-confirm-meta">
+        {% if source_household_label and source_household_id %}
+          <div>元の家: {{ source_household_label }} / 台帳ID {{ source_household_id }}</div>
+        {% endif %}
+        {% if change_note %}
+          <div>メモ: {{ change_note }}</div>
+        {% endif %}
+      </div>
+      <p class="muted">移動が誤りなら、その場で取り消せます。</p>
+      <form method="post" class="move-confirm-actions">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="undo_move">
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <input type="hidden" name="undo_household_id" value="{{ source_household_id }}">
+        <input type="hidden" name="change_note" value="{{ undo_change_note }}">
+        <button class="button" type="submit">移動を取り消す</button>
+        <a class="ghost-button" href="{{ return_url }}">{{ return_label }}</a>
+      </form>
+    </section>
+  </div>
+{% endblock %}

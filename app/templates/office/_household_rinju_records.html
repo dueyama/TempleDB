@@ -1,0 +1,20 @@
+<div class="record-card">
+  <h3>臨終勤行の登録・編集</h3>
+  <p class="muted">命日から四十九日までの方を表示します。済んでいる場合は登録画面の「完了保存」を使えます。</p>
+  <div class="card-stack">
+    {% for item in detail.rinju_records %}
+      <div class="card-actions card-actions-tight">
+        <span>{{ item.person_name }} / 命日 {{ item.target_date }}</span>
+        {% if data_backend == 'db' and item.is_actionable %}
+          {% if item.has_schedule %}
+            <a class="ghost-button" href="{% url 'office:edit_service_schedule' detail.summary.household_id item.schedule_event_id %}?source_table={{ item.schedule_source_table|urlencode }}&next={{ current_url|urlencode }}">臨終勤行を開く</a>
+            <span class="inline-status">{{ item.schedule_status_label|default:"登録済み" }}</span>
+          {% else %}
+            <a class="ghost-button" href="{% url 'office:create_service_schedule' detail.summary.household_id item.person_id %}?service_label={{ item.label|urlencode }}&target_date={{ item.target_date|urlencode }}&category={{ item.schedule_category|urlencode }}&next={{ current_url|urlencode }}">臨終勤行を登録</a>
+            <span class="muted">未登録</span>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,64 @@
+[Unit]
+Description=TempleDB PostgreSQL demo (Gunicorn)
+Documentation=file://@WORKSPACE_ROOT@/docs/postgresql_demo_service.md
+Requires=postgresql@17-main.service
+After=postgresql@17-main.service network-online.target
+Wants=network-online.target
+Conflicts=templedb-sqlite-demo.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=@RUN_USER@
+Group=@RUN_GROUP@
+WorkingDirectory=@WORKSPACE_ROOT@/app
+EnvironmentFile=@WORKSPACE_ROOT@/.env.demo
+EnvironmentFile=@WORKSPACE_ROOT@/.env.formal-server
+EnvironmentFile=@WORKSPACE_ROOT@/.env.postgresql-demo
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+Environment=MPLCONFIGDIR=@WORKSPACE_ROOT@/runtime/matplotlib
+Environment=XDG_CACHE_HOME=@WORKSPACE_ROOT@/runtime/xdg-cache
+Environment=TEMPLEDB_GUNICORN_UPSTREAM=127.0.0.1:8012
+ExecStartPre=/usr/bin/pg_isready -q -h ${DATABASE_HOST} -p ${DATABASE_PORT} -d ${DATABASE_NAME}
+ExecStartPre=@WORKSPACE_ROOT@/.venv/bin/python manage.py verify_runtime_contract --engine postgresql --runtime-kind demo
+ExecStartPre=@WORKSPACE_ROOT@/.venv/bin/python manage.py migrate --check --skip-checks
+ExecStartPre=@WORKSPACE_ROOT@/.venv/bin/python manage.py check --deploy --fail-level WARNING
+ExecStartPre=/usr/bin/test -r @WORKSPACE_ROOT@/app/staticfiles/icons/favicon.ico
+ExecStartPre=/usr/bin/test -r @WORKSPACE_ROOT@/app/staticfiles/office/schema_map.css
+ExecStart=@WORKSPACE_ROOT@/.venv/bin/gunicorn config.wsgi:application --bind ${TEMPLEDB_GUNICORN_UPSTREAM} --workers 1 --threads 1 --worker-class sync --timeout 180 --graceful-timeout 30 --forwarded-allow-ips 127.0.0.1 --no-control-socket --access-logfile - --access-logformat "%%(h)s %%(t)s \"%%(m)s %%(U)s %%(H)s\" %%(s)s %%(b)s %%(L)s" --error-logfile -
+ExecStartPost=/usr/bin/curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-connrefused --max-time 3 --output /dev/null --header "Host: localhost" --header "X-Forwarded-Proto: https" http://127.0.0.1:8012/login/
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+BindReadOnlyPaths=@WORKSPACE_ROOT@
+BindPaths=@WORKSPACE_ROOT@/runtime
+BindPaths=@WORKSPACE_ROOT@/app/data/generated
+BindPaths=@WORKSPACE_ROOT@/app/data/runtime
+BindPaths=@WORKSPACE_ROOT@/app/config/tenant_preferences
+BindPaths=/var/run/postgresql
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

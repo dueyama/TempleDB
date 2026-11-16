@@ -1,0 +1,17 @@
+contract_type: component
+version: 2
+component_id: action_bar
+purpose: Groups primary, secondary, and destructive commands without changing their intent.
+structure:
+  - primary button or link appears first
+  - secondary actions use ghost buttons
+  - rare related actions may be inside details/summary
+  - destructive actions use danger styling and confirmation
+usage:
+  - household_browser.browser_actions
+  - household_detail.card_actions
+  - record_edit.action_row
+  - settings_home.settings_actions
+rules:
+  - Do not hide the only path to save or return.
+  - Mutating actions must have explicit risk_level and confirmation in screen YAML.

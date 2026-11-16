@@ -1,0 +1,8 @@
+{
+  "address_query_replacements": [
+    {
+      "match": "荒人",
+      "replace": ""
+    }
+  ]
+}

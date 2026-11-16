@@ -1,0 +1,172 @@
+contract_type: screen
+version: 2
+dsl_version: 2
+screen_id: household_browser
+title: 戸主ブラウザ
+route_name: household_browser
+route_path: /households/
+template: office/household_browser.html
+purpose: Search households, select one household, and inspect linked current people, memorial people, schedules, payments, and quality signals.
+primary_models:
+  - imports.Household
+  - imports.HouseholdProfile
+  - imports.Person
+  - imports.DeceasedProfile
+  - imports.ServiceSchedule
+  - imports.OfferingPayment
+layout:
+  density: high_information
+  structure:
+    - hero_with_help
+    - search_filter_panel
+    - candidate_window_panel
+    - gojuon_toolbar
+    - household_list
+    - household_detail
+  desktop: Two-column list/detail layout.
+  tablet_mobile: Compact layout keeps filters first and lets selected detail take focus.
+regions:
+  - region_id: filter_bar
+    role: search by household head, kana, ledger id, address, phone, and optional person search
+    priority: primary
+  - region_id: kana_toolbar
+    role: gojuon browsing with result counts
+    priority: secondary
+  - region_id: household_list
+    role: select household summary rows
+    priority: primary
+  - region_id: household_detail
+    role: render selected household detail partial
+    priority: primary
+actions:
+  - action_id: create_household
+    label: 新しい家を作成
+    intent: add a new operational household from the browser
+    method: GET
+    route_name: create_household
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: apply_household_search
+    label: 絞り込む
+    intent: update list filters without changing DB records
+    method: GET
+    route_name: household_browser
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: update_candidate_window
+    label: 期間を更新
+    intent: adjust memorial candidate date window for display
+    method: GET
+    route_name: household_browser
+    mutating: false
+    risk_level: none
+    confirmation: none
+  - action_id: open_selected_household
+    label: household list item
+    intent: set selected household and show detail
+    method: GET
+    route_name: household_browser
+    mutating: false
+    risk_level: none
+    confirmation: none
+states:
+  - state_id: unavailable
+    trigger: no usable operational source or dataset
+    presentation: show まだ表示できません panel and message
+  - state_id: empty_result
+    trigger: filter returns zero households
+    presentation: keep filters visible and show empty list message
+data_bindings:
+  - source: query
+    target: filter_bar.q
+  - source: include_memorial_search
+    target: filter_bar.person_search_checkbox
+  - source: kana_groups
+    target: kana_toolbar.buttons
+  - source: result_count
+    target: household_list.heading
+  - source: selected_household
+    target: household_detail.active_record
+workflow_refs:
+  - household_record_lifecycle
+semantic_tree:
+  node_id: household_browser.page
+  kind: page
+  role: household search and detail workspace
+  priority: primary
+  children:
+    - node_id: household_browser.hero
+      kind: hero
+      role: title, help popover, and create-household action
+      priority: primary
+      actions:
+        - create_household
+    - node_id: household_browser.filters
+      kind: grid
+      role: search and candidate-window controls
+      priority: primary
+      children:
+        - node_id: household_browser.search_form
+          kind: form
+          component: filter_panel
+          role: text search and person-search toggle
+          actions:
+            - apply_household_search
+        - node_id: household_browser.candidate_window_form
+          kind: form
+          component: filter_panel
+          role: date-window controls for memorial candidates
+          actions:
+            - update_candidate_window
+    - node_id: household_browser.kana_toolbar
+      kind: list
+      role: gojuon group pills with counts
+      priority: secondary
+    - node_id: household_browser.browser_grid
+      kind: grid
+      role: desktop list/detail split
+      priority: primary
+      children:
+        - node_id: household_browser.household_list
+          kind: list
+          component: entity_card
+          role: selectable household summaries
+          actions:
+            - open_selected_household
+        - node_id: household_browser.household_detail
+          kind: detail
+          role: selected household detail partial
+visual_signature:
+  density: high information, work-table feeling, no decorative hero-only layout
+  rhythm: filters, kana controls, then persistent list/detail workspace
+  information_priority:
+    - search controls stay above list/detail
+    - selected household detail is as important as the list
+  disclosure:
+    - help text lives in ? popovers
+    - household detail rare actions are delegated to details menus
+  responsive_behavior: desktop uses two columns; mobile/tablet stack and allow detail focus
+state_matrix:
+  - state_id: normal
+    required_nodes:
+      - household_browser.filters
+      - household_browser.household_list
+      - household_browser.household_detail
+  - state_id: unavailable
+    required_nodes:
+      - household_browser.hero
+    fallback_text: まだ表示できません
+  - state_id: empty_result
+    required_nodes:
+      - household_browser.filters
+      - household_browser.kana_toolbar
+    forbidden_behavior: hiding filters after a zero-result search
+evidence:
+  source_map_ref: source_map.json#/screens/household_browser
+  template_paths:
+    - source/templates/base.html
+    - source/templates/office/household_browser.html
+    - source/templates/office/_household_browser_list_items.html
+    - source/templates/office/_household_browser_detail_content.html

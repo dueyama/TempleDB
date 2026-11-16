@@ -1,0 +1,8 @@
+{
+  "package_kind": "templedb-unified-starter-v1",
+  "dataset_id": "synthetic_demo_v1",
+  "database": "sqlite",
+  "demo_seed_mode": "dataset",
+  "product_database": "Created locally; never bundled",
+  "status": "local-review-draft"
+}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .transition-shell {
+      display: grid;
+      gap: 22px;
+      max-width: 960px;
+    }
+    .transition-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.94);
+      padding: 22px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .transition-form {
+      display: grid;
+      gap: 18px;
+    }
+    .field-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .field-row {
+      display: grid;
+      gap: 8px;
+    }
+    .field-row label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field-row input,
+    .field-row select,
+    .field-row textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 10px 12px;
+      color: inherit;
+    }
+    .field-row ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .field-row ul li label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: inherit;
+      font-size: .95rem;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .callout {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 14px 16px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin: 0;
+    }
+    .pair {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 12px 14px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="transition-shell">
+    <section class="hero">
+      <div class="eyebrow">Virtual Head</div>
+      <h1>{{ title }}</h1>
+      <p>{{ subtitle }}</p>
+    </section>
+
+    <section class="transition-card">
+      <h2>現在の仮戸主</h2>
+      <dl class="pair-grid">
+        <div class="pair">
+          <dt>氏名</dt>
+          <dd>{{ virtual_head_display_name|default:virtual_head.name }}</dd>
+        </div>
+        <div class="pair">
+          <dt>かな</dt>
+          <dd>{{ virtual_head.kana|default:"-" }}</dd>
+        </div>
+        <div class="pair">
+          <dt>台帳ID</dt>
+          <dd>{{ household.legacy_household_id }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="transition-card">
+      <form method="post" class="transition-form" data-quicklink-guard-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <div class="callout">
+          仮戸主の氏名を書き換えるのではなく、ここで実際の戸主に置き換えます。
+          置き換え後、仮戸主は削除済みとして退役します。
+        </div>
+        {% if form.errors %}
+          <div class="callout" role="alert">
+            保存できませんでした。設定方法と入力内容を確認してください。
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        <div class="field-grid">
+          {% for field in form.visible_fields %}
+            <div class="field-row">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<div class="muted">{{ field.help_text }}</div>{% endif %}
+              {% if field.errors %}{{ field.errors }}{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="action-row">
+          <button class="button" type="submit" data-quicklink-save>実戸主を設定</button>
+          <a class="ghost-button" href="{{ next_url }}">戻る</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

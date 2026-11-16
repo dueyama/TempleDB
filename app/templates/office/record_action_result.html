@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .action-result-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .action-result-card {
+      max-width: 720px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.94);
+      padding: 24px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .action-result-card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+    .action-result-meta {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 18px;
+      color: var(--muted);
+    }
+    .action-result-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    @media (max-width: 720px) {
+      .action-result-card {
+        padding: 18px;
+      }
+      .action-result-actions {
+        display: grid;
+      }
+      .action-result-actions > * {
+        width: 100%;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="action-result-shell">
+    <section class="hero">
+      {% if eyebrow %}
+        <div class="eyebrow">{{ eyebrow }}</div>
+      {% endif %}
+      <h1>{{ title }}</h1>
+      {% if subtitle %}
+        <p>{{ subtitle }}</p>
+      {% endif %}
+    </section>
+
+    <section class="action-result-card">
+      <h2>{{ result_heading }}</h2>
+      <p>{{ result_message }}</p>
+      {% if result_meta_lines %}
+        <div class="action-result-meta">
+          {% for line in result_meta_lines %}
+            <div>{{ line }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="action-result-actions">
+        <a class="button" href="{{ return_url }}">{{ return_label }}</a>
+      </div>
+    </section>
+  </div>
+{% endblock %}

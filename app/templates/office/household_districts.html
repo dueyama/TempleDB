@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block title %}{% if selected_district %}{{ selected_district.name }} 地区メンバー一覧{% else %}戸主地区割当{% endif %} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .assign-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .assign-top,
+    .assign-actions,
+    .summary-grid,
+    .row-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .assign-top {
+      justify-content: space-between;
+      align-items: end;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .summary-box,
+    .section-card,
+    .household-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+    }
+    .summary-box,
+    .section-card,
+    .household-card {
+      padding: 18px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .filter-form,
+    .assign-form {
+      display: grid;
+      gap: 12px;
+    }
+    .filter-row,
+    .assign-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.5fr minmax(180px, .9fr) auto;
+      align-items: end;
+    }
+    .filter-row {
+      grid-template-columns: 1.4fr minmax(200px, .9fr) auto;
+    }
+    .address-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(120px, .6fr) repeat(3, minmax(170px, 1fr));
+      margin-bottom: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 10px 12px;
+      color: inherit;
+    }
+    .household-list {
+      display: grid;
+      gap: 14px;
+    }
+    .household-card h3 {
+      margin: 0 0 8px;
+    }
+    .card-meta {
+      color: var(--muted);
+      margin: -4px 0 12px;
+    }
+    .district-address-print {
+      display: none;
+    }
+    @media (max-width: 860px) {
+      .filter-row,
+      .assign-grid,
+      .address-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+    @media print {
+      body {
+        background: #fff;
+        margin: 0;
+      }
+      .shell {
+        max-width: none;
+        padding: 0;
+      }
+      .session-bar,
+      .global-nav,
+      .office-subnav,
+      .hero,
+      .summary-grid,
+      .section-card,
+      .flash-list {
+        display: none !important;
+      }
+      .assign-shell {
+        display: block;
+      }
+      .district-address-print {
+        display: block;
+        color: #111;
+        font-size: 10pt;
+      }
+      .district-address-print h1 {
+        margin: 0 0 2mm;
+        font-size: 17pt;
+        line-height: 1.25;
+      }
+      .district-address-print .print-meta {
+        margin-bottom: 6mm;
+        font-size: 9pt;
+      }
+      .district-address-print table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .district-address-print th,
+      .district-address-print td {
+        border: 1px solid #999;
+        padding: 2.5mm 2mm;
+        text-align: left;
+        vertical-align: top;
+        word-break: break-word;
+      }
+      .district-address-print th {
+        background: #f2f2f2;
+        font-weight: 600;
+      }
+      .district-address-print tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .print-name {
+        width: 26%;
+      }
+      .print-postal-code {
+        width: 18%;
+      }
+      .print-address {
+        width: 56%;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="assign-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="household_districts" %}
+    <section class="hero">
+      <div class="assign-top">
+        <div>
+          <div class="eyebrow">Settings / Household</div>
+          <h1>{% if selected_district %}{{ selected_district.name }} 地区メンバー一覧{% else %}戸主地区・送付区分{% endif %}</h1>
+          <p>{% if selected_district %}地区所属の戸主について、住所を確認・編集し、名前・郵便番号・住所の一覧を印刷できます。{% else %}戸主ごとに、地区所属・郵送・送付しないを手作業で設定します。地区で絞り込むと住所も確認・編集できます。{% endif %}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <article class="summary-box">
+        <div class="label">最新取込履歴</div>
+        <div class="value">{{ latest_household_batch_id|default:"未取得" }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">地区所属</div>
+        <div class="value">{{ district_household_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">郵送</div>
+        <div class="value">{{ postal_household_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">送付しない</div>
+        <div class="value">{{ no_delivery_household_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">未割当</div>
+        <div class="value">{{ unassigned_household_count }}</div>
+      </article>
+      <article class="summary-box">
+        <div class="label">総戸主数</div>
+        <div class="value">{{ total_household_count }}</div>
+      </article>
+    </section>
+
+    <section class="section-card">
+      <div class="eyebrow">Filter</div>
+      <h2>{% if selected_district %}{{ selected_district.name }} の戸主を確認{% else %}戸主を探す{% endif %}</h2>
+      <form method="get" class="filter-form">
+        <div class="filter-row">
+          <div class="field">
+            <label for="id_q">氏名・ふりがな・台帳ID</label>
+            <input id="id_q" type="text" name="q" value="{{ query }}" placeholder="例: 光田 / 193">
+          </div>
+          <div class="field">
+            <label for="id_filter_district_id">地区</label>
+            <select id="id_filter_district_id" name="filter_district_id">
+              <option value="">すべて</option>
+              {% for district in districts %}
+                <option value="{{ district.id }}" {% if filter_district_id == district.id|stringformat:"s" %}selected{% endif %}>
+                  {{ district.name }}{% if not district.is_active %}（手配り停止中・郵送扱い）{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row-actions">
+            <button class="button" type="submit">絞り込む</button>
+            {% if query or selected_district %}
+              <a class="ghost-button" href="{% url 'office:household_districts' %}">解除</a>
+            {% endif %}
+            {% if selected_district %}
+              <button class="ghost-button" type="button" onclick="window.print()">印刷する</button>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+    </section>
+
+    {% if selected_district %}
+      <section class="district-address-print" aria-label="{{ selected_district.name }} 地区メンバー住所一覧">
+        <h1>{{ selected_district.name }} 地区メンバー住所一覧</h1>
+        <div class="print-meta">
+          {{ households|length }}世帯 / 最新取込履歴 {{ latest_household_batch_id|default:"未取得" }}
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="print-name">名前</th>
+              <th class="print-postal-code">郵便番号</th>
+              <th class="print-address">住所</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in households %}
+              <tr>
+                <td class="print-name">{{ row.head_name }}</td>
+                <td class="print-postal-code">{{ row.postal_code|default:"" }}</td>
+                <td class="print-address">
+                  {{ row.address_line1|default:"" }}
+                  {% if row.address_line2 %}<br>{{ row.address_line2 }}{% endif %}
+                  {% if row.address_line3 %}<br>{{ row.address_line3 }}{% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3">表示できる戸主がありません。</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    {% endif %}
+
+    <section class="section-card">
+      <div class="eyebrow">Assign</div>
+      <h2>地区・送付区分を設定する</h2>
+      <div class="household-list">
+        {% for row in households %}
+          <article class="household-card">
+            <h3>{{ row.head_name }} <span class="muted">/ 台帳ID {{ row.household_id }}</span></h3>
+            <div class="card-meta">
+              {% if row.head_name_kana %}{{ row.head_name_kana }}{% endif %}
+              {% if row.phone %}{% if row.head_name_kana %} / {% endif %}{{ row.phone }}{% endif %}
+            </div>
+            <form method="post" class="assign-form">
+              {% csrf_token %}
+              <input type="hidden" name="q" value="{{ query }}">
+              <input type="hidden" name="filter_district_id" value="{{ filter_district_id }}">
+              <input type="hidden" name="household_id" value="{{ row.household_id }}">
+              {% if selected_district %}
+                <div class="address-grid">
+                  <div class="field">
+                    <label for="postal-code-{{ row.household_id }}">郵便番号</label>
+                    <input id="postal-code-{{ row.household_id }}" type="text" name="postal_code" value="{{ row.postal_code|default:"" }}">
+                  </div>
+                  <div class="field">
+                    <label for="address-line1-{{ row.household_id }}">住所1</label>
+                    <input id="address-line1-{{ row.household_id }}" type="text" name="address_line1" value="{{ row.address_line1|default:"" }}">
+                  </div>
+                  <div class="field">
+                    <label for="address-line2-{{ row.household_id }}">住所2</label>
+                    <input id="address-line2-{{ row.household_id }}" type="text" name="address_line2" value="{{ row.address_line2|default:"" }}">
+                  </div>
+                  <div class="field">
+                    <label for="address-line3-{{ row.household_id }}">住所3</label>
+                    <input id="address-line3-{{ row.household_id }}" type="text" name="address_line3" value="{{ row.address_line3|default:"" }}">
+                  </div>
+                </div>
+              {% endif %}
+              {% if selected_district %}
+                <input type="hidden" name="delivery_method" value="{{ row.delivery_method }}">
+                <input type="hidden" name="district_id" value="{{ row.district_id }}">
+                <div class="assign-grid">
+                  <div class="field">
+                    <label>現在の状態</label>
+                    <input type="text" value="{% if row.delivery_method == 'district' and row.district_name %}地区所属 / {{ row.district_name }}{% elif row.delivery_label %}{{ row.delivery_label }}{% else %}未設定{% endif %}" readonly>
+                  </div>
+                  <div class="row-actions">
+                    <button class="button" type="submit">住所を保存</button>
+                  </div>
+                </div>
+              {% else %}
+                <div class="assign-grid">
+                  <div class="field">
+                    <label for="delivery-{{ row.household_id }}">送付区分</label>
+                    <select id="delivery-{{ row.household_id }}" name="delivery_method">
+                      {% for value, label in delivery_choices %}
+                        <option value="{{ value }}" {% if row.delivery_method == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="district-{{ row.household_id }}">地区</label>
+                    <select id="district-{{ row.household_id }}" name="district_id">
+                      <option value="">未設定</option>
+                      {% for district in districts %}
+                        <option value="{{ district.id }}" {% if row.district_id == district.id|stringformat:"s" %}selected{% endif %}>
+                          {{ district.name }}{% if not district.is_active %}（手配り停止中・郵送扱い）{% endif %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>現在の状態</label>
+                    <input type="text" value="{% if row.delivery_method == 'district' and row.district_name %}地区所属 / {{ row.district_name }}{% elif row.delivery_label %}{{ row.delivery_label }}{% else %}未設定{% endif %}" readonly>
+                  </div>
+                  <div class="row-actions">
+                    <button class="button" type="submit">保存</button>
+                  </div>
+                </div>
+              {% endif %}
+            </form>
+          </article>
+        {% empty %}
+          <div class="callout">表示できる戸主がありません。先に取込履歴を確認してください。</div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

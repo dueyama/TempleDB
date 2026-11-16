@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .transition-shell {
+      display: grid;
+      gap: 22px;
+      max-width: 960px;
+    }
+    .transition-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.94);
+      padding: 22px;
+      box-shadow: 0 8px 28px rgba(68, 50, 33, 0.06);
+    }
+    .transition-form {
+      display: grid;
+      gap: 18px;
+    }
+    .field-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .field-section {
+      display: grid;
+      gap: 14px;
+    }
+    .field-section h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .field-row {
+      display: grid;
+      gap: 8px;
+    }
+    .field-row label {
+      color: var(--muted);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field-row input,
+    .field-row select,
+    .field-row textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 10px 12px;
+      color: inherit;
+    }
+    .callout {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 14px 16px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin: 0;
+    }
+    .pair {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: 12px 14px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="transition-shell">
+    <section class="hero">
+      <div class="eyebrow">New Memorial Person</div>
+      <h1>{{ title }}</h1>
+      <p>{{ household.display_head_name }} / 台帳ID {{ household.legacy_household_id }}</p>
+    </section>
+
+    <section class="transition-card">
+      <h2>対象の家</h2>
+      <dl class="pair-grid">
+        <div class="pair">
+          <dt>戸主</dt>
+          <dd>{{ household.display_head_name }}</dd>
+        </div>
+        <div class="pair">
+          <dt>住所</dt>
+          <dd>{{ household.address_line1 }}{% if household.address_line2 %} {{ household.address_line2 }}{% endif %}</dd>
+        </div>
+        <div class="pair">
+          <dt>電話</dt>
+          <dd>{{ household.phone|default:"-" }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="transition-card">
+      <form method="post" class="transition-form" data-quicklink-guard-form>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+
+        <div class="callout">
+          この家に、新しい故人を登録します。通常はそのまま葬儀予定も作ります。
+        </div>
+        <div class="field-grid">
+          <div class="field-section">
+            <h3>人物情報</h3>
+            {% with field=form.name %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.kana %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.gender %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.birth_date_input %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.relationship_label %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+          </div>
+          <div class="field-section">
+            <h3>往生登録</h3>
+            {% with field=form.registration_mode %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.death_date_input %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.kaimyo %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.kaimyo_kana %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.age_at_death %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.age_unit %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.deceased_note %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+          </div>
+          <div class="field-section">
+            <h3>葬儀予定</h3>
+            <div class="callout">
+              「往生として登録（葬儀も作る）」のときだけ使います。葬儀日を空欄にすると、命日をそのまま入れます。
+            </div>
+            {% with field=form.funeral_scheduled_date_input %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.funeral_scheduled_time %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+            {% with field=form.funeral_location %}
+              <div class="field-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}{{ field.errors }}{% endif %}</div>
+            {% endwith %}
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="button" type="submit" data-quicklink-save>登録する</button>
+          <a class="ghost-button" href="{{ next_url }}">戻る</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

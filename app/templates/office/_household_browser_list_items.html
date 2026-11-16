@@ -1,0 +1,30 @@
+<div class="household-list" data-household-list>
+  {% for item in results %}
+    <a
+      class="household-link{% if item.household_id == selected_household %} active{% endif %}"
+      data-household-link
+      data-preserve-scroll
+      href="{% url 'office:household_browser' %}?kana_group={{ kana_group }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if include_memorial_search %}&include_memorial_search=1{% endif %}{% if candidate_from %}&candidate_from={{ candidate_from|urlencode }}{% endif %}{% if candidate_to %}&candidate_to={{ candidate_to|urlencode }}{% endif %}&household_id={{ item.household_id }}{% if preview_mode == 'mobile' or household_focus_mode == 'detail' %}&focus=detail{% endif %}{% if preview_mode != 'auto' %}&preview={{ preview_mode }}{% endif %}"
+    >
+      <h3 class="household-link-title">
+        <span>{{ item.name }}</span>
+        {% if item.role_badges %}
+          <span class="household-link-badges">
+            {% for badge in item.role_badges %}
+              <span class="household-role-badge">{{ badge }}</span>
+            {% endfor %}
+          </span>
+        {% endif %}
+        <span class="household-link-id-inline">台帳ID {{ item.household_id }}</span>
+      </h3>
+      <div class="household-meta">
+        {% if item.kana %}<div>{{ item.kana }}</div>{% endif %}
+        {% if item.address %}<div>{{ item.address }}</div>{% endif %}
+        {% if item.phone %}<div>{{ item.phone }}</div>{% endif %}
+        <div>現在帳 {{ item.current_count }} / 過去帳 {{ item.memorial_count }} / 予定 {{ item.event_count }}</div>
+      </div>
+    </a>
+  {% empty %}
+    <div class="callout">該当する戸主がありません。</div>
+  {% endfor %}
+</div>

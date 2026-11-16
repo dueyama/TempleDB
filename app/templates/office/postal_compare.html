@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}郵送先比較 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .compare-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .compare-actions,
+    .summary-grid,
+    .diff-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-grid,
+    .diff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box,
+    .section-card,
+    .row-card,
+    .compare-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .row-list {
+      display: grid;
+      gap: 14px;
+    }
+    .pair-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    .pair {
+      border-top: 1px solid var(--line);
+      padding-top: 8px;
+    }
+    .pair dt {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .pair dd {
+      margin: 0;
+    }
+    .compare-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      margin-top: 14px;
+    }
+    .diff-row {
+      display: grid;
+      gap: 8px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+    .diff-row:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .compare-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="compare-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="postal_compare" %}
+    <section class="hero">
+      <div class="eyebrow">Settings / Auxiliary CSV</div>
+      <h1>郵送先の DB 比較</h1>
+      {% if analysis.csv_path %}
+        <p>{{ analysis.csv_path }}</p>
+      {% endif %}
+      {% if analysis.error_message %}
+        <p>{{ analysis.error_message }}</p>
+      {% else %}
+        <p>DB 側の有効な郵送先一覧と、郵送名簿 CSV の差分を見ます。</p>
+      {% endif %}
+    </section>
+
+    {% if analysis.available %}
+      <section class="summary-grid">
+        <article class="summary-box">
+          <div class="label">DB 郵送先</div>
+          <div class="value">{{ analysis.summary.db_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">CSV 行</div>
+          <div class="value">{{ analysis.summary.csv_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">完全一致</div>
+          <div class="value">{{ analysis.summary.exact_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">項目差あり</div>
+          <div class="value">{{ analysis.summary.mismatch_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">CSVだけ</div>
+          <div class="value">{{ analysis.summary.csv_only_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">DBだけ</div>
+          <div class="value">{{ analysis.summary.db_only_count }}</div>
+        </article>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">Exact</div>
+        <h2>完全一致</h2>
+        <div class="row-list">
+          {% for item in analysis.exact_matches %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>CSV 行</dt><dd>{{ item.csv_row.row_number }}</dd></div>
+                <div class="pair"><dt>氏名</dt><dd>{{ item.csv_row.recipient_name }}</dd></div>
+                <div class="pair"><dt>郵便番号</dt><dd>{{ item.csv_row.postal_code|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所</dt><dd>{{ item.csv_row.address_line1|default:"-" }} {{ item.csv_row.address_line2|default:"" }}</dd></div>
+                <div class="pair"><dt>電話</dt><dd>{{ item.csv_row.phone|default:"-" }}</dd></div>
+                <div class="pair"><dt>台帳</dt><dd><a href="{% url 'office:household_browser' %}?household_id={{ item.db_row.household_id }}">台帳ID {{ item.db_row.household_id }}</a></dd></div>
+              </div>
+            </article>
+          {% empty %}
+            <div class="callout">完全一致はありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">Mismatch</div>
+        <h2>項目差あり</h2>
+        <div class="row-list">
+          {% for item in analysis.field_mismatches %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>CSV 行</dt><dd>{{ item.csv_row.row_number }}</dd></div>
+                <div class="pair"><dt>CSV 氏名</dt><dd>{{ item.csv_row.recipient_name }}</dd></div>
+                <div class="pair"><dt>DB 側</dt><dd><a href="{% url 'office:household_browser' %}?household_id={{ item.db_row.household_id }}">台帳ID {{ item.db_row.household_id }} / {{ item.db_row.household_name }}</a></dd></div>
+                <div class="pair"><dt>送付先種別</dt><dd>{{ item.db_row.recipient_role_label }}</dd></div>
+              </div>
+              <div class="compare-grid">
+                <article class="compare-card">
+                  <div class="eyebrow">CSV</div>
+                  <strong>{{ item.csv_row.recipient_name }}</strong>
+                  <div>{{ item.csv_row.postal_code|default:"-" }}</div>
+                  <div>{{ item.csv_row.address_line1|default:"-" }}</div>
+                  <div>{{ item.csv_row.address_line2|default:"" }}</div>
+                  <div>{{ item.csv_row.phone|default:"-" }}</div>
+                </article>
+                <article class="compare-card">
+                  <div class="eyebrow">DB</div>
+                  <strong>{{ item.db_row.recipient_name }}</strong>
+                  <div>{{ item.db_row.postal_code|default:"-" }}</div>
+                  <div>{{ item.db_row.address_line1|default:"-" }}</div>
+                  <div>{{ item.db_row.address_line2|default:"" }}</div>
+                  <div>{{ item.db_row.phone|default:"-" }}</div>
+                </article>
+              </div>
+              <div class="compare-note">差分項目</div>
+              {% for diff in item.field_differences %}
+                <div class="diff-row">
+                  <strong>{{ diff.label }}</strong>
+                  <div>CSV: {{ diff.csv_value }}</div>
+                  <div>DB: {{ diff.db_value }}</div>
+                </div>
+              {% endfor %}
+            </article>
+          {% empty %}
+            <div class="callout">項目差ありはありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">CSV Only</div>
+        <h2>CSV にだけある行</h2>
+        <div class="row-list">
+          {% for item in analysis.csv_only %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>CSV 行</dt><dd>{{ item.row_number }}</dd></div>
+                <div class="pair"><dt>氏名</dt><dd>{{ item.recipient_name }}</dd></div>
+                <div class="pair"><dt>郵便番号</dt><dd>{{ item.postal_code|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所1</dt><dd>{{ item.address_line1|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所2</dt><dd>{{ item.address_line2|default:"-" }}</dd></div>
+                <div class="pair"><dt>電話</dt><dd>{{ item.phone|default:"-" }}</dd></div>
+              </div>
+            </article>
+          {% empty %}
+            <div class="callout">CSV だけの行はありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="eyebrow">DB Only</div>
+        <h2>DB にだけある郵送先</h2>
+        <div class="row-list">
+          {% for item in analysis.db_only %}
+            <article class="row-card">
+              <div class="pair-grid">
+                <div class="pair"><dt>台帳</dt><dd><a href="{% url 'office:household_browser' %}?household_id={{ item.household_id }}">台帳ID {{ item.household_id }}</a></dd></div>
+                <div class="pair"><dt>現在戸主</dt><dd>{{ item.household_name }}</dd></div>
+                <div class="pair"><dt>送付先</dt><dd>{{ item.recipient_name }}</dd></div>
+                <div class="pair"><dt>送付先種別</dt><dd>{{ item.recipient_role_label }}</dd></div>
+                <div class="pair"><dt>郵便番号</dt><dd>{{ item.postal_code|default:"-" }}</dd></div>
+                <div class="pair"><dt>住所</dt><dd>{{ item.address_line1|default:"-" }} {{ item.address_line2|default:"" }}</dd></div>
+                <div class="pair"><dt>電話</dt><dd>{{ item.phone|default:"-" }}</dd></div>
+              </div>
+            </article>
+          {% empty %}
+            <div class="callout">DB だけの郵送先はありません。</div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

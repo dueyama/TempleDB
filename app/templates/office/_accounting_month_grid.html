@@ -1,0 +1,16 @@
+<section class="month-grid">
+  {% for month in months %}
+    <article class="month-card">
+      <div>
+        <div class="eyebrow">Month</div>
+        <h2>{{ month.label }}</h2>
+      </div>
+      <div class="month-meta">{{ month.payment_count }}件 / {{ month.total_amount }}円</div>
+      {% if month.entries %}
+        {% include "office/_accounting_entry_table.html" with entries=month.entries show_month_day=False %}
+      {% else %}
+        <div class="month-empty">この月の入金はまだありません。</div>
+      {% endif %}
+    </article>
+  {% endfor %}
+</section>

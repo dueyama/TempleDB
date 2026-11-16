@@ -1,0 +1,70 @@
+<article class="notice-page" data-preview-scale-page style="--recipient-font-size: {{ notice_style.recipient_font_size }}rem; --body-font-size: {{ notice_style.body_font_size }}rem; --signature-font-size: {{ notice_style.signature_font_size }}rem; --table-font-size: {{ notice_style.table_font_size }}rem;">
+  {% if distribution_marker %}<div class="distribution-marker">{{ distribution_marker }}</div>{% endif %}
+  <div class="page-layout">
+    <header class="recipient-row">
+      <div class="recipient-name">{{ document.recipient_name }} <span class="suffix">様</span></div>
+    </header>
+
+    <section class="intro-block">
+      <p class="intro-text">{{ intro_text|linebreaksbr }}</p>
+    </section>
+
+    <section class="table-column">
+      <table class="notice-table">
+        <colgroup>
+          <col style="width: 18%;">
+          <col style="width: 16%;">
+          <col style="width: 22%;">
+          <col style="width: 23%;">
+          <col style="width: 21%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>{{ memorial_notice_table_labels.death_date }}</th>
+            <th>{{ memorial_notice_table_labels.memorial_service }}</th>
+            <th>{{ deceased_labels.kaimyo }}</th>
+            <th>{{ deceased_labels.zokumyo }}</th>
+            <th>{{ memorial_notice_table_labels.other_note }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in document.table_entries %}
+            {% if entry.row_kind == "reference_heading" %}
+              <tr class="reference-heading-row">
+                <td colspan="5">{{ entry.reference_heading }}</td>
+              </tr>
+            {% else %}
+              <tr{% if entry.row_kind == "blank" or not entry.target_date and not entry.label and not entry.kaimyo and not entry.zokumyo_name and not entry.zokumyo_age and not entry.other_note %} class="is-empty"{% endif %}>
+                <td class="date-cell">
+                  {% if entry.target_date %}
+                    {% if entry.target_date_year %}<span class="date-era">{{ entry.target_date_year }}</span>{% endif %}
+                    <span class="date-main">{{ entry.target_date_main|default:entry.target_date }}</span>
+                  {% endif %}
+                </td>
+                <td class="label-cell">{{ entry.label }}</td>
+                <td class="kaimyo-cell">{{ entry.kaimyo }}</td>
+                <td class="zokumyo-cell">
+                  {% if entry.zokumyo_name %}<span class="name">{{ entry.zokumyo_name }}</span>{% endif %}
+                  {% if entry.zokumyo_age %}<span class="age">{{ entry.zokumyo_age }}</span>{% endif %}
+                </td>
+                <td class="other-cell">
+                  {% if entry.other_note %}
+                    {{ entry.other_note }}
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="outro-block">
+      <p class="outro-text">{{ outro_text|linebreaksbr }}</p>
+    </section>
+
+    <section class="signature-block">
+      <p class="signature-text">{{ signature_text|linebreaksbr }}</p>
+    </section>
+  </div>
+</article>

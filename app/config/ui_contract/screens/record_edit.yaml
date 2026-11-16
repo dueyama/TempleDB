@@ -1,0 +1,152 @@
+contract_type: screen
+version: 2
+dsl_version: 2
+screen_id: record_edit
+title: DB edit
+route_name: edit_household
+route_path: /households/:household_id/edit/
+template: office/record_edit.html
+purpose: Shared edit surface for household, person, service schedule, and payment-oriented record forms with audit note, soft delete, restore, and contextual related actions.
+primary_models:
+  - imports.Household
+  - imports.Person
+  - imports.ServiceSchedule
+  - imports.OfferingPayment
+  - imports.RecordEditLog
+layout:
+  density: form_with_audit_context
+  structure:
+    - hero
+    - primary_edit_card
+    - secondary_context_card
+    - action_row
+  responsive: Primary form remains first; context and history stack below on narrow screens.
+regions:
+  - region_id: edit_form
+    role: render Django form visible fields and hidden provenance fields
+    priority: primary
+  - region_id: time_machine
+    role: optional field-level historical value restore before saving
+    priority: secondary
+  - region_id: payment_formset
+    role: service-payment subform rows when editing a service schedule
+    priority: secondary
+  - region_id: action_row
+    role: save, restore, related actions, delete, and return
+    priority: primary
+actions:
+  - action_id: save_record
+    label: 保存
+    intent: persist edited fields with optional change memo and audit log
+    method: POST
+    route_name: edit_household
+    mutating: true
+    risk_level: medium
+    confirmation: inline
+    result: Updates the target record and records field changes.
+  - action_id: delete_record
+    label: 削除
+    intent: soft-delete the target record when allowed
+    method: POST
+    route_name: edit_household
+    mutating: true
+    risk_level: high
+    confirmation: browser_confirm
+    result: Marks record deleted and keeps restore path available.
+  - action_id: restore_record
+    label: 復元
+    intent: restore a soft-deleted record
+    method: POST
+    route_name: edit_household
+    mutating: true
+    risk_level: medium
+    confirmation: inline
+    result: Makes the record visible again.
+  - action_id: open_time_machine
+    label: タイムマシンモードを開く
+    intent: show previous field values for selective restore before save
+    method: GET
+    route_name: edit_household
+    mutating: false
+    risk_level: none
+    confirmation: none
+states:
+  - state_id: read_only_completed_service
+    trigger: completed service schedule is opened without edit mode
+    presentation: show read-only callout and 編集する button
+  - state_id: validation_errors
+    trigger: form or formset validation fails
+    presentation: keep submitted values, show field errors, do not save
+  - state_id: record_deleted
+    trigger: target record has deleted metadata
+    presentation: show deleted callout and restore action
+data_bindings:
+  - source: form.visible_fields
+    target: edit_form.fields
+  - source: change_note
+    target: audit.change_note
+  - source: payment_formset
+    target: payment_formset.rows
+  - source: time_machine_field_options
+    target: time_machine.field_options
+workflow_refs:
+  - household_record_lifecycle
+  - service_schedule_lifecycle
+semantic_tree:
+  node_id: record_edit.page
+  kind: page
+  role: shared audited edit surface
+  priority: primary
+  children:
+    - node_id: record_edit.hero
+      kind: hero
+      role: record type title and warning subtitle
+      priority: primary
+    - node_id: record_edit.layout
+      kind: grid
+      role: primary form plus secondary context
+      priority: primary
+      children:
+        - node_id: record_edit.form_card
+          kind: form
+          component: record_edit_form
+          role: editable fields, change note, validation, and submit actions
+          actions:
+            - save_record
+            - delete_record
+            - restore_record
+            - open_time_machine
+        - node_id: record_edit.context_card
+          kind: panel
+          role: linked service members, history, Google sync, and contextual warnings
+visual_signature:
+  density: form-focused with visible audit and related context
+  rhythm: hero, edit card, form fields, optional subforms, action row
+  information_priority:
+    - save/return always reachable at bottom of primary form
+    - delete is visually separate from save
+  disclosure:
+    - time machine is opt-in
+    - related actions are inside details menu
+    - completed services may be read-only until explicitly edited
+  responsive_behavior: primary edit card appears before context card on narrow screens
+state_matrix:
+  - state_id: editable
+    required_nodes:
+      - record_edit.form_card
+    required_actions:
+      - save_record
+  - state_id: read_only_completed_service
+    required_text: 編集する
+  - state_id: record_deleted
+    required_actions:
+      - restore_record
+    forbidden_actions:
+      - save_record
+  - state_id: validation_errors
+    required_behavior: preserve submitted values and show field errors
+evidence:
+  source_map_ref: source_map.json#/screens/record_edit
+  template_paths:
+    - source/templates/base.html
+    - source/templates/office/record_edit.html

@@ -1,0 +1,15 @@
+{% if recovery_health_warning %}
+  <section class="recovery-health-warning" role="status" aria-labelledby="recovery-health-heading">
+    <h2 id="recovery-health-heading">バックアップの状態を確認してください</h2>
+    <ul>
+      {% for check in recovery_health_warning.checks %}
+        <li><strong>{{ check.label }}</strong>：{{ check.message }}</li>
+      {% endfor %}
+    </ul>
+    {% if recovery_health_warning.checked_at %}
+      <p class="recovery-health-checked">最終確認：{{ recovery_health_warning.checked_at|date:"Y-m-d H:i" }}</p>
+    {% endif %}
+    <p class="recovery-health-note">保存済みバックアップの検査と、実際に復元できることの確認は別に行います。</p>
+    {% if realdata_preview %}<p class="recovery-health-note">テスト環境では起動時の確認結果のコピーを表示しています。自動更新はしません。</p>{% endif %}
+  </section>
+{% endif %}

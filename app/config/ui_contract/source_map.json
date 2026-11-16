@@ -1,0 +1,65 @@
+{
+  "contract_type": "ui_source_map",
+  "version": 2,
+  "screens": {
+    "home": {
+      "route_name": "home",
+      "route_path": "/",
+      "template": "office/home.html",
+      "source_templates": [
+        "source/templates/base.html",
+        "source/templates/office/home.html",
+        "source/templates/office/_service_ledger_section.html",
+        "source/templates/office/_service_ledger_card_styles.html"
+      ]
+    },
+    "household_browser": {
+      "route_name": "household_browser",
+      "route_path": "/households/",
+      "template": "office/household_browser.html",
+      "source_templates": [
+        "source/templates/base.html",
+        "source/templates/office/household_browser.html",
+        "source/templates/office/_household_browser_list_items.html",
+        "source/templates/office/_household_browser_detail_content.html"
+      ]
+    },
+    "household_detail": {
+      "route_name": "household_browser",
+      "route_path": "/households/?household_id=:household_id&focus=detail",
+      "template": "office/_household_browser_detail_content.html",
+      "source_templates": [
+        "source/templates/office/_household_browser_detail_content.html"
+      ]
+    },
+    "record_edit": {
+      "route_name": "edit_household",
+      "route_path": "/households/:household_id/edit/",
+      "template": "office/record_edit.html",
+      "source_templates": [
+        "source/templates/base.html",
+        "source/templates/office/record_edit.html"
+      ]
+    },
+    "service_ledger": {
+      "route_name": "service_ledger",
+      "route_path": "/services/",
+      "template": "office/service_ledger.html",
+      "source_templates": [
+        "source/templates/base.html",
+        "source/templates/office/service_ledger.html",
+        "source/templates/office/_service_ledger_section.html",
+        "source/templates/office/_service_ledger_card_styles.html"
+      ]
+    },
+    "settings_home": {
+      "route_name": "settings_home",
+      "route_path": "/settings/",
+      "template": "office/settings_home.html",
+      "source_templates": [
+        "source/templates/base.html",
+        "source/templates/office/settings_home.html"
+      ]
+    }
+  }
+}

@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+
+{% block title %}別のMacへ引越し | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .guide-shell {
+      display: grid;
+      gap: 22px;
+      width: 100%;
+    }
+    .guide-shell > *,
+    .guide-shell .grid > *,
+    .action-row > *,
+    .guide-card,
+    .guide-card form,
+    .summary-box,
+    .definition-grid > div {
+      min-width: 0;
+    }
+    .guide-shell .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .migration-hero {
+      padding-block: 22px;
+    }
+    .migration-hero h1 {
+      font-size: clamp(2rem, 3.2vw, 2.8rem);
+    }
+    .summary-row {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    }
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .summary-box,
+    .guide-card {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1rem;
+      word-break: break-word;
+    }
+    .action-card {
+      border-color: var(--accent-soft);
+      background: var(--panel-bg-strong);
+    }
+    .action-card h2 {
+      margin-bottom: 8px;
+    }
+    .action-intro {
+      margin: 0;
+      max-width: 58rem;
+      line-height: 1.65;
+    }
+    .private-warning {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--warning-line);
+      background: var(--warning-bg);
+    }
+    .private-warning p {
+      margin: 4px 0 0;
+      line-height: 1.55;
+    }
+    .warning-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.7;
+    }
+    .confirmation-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .confirmation-item {
+      align-items: flex-start;
+      display: flex;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: var(--panel-bg-subtle);
+      line-height: 1.55;
+    }
+    .confirmation-item input {
+      flex: 0 0 auto;
+      margin-top: .3em;
+    }
+    .confirmation-copy {
+      display: grid;
+      gap: 2px;
+    }
+    .confirmation-copy small {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .migration-form {
+      width: 100%;
+    }
+    .primary-action {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .bundle-file-name {
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+    .definition-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    }
+    .definition-grid dt {
+      color: var(--muted);
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .definition-grid dd {
+      margin: 6px 0 0;
+      word-break: break-word;
+    }
+    .guide-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.7;
+    }
+    .guide-list li {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .guide-details,
+    .bundle-contents {
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: var(--panel-bg-subtle);
+    }
+    .guide-details {
+      box-shadow: var(--shadow-card);
+    }
+    .guide-details > summary,
+    .bundle-contents > summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 700;
+    }
+    .guide-details > summary::-webkit-details-marker,
+    .bundle-contents > summary::-webkit-details-marker {
+      display: none;
+    }
+    .guide-details > summary {
+      padding: 18px;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+    }
+    .bundle-contents {
+      margin-top: 16px;
+    }
+    .bundle-contents > summary {
+      padding: 12px 14px;
+    }
+    .guide-details > summary::after,
+    .bundle-contents > summary::after {
+      content: "＋";
+      float: right;
+      color: var(--muted);
+    }
+    .guide-details[open] > summary::after,
+    .bundle-contents[open] > summary::after {
+      content: "−";
+    }
+    .guide-details-body {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+      padding: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .bundle-contents-body {
+      padding: 0 14px 14px;
+    }
+    .guide-details-body > .guide-card,
+    .guide-details-body .guide-card {
+      box-shadow: none;
+    }
+    .guide-card code,
+    .guide-details code {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .command-group + .command-group {
+      margin-top: 18px;
+    }
+    .command-group h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+    .command-block {
+      margin: 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: #f7efe3;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      line-height: 1.7;
+      min-width: 0;
+      width: 100%;
+      white-space: pre;
+      max-width: 100%;
+    }
+    .command-block code {
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    @media (max-width: 760px) {
+      .guide-shell .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .summary-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .guide-card,
+      .guide-details-body {
+        padding: 16px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="guide-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="backup_settings" %}
+
+    <section class="hero migration-hero">
+      <div class="eyebrow">Backup Migration</div>
+      <h1>別のMacへ引越し</h1>
+      <p>このMacのTempleDB一式と、確認済みのバックアップを1つの引越しセットにまとめます。復元は新しいMacで行います。</p>
+    </section>
+
+    {% if guide.backup_run %}
+      <section class="summary-row">
+        <article class="summary-box">
+          <div class="label">対象バックアップ</div>
+          <div class="value">{{ guide.backup_run.backup_file_name|default:"-" }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">作成日時</div>
+          <div class="value">{{ guide.backup_run.started_at|date:"Y-m-d H:i" }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">引越し準備</div>
+          <div class="value">{{ guide.readiness_label }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">最新別DBテスト復元</div>
+          <div class="value">
+            {% if guide.verification_run %}
+              {{ guide.verification_run.get_status_display }}
+            {% else %}
+              未実行
+            {% endif %}
+          </div>
+        </article>
+      </section>
+    {% endif %}
+
+    {% if guide.warnings %}
+      <section class="callout">
+        <div class="eyebrow">Warning</div>
+        <h2 style="margin-top: 0;">先に確認すること</h2>
+        <ul class="warning-list">
+          {% for warning in guide.warnings %}
+            <li>{{ warning }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if not guide.backup_run %}
+      <section class="guide-card">
+        <div class="eyebrow">No Backup Yet</div>
+        <h2>まずバックアップを作成してください</h2>
+        <p class="muted">この画面は成功した backup がある前提で使います。先にバックアップ設定へ戻って、保存先設定と手動バックアップを済ませてください。</p>
+        <div class="action-row" style="margin-top: 16px;">
+          <a class="button" href="{{ backup_settings_url }}">バックアップ設定へ戻る</a>
+        </div>
+      </section>
+    {% else %}
+      <section class="guide-card action-card">
+        <div class="eyebrow">Migration Bundle</div>
+        <h2>お引越しセット</h2>
+        <p class="action-intro"><strong>{{ guide.backup_run.backup_file_name }}</strong> と、現在のTempleDBのコード・設定・運用データを1つにまとめます。Git履歴と未コミット・未追跡ファイルも含みます。</p>
+        <div class="private-warning">
+          <strong>秘密情報を含む引越し専用ファイルです。</strong>
+          <p><code>.env</code>、Google credential、個人情報を含むCSV・MDB・PDF等が入ります。暗号化した外部ディスク等で直接移動してください。</p>
+        </div>
+        {% if guide.can_create_bundle %}
+          <form class="migration-form" method="post" action="{% url 'office:download_backup_migration_bundle' %}">
+            {% csrf_token %}
+            <input type="hidden" name="run_id" value="{{ guide.backup_run.id }}">
+            <div class="confirmation-list">
+              <label class="confirmation-item">
+                <input type="checkbox" name="include_private_migration_payload" value="confirmed" required>
+                <span class="confirmation-copy">
+                  <strong>秘密情報を含める</strong>
+                  <small><code>.env</code>、credential、CSV/MDB/PDF等の秘密・個人情報がセットに入ることを理解しました。</small>
+                </span>
+              </label>
+              <label class="confirmation-item">
+                <input type="checkbox" name="single_primary_cutover_confirmation" value="confirmed" required>
+                <span class="confirmation-copy">
+                  <strong>2台を同時に動かさない</strong>
+                  <small>新Macを正本にする前に旧Macの入力とTempleDBサーバーを止め、2台同時でGoogle同期・自動バックアップを動かさないことを理解しました。</small>
+                </span>
+              </label>
+              <label class="confirmation-item">
+                <input type="checkbox" name="restore_verification_confirmation" value="confirmed" required>
+                <span class="confirmation-copy">
+                  <strong>新Macで復元を確認する</strong>
+                  <small>旧Macを廃棄・再開する前に、新Macの主要画面・件数・private資産・新backupの別DBテスト復元を確認します。</small>
+                </span>
+              </label>
+            </div>
+            <div class="primary-action">
+              <button class="button" type="submit">お引越しセット作成</button>
+              {% if migration_bundle_filename %}
+                <span class="bundle-file-name">{{ migration_bundle_filename }}</span>
+              {% endif %}
+            </div>
+          </form>
+          {% if guide.migration_bundle_root_dir %}
+            <p class="muted" style="margin-top: 12px; margin-bottom: 0;">展開後は <code>{{ guide.migration_bundle_root_dir }}/TempleDB/</code> で作業します。</p>
+          {% endif %}
+        {% else %}
+          <p class="muted">このバックアップでは、まだお引越しセットを作成できません。</p>
+          {% if guide.bundle_blockers %}
+            <ul class="warning-list">
+              {% for reason in guide.bundle_blockers %}
+                <li>{{ reason }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <div class="action-row" style="margin-top: 16px;">
+            <a class="ghost-button" href="{{ backup_settings_url }}">同じバックアップをテスト復元する</a>
+          </div>
+        {% endif %}
+        {% if migration_bundle_entries %}
+          <details class="bundle-contents">
+            <summary>セットに入るものを確認</summary>
+            <div class="bundle-contents-body">
+              <h3>bundle に入るもの</h3>
+              <ul class="guide-list">
+                {% for item in migration_bundle_entries %}
+                  <li>
+                    <code>{{ item.path }}</code>
+                    {% if item.included %} / あり{% else %} / 条件により未同梱{% endif %}
+                    <br>
+                    <span class="muted">{{ item.description }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </details>
+        {% endif %}
+      </section>
+
+      <details class="guide-details">
+        <summary>使用するバックアップの技術情報</summary>
+        <div class="guide-details-body">
+          <section class="guide-card">
+            <div class="eyebrow">Selected Backup</div>
+            <h2>今回使うバックアップ</h2>
+            <dl class="definition-grid">
+              <div>
+                <dt>保存先</dt>
+                <dd>{{ guide.backup_run.destination_path|default:"-" }}</dd>
+              </div>
+              <div>
+                <dt>SHA256</dt>
+                <dd><code>{{ guide.backup_run.backup_sha256|default:"-" }}</code></dd>
+              </div>
+              <div>
+                <dt>バックアップファイル</dt>
+                <dd>
+                  {{ guide.backup_run.backup_file_name|default:"-" }}
+                  {% if guide.artifact_exists %} / あり{% else %} / なし{% endif %}
+                </dd>
+              </div>
+              <div>
+                <dt>Manifest</dt>
+                <dd>
+                  {% if guide.manifest_exists and guide.manifest_matches_run %}
+                    あり / backup runと一致
+                  {% elif guide.manifest_exists %}
+                    あり / 不一致
+                  {% else %}
+                    なし
+                  {% endif %}
+                </dd>
+              </div>
+              <div>
+                <dt>検証DB</dt>
+                <dd>
+                  {% if guide.verification_run %}
+                    <code>{{ guide.verification_run.verification_database_name }}</code>
+                  {% else %}
+                    -
+                  {% endif %}
+                </dd>
+              </div>
+              <div>
+                <dt>検証結果</dt>
+                <dd>
+                  {% if guide.verification_run %}
+                    {{ guide.verification_run.get_status_display }}
+                  {% else %}
+                    未実行
+                  {% endif %}
+                </dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
+      <details class="guide-details">
+        <summary>1. 旧Macと新Macの事前準備</summary>
+        <div class="guide-details-body">
+          <section class="grid">
+            <article class="guide-card">
+              <div class="eyebrow">Old Mac</div>
+              <h2>旧Macでやること</h2>
+              <ol class="guide-list">
+                {% for step in guide.old_mac_steps %}
+                  <li>{{ step }}</li>
+                {% endfor %}
+              </ol>
+            </article>
+
+            <article class="guide-card">
+              <div class="eyebrow">New Mac</div>
+              <h2>新しいMacに入れるもの</h2>
+              <ul class="guide-list">
+                {% for item in guide.new_mac_requirements %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+              <p class="muted" style="margin-bottom: 0;">Python 要件: {{ guide.python_requirement }}</p>
+            </article>
+          </section>
+        </div>
+      </details>
+
+      <details class="guide-details">
+        <summary>2. 秘密・運用資産を戻す</summary>
+        <div class="guide-details-body">
+          <section class="guide-card">
+            <div class="eyebrow">Private Payload</div>
+            <h2>秘密・運用資産の復元</h2>
+            <ol class="guide-list">
+              {% for step in guide.private_payload_restore_steps %}
+                <li>{{ step }}</li>
+              {% endfor %}
+            </ol>
+          </section>
+        </div>
+      </details>
+
+      <details class="guide-details">
+        <summary>3. URL・Google Calendarを切り替える</summary>
+        <div class="guide-details-body">
+          <section class="grid">
+            <article class="guide-card">
+              <div class="eyebrow">Tailscale</div>
+              <h2>URLとServeの切替</h2>
+              <ol class="guide-list">
+                {% for step in guide.tailscale_cutover_steps %}
+                  <li>{{ step }}</li>
+                {% endfor %}
+              </ol>
+            </article>
+
+            <article class="guide-card">
+              <div class="eyebrow">Google Calendar</div>
+              <h2>既存予定を作り直さない切替</h2>
+              <ol class="guide-list">
+                {% for step in guide.google_calendar_cutover_steps %}
+                  <li>{{ step }}</li>
+                {% endfor %}
+              </ol>
+            </article>
+          </section>
+
+          <section class="guide-card">
+            <div class="eyebrow">Single Primary</div>
+            <h2>2台同時稼働を防ぐ切替順序</h2>
+            <ol class="guide-list">
+              {% for step in guide.cutover_safety_steps %}
+                <li>{{ step }}</li>
+              {% endfor %}
+            </ol>
+          </section>
+        </div>
+      </details>
+
+      <details class="guide-details">
+        <summary>4. 復元コマンドと最終確認</summary>
+        <div class="guide-details-body">
+          <section class="guide-card">
+            <div class="eyebrow">Commands</div>
+            <h2>新しいMacで打つコマンド</h2>
+            {% for group in guide.command_groups %}
+              <div class="command-group">
+                <h3>{{ group.title }}</h3>
+                <pre class="command-block"><code>{% for command in group.commands %}{{ command }}
+{% endfor %}</code></pre>
+              </div>
+            {% endfor %}
+            <p class="muted">復元の基本形: <code>{{ guide.restore_command }}</code></p>
+            {% if guide.dump_path_example %}
+              <p class="muted" style="margin-bottom: 0;">バックアップpathの例: <code>{{ guide.dump_path_example }}</code></p>
+            {% endif %}
+          </section>
+
+          <section class="guide-card">
+            <div class="eyebrow">After Restore</div>
+            <h2>引越し後の確認</h2>
+            <ol class="guide-list">
+              {% for item in guide.post_restore_checks %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ol>
+            {% if guide.verification_run and guide.verification_run.verification_summary %}
+              <p class="muted">旧Macでの直近別DBテスト復元 summary:</p>
+              <pre class="command-block"><code>{{ guide.verification_run.verification_summary }}</code></pre>
+            {% endif %}
+          </section>
+        </div>
+      </details>
+
+      <section class="guide-card">
+        <div class="action-row">
+          <a class="ghost-button" href="{{ backup_settings_url }}">バックアップ設定へ戻る</a>
+        </div>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

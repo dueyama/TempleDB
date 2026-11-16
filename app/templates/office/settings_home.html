@@ -1,0 +1,626 @@
+{% extends "base.html" %}
+
+{% block title %}設定 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .settings-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .settings-actions,
+    .settings-grid,
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .settings-group {
+      display: grid;
+      gap: 14px;
+    }
+    .settings-group-head {
+      display: grid;
+      gap: 4px;
+    }
+    .settings-group-head h2 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+    .setting-card,
+    .summary-box {
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      padding: 18px;
+      box-shadow: var(--shadow-card);
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      background: var(--ghost-bg);
+      text-decoration: none;
+      color: inherit;
+    }
+    .settings-warning {
+      border: 1px solid var(--warning-line);
+      background: var(--warning-bg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      gap: 8px;
+    }
+    .settings-warning h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    @media (max-width: 980px) {
+      .settings-group-head h2,
+      .setting-card h2 {
+        font-size: 1.05rem;
+        line-height: 1.45;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="settings-shell">
+    {% include "includes/office_nav.html" with current_section="settings" %}
+    {% include "includes/office_subnav.html" with current_page="settings_home" %}
+    <section class="hero">
+      <div class="eyebrow">Settings</div>
+      <h1>設定</h1>
+      <p>寺院情報、表示、ユーザー、バックアップ、外部連携などの運用設定を管理します。</p>
+      <p class="muted">Django 標準の管理画面で直接管理したい場合は <a href="/admin/auth/user/">ユーザー管理 (Django Admin)</a> を使います。</p>
+    </section>
+
+    {% if operational_source_status.has_bootstrap_warning %}
+      <section class="settings-warning">
+        <div class="eyebrow">Operational Source</div>
+        <h2>通常運用 source を確認してください</h2>
+        <p>{{ operational_source_status.warning_message }}</p>
+        <p class="muted">
+          現在の source: <code>{{ operational_source_status.source_id|default:"未解決" }}</code>
+          {% if operational_source_status.registry_default_source_id %}
+            / registry default: <code>{{ operational_source_status.registry_default_source_id }}</code>
+          {% endif %}
+        </p>
+        {% if operational_source_status.bootstrap_logged_at %}
+          <p class="muted">初回記録: {{ operational_source_status.bootstrap_logged_at }}</p>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    <section class="settings-group">
+      <div class="settings-group-head">
+        <div class="eyebrow">Basics</div>
+        <div class="help-heading-row">
+          <h2>基本・情報設定</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="settings-basics-help"
+              aria-expanded="false"
+              aria-label="基本・情報設定の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="settings-basics-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>寺院情報、表示テーマ、ユーザー、バックアップ、外部連携など、TempleDB 自体の設定をまとめています。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <article class="setting-card" id="temple-identity-card">
+          <div class="eyebrow">Print</div>
+          <h2>寺院情報</h2>
+          <p>年忌表などの左端に印刷する寺院名と電話番号、翌年回忌案内の既定署名や token に使う宗派名・郵便番号・住所・住職名、および法要印刷カードの読経順を DB に保存します。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">現在の宗派名</div>
+              <div class="value" style="font-size: 1rem;">{{ temple_identity_setting.temple_sect|default:"未設定" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">現在の寺院名</div>
+              <div class="value" style="font-size: 1.1rem;">{{ temple_identity_setting.temple_name|default:"未設定" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">現在の郵便番号</div>
+              <div class="value" style="font-size: 1rem;">{{ temple_identity_setting.temple_postal_code|default:"未設定" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">現在の住所</div>
+              <div class="value" style="font-size: 1rem;">{{ temple_identity_setting.temple_address|default:"未設定" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">現在の電話</div>
+              <div class="value" style="font-size: 1rem;">{{ temple_identity_setting.temple_phone|default:"未設定" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">現在の住職名</div>
+              <div class="value" style="font-size: 1rem;">{{ temple_identity_setting.chief_priest_name|default:"未設定" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">現在の読経順</div>
+              <div class="value" style="font-size: 1rem; line-height: 1.6;">{{ temple_identity_setting.service_schedule_sutra_cycle|linebreaksbr }}</div>
+            </div>
+          </div>
+          <form method="post" action="{% url 'office:save_temple_identity' %}" style="margin-top: 16px; display: grid; gap: 12px; max-width: 460px;">
+            {% csrf_token %}
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.temple_sect.label }}</span>
+              {{ temple_identity_form.temple_sect }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.temple_sect.help_text }}</span>
+            </label>
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.temple_name.label }}</span>
+              {{ temple_identity_form.temple_name }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.temple_name.help_text }}</span>
+            </label>
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.temple_postal_code.label }}</span>
+              {{ temple_identity_form.temple_postal_code }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.temple_postal_code.help_text }}</span>
+            </label>
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.temple_address.label }}</span>
+              {{ temple_identity_form.temple_address }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.temple_address.help_text }}</span>
+            </label>
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.temple_phone.label }}</span>
+              {{ temple_identity_form.temple_phone }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.temple_phone.help_text }}</span>
+            </label>
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.chief_priest_name.label }}</span>
+              {{ temple_identity_form.chief_priest_name }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.chief_priest_name.help_text }}</span>
+            </label>
+            <label class="field" style="display: grid; gap: 6px;">
+              <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ temple_identity_form.service_schedule_sutra_cycle.label }}</span>
+              {{ temple_identity_form.service_schedule_sutra_cycle }}
+              <span class="muted" style="font-size: 0.85rem;">{{ temple_identity_form.service_schedule_sutra_cycle.help_text }}</span>
+            </label>
+            <button class="button" type="submit">寺院情報を保存</button>
+          </form>
+        </article>
+
+        <article class="setting-card">
+          <div class="eyebrow">Users</div>
+          <h2>ユーザー管理</h2>
+          <p>ログイン用ユーザーの追加、管理者切替、有効/停止、パスワード再設定を行います。自分のパスワード変更もここから辿れます。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">総ユーザー数</div>
+              <div class="value">{{ user_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">有効ユーザー</div>
+              <div class="value">{{ active_user_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">管理者</div>
+              <div class="value">{{ admin_user_count }}</div>
+            </div>
+          </div>
+          <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a class="ghost-button" href="{% url 'password_change' %}">自分のパスワード変更</a>
+            {% if request.user.is_superuser %}
+              <a class="button" href="{% url 'office:user_management' %}">ユーザー管理ページを開く</a>
+            {% endif %}
+          </div>
+          {% if not request.user.is_superuser %}
+            <p class="muted" style="margin-top: 16px;">ユーザー管理ページは管理者だけ利用できます。</p>
+          {% endif %}
+        </article>
+
+        <article class="setting-card" id="ui-appearance-card">
+          <div class="eyebrow">Appearance</div>
+          <h2>表示テーマ</h2>
+          <p>
+            標準は角を丸くした立体的な操作ボタン、軽量は従来と同じ平面的な操作ボタンです。
+            ラベルやタグ、導線、URL、フォーム項目、表示データは変わりません。
+          </p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">現在のテーマ</div>
+              <div class="value" style="font-size: 1rem;">{{ ui_theme_label }}</div>
+            </div>
+          </div>
+          {% if ui_theme_warning %}
+            <p class="callout" style="margin-top: 16px;">
+              表示設定ファイルを読み取れないため、安全な既定表示を使っています。
+              管理者が下の選択肢を保存すると修復できます。
+            </p>
+          {% endif %}
+          {% if request.user.is_superuser %}
+            <form method="post" action="{% url 'office:save_ui_appearance' %}" style="margin-top: 16px; display: grid; gap: 12px;">
+              {% csrf_token %}
+              <div class="field" style="display: grid; gap: 8px;">
+                <span style="font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em;">{{ ui_appearance_form.theme.label }}</span>
+                {{ ui_appearance_form.theme }}
+                <span class="muted" style="font-size: 0.85rem;">{{ ui_appearance_form.theme.help_text }}</span>
+              </div>
+              <button class="button" type="submit">表示テーマを保存</button>
+            </form>
+            <p class="muted" style="margin-top: 12px;">
+              寺院ごとの軽い表示設定としてJSONファイルへ保存し、再起動せず次の画面から反映します。
+            </p>
+          {% else %}
+            <p class="muted" style="margin-top: 16px;">表示テーマの変更は管理者だけ実行できます。</p>
+          {% endif %}
+        </article>
+
+        <article class="setting-card">
+          <div class="eyebrow">Operations</div>
+          <h2>バックアップ</h2>
+          <p>正本DBの保存先、手動バックアップ、テスト復元を管理します。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">現在のデータベース</div>
+              <div class="value" style="font-size: 1rem;">{{ database_engine_label }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">保存先</div>
+              <div class="value" style="font-size: 0.98rem; word-break: break-all;">
+                {% if backup_destination_status.configured %}
+                  {{ backup_destination_status.path }}
+                {% else %}
+                  未設定
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">接続状態</div>
+              <div class="value">
+                {% if backup_destination_status.connected %}
+                  接続中
+                {% elif backup_destination_status.configured %}
+                  未接続
+                {% else %}
+                  未設定
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">最終成功</div>
+              <div class="value" style="font-size: 1rem;">
+                {% if backup_last_success_run %}
+                  {{ backup_last_success_run.started_at|date:"Y-m-d H:i" }}
+                {% else %}
+                  まだありません
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% if not backup_feature_enabled %}
+            <p class="muted" style="margin-top: 16px;">バックアップ機能は本運用の PostgreSQL または SQLite で利用できます。</p>
+          {% elif request.user.is_superuser %}
+            <p style="margin-top: 16px;">
+              <a class="button" href="{% url 'office:backup_settings' %}">バックアップ設定を開く</a>
+            </p>
+          {% else %}
+            <p class="muted" style="margin-top: 16px;">バックアップ設定ページは管理者だけ利用できます。</p>
+          {% endif %}
+          {% if backup_last_failure_run %}
+            <p class="muted" style="margin-top: 10px;">最終失敗: {{ backup_last_failure_run.started_at|date:"Y-m-d H:i" }}</p>
+          {% endif %}
+        </article>
+
+        <article class="setting-card" id="data-imports-card">
+          <div class="eyebrow">Import & Review</div>
+          <h2>取込・照合</h2>
+          <p>外部DB/source の取込管理と、手配り名簿、郵送名簿の反映・照合確認を専用ページで扱います。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">対象</div>
+              <div class="value" style="font-size: 1rem;">外部DB / source</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">補助</div>
+              <div class="value" style="font-size: 0.98rem;">補助CSV</div>
+            </div>
+          </div>
+          <p style="margin-top: 16px;">
+            <a class="button" href="{% url 'office:data_imports' %}">取込・照合を開く</a>
+          </p>
+        </article>
+
+        <article class="setting-card">
+          <div class="eyebrow">Operations</div>
+          <h2>Google カレンダー</h2>
+          <p>TempleDB の法要予定を、専用の非公開 Google カレンダーへ片方向同期します。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">状態</div>
+              <div class="value">
+                {% if google_calendar_setting.enabled %}
+                  有効
+                {% else %}
+                  無効
+                {% endif %}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Calendar ID</div>
+              <div class="value" style="font-size: 0.98rem; word-break: break-all;">
+                {{ google_calendar_setting.calendar_id|default:"未設定" }}
+              </div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Service Account</div>
+              <div class="value" style="font-size: 0.98rem; word-break: break-all;">
+                {{ google_calendar_account_info.client_email|default:"未検出" }}
+              </div>
+            </div>
+          </div>
+          {% if google_calendar_configuration_errors %}
+            <p class="muted" style="margin-top: 16px;">{{ google_calendar_configuration_errors|join:" / " }}</p>
+          {% else %}
+            <p class="muted" style="margin-top: 16px;">競合 {{ google_calendar_conflict_count }} 件 / エラー {{ google_calendar_error_count }} 件</p>
+          {% endif %}
+          {% if request.user.is_superuser %}
+            <p style="margin-top: 16px;">
+              <a class="button" href="{% url 'office:google_calendar_settings' %}">Google カレンダー設定を開く</a>
+            </p>
+          {% else %}
+            <p class="muted" style="margin-top: 16px;">Google カレンダー設定ページは管理者だけ利用できます。</p>
+          {% endif %}
+        </article>
+
+        <article class="setting-card">
+          <div class="eyebrow">Schema</div>
+          <h2>データベース関係図</h2>
+          <p>現在接続中のDBから、実際のテーブル、カラム、制約、外部キーを read-only で確認します。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">表示内容</div>
+              <div class="value">物理テーブル / 外部キー</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">形式</div>
+              <div class="value">物理ER図 / 定義一覧</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">権限</div>
+              <div class="value">管理者のみ</div>
+            </div>
+          </div>
+          {% if request.user.is_superuser %}
+            <p style="margin-top: 16px;">
+              <a class="button" href="{% url 'office:schema_map' %}">関係図を開く</a>
+            </p>
+          {% else %}
+            <p class="muted" style="margin-top: 16px;">このページは管理者だけ利用できます。</p>
+          {% endif %}
+        </article>
+
+        {% if request.user.is_superuser and starter_package_available %}
+          <article class="setting-card" id="starter-package-card">
+            <div class="eyebrow">Starter</div>
+            <h2>TempleDBスターターパッケージ</h2>
+            <p>架空データのデモと、Codexと一緒に空の製品DBを準備して既存DBから移行するための導入資料を、一つの配布物にまとめます。</p>
+            <div class="meta-row">
+              <div class="summary-box">
+                <div class="label">通常に展開</div>
+                <div class="value" style="font-size: 1rem;">デモを起動</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Codexで開く</div>
+                <div class="value" style="font-size: 1rem;">新規導入・移行</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">製品データ</div>
+                <div class="value" style="font-size: 1rem;">空DBから開始</div>
+              </div>
+            </div>
+            <p class="muted" style="margin-top: 16px;">現在の本番DB、認証情報、旧DB原本は含めません。新規利用ではデモDBを書き換えず、Codexが別の製品DBを作成します。</p>
+            <form method="post" action="{% url 'office:download_starter_package' %}" style="margin-top: 16px;">
+              {% csrf_token %}
+              <button class="button" type="submit">TempleDBスターターパッケージを作成</button>
+            </form>
+          </article>
+        {% endif %}
+
+        <article class="setting-card">
+          <div class="eyebrow">Handoff</div>
+          <h2>AI引き継ぎパッケージ</h2>
+          <p>現在のコード、設計資料、物理schema、migration、匿名件数、復旧状態を、AIが保守を引き継げる形にまとめます。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">形式</div>
+              <div class="value" style="font-size: 1rem;">tar.gz</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">内容</div>
+              <div class="value" style="font-size: 1rem;">本番DB行を直接出力しない</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">用途</div>
+              <div class="value" style="font-size: 1rem;">AI保守引き継ぎ</div>
+            </div>
+          </div>
+          <p class="muted" style="margin-top: 16px;">本番DBの個別行・認証行・DB backupは出力しません。ただし追跡済みコード・テスト・履歴には実運用由来の氏名・住所・電話・寺院名・endpoint等が残る場合があります。復元用や公開用ではなく、信頼する保守者・AIだけに渡してください。</p>
+          {% if request.user.is_superuser %}
+            <form method="post" action="{% url 'office:download_handoff_package' %}" style="margin-top: 16px;">
+              {% csrf_token %}
+              <button class="button" type="submit">AI引き継ぎパッケージを作成</button>
+            </form>
+          {% else %}
+            <p class="muted" style="margin-top: 16px;">AI引き継ぎパッケージの作成は管理者だけ利用できます。</p>
+          {% endif %}
+        </article>
+
+        <article class="setting-card">
+          <div class="eyebrow">Master</div>
+          <h2>地区定義</h2>
+          <p>地区名、略称、表示順、地区役員、有効/停止を管理します。地区役員は、その地区に割り当てた現在帳から選びます。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">有効地区</div>
+              <div class="value">{{ active_district_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">停止中地区</div>
+              <div class="value">{{ inactive_district_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">総数</div>
+              <div class="value">{{ district_count }}</div>
+            </div>
+          </div>
+          <p style="margin-top: 16px;">
+            <a class="button" href="{% url 'office:districts' %}">地区定義を開く</a>
+          </p>
+        </article>
+
+        <article class="setting-card">
+          <div class="eyebrow">Assignment</div>
+          <h2>戸主地区・送付区分</h2>
+          <p>戸主ごとに、地区所属・郵送・送付しないを手作業で設定します。既定は未設定で、地区役員候補は地区所属の現在帳だけから選べます。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">最新取込履歴</div>
+              <div class="value">{{ latest_household_batch_id|default:"未取得" }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">地区所属</div>
+              <div class="value">{{ district_household_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">郵送</div>
+              <div class="value">{{ postal_household_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">送付しない</div>
+              <div class="value">{{ no_delivery_household_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">未割当</div>
+              <div class="value">{{ unassigned_household_count }}</div>
+            </div>
+          </div>
+          <p style="margin-top: 16px;">
+            <a class="button" href="{% url 'office:household_districts' %}">戸主地区・送付区分を開く</a>
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="settings-group">
+      <div class="settings-group-head">
+        <div class="eyebrow">District Officers</div>
+        <div class="help-heading-row">
+          <h2>{{ role_labels.district_officer }}</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="settings-district-officers-help"
+              aria-expanded="false"
+              aria-label="{{ role_labels.district_officer }}の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="settings-district-officers-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>{{ role_labels.district_officer }}の確認、修正、印刷物は{{ role_document_labels.district_officer_roster }}から進みます。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <article class="setting-card">
+          <div class="eyebrow">Roles</div>
+          <h2>{{ role_document_labels.district_officer_roster }}</h2>
+          <p>{{ role_labels.district_officer }}の現在の担当者を一覧表示し、その人の修正や{{ role_labels.district_officer }}解除へ進めます。{{ role_labels.district_officer }}向けの印刷物もこの一覧から開きます。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">{{ role_labels.district_officer }}</div>
+              <div class="value">{{ district_officer_count }}</div>
+            </div>
+          </div>
+          <p style="margin-top: 16px;">
+            <a class="button" href="{% url 'office:district_officer_roster' %}">{{ role_document_labels.district_officer_roster }}</a>
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="settings-group">
+      <div class="settings-group-head">
+        <div class="eyebrow">Roles</div>
+        <div class="help-heading-row">
+          <h2>その他役職</h2>
+          <div class="help-popover" data-help-popover>
+            <button
+              class="help-popover-button help-popover-button-compact"
+              type="button"
+              aria-controls="settings-other-roles-help"
+              aria-expanded="false"
+              aria-label="その他役職の説明"
+              data-help-popover-button
+            >?</button>
+            <div
+              class="help-popover-panel"
+              id="settings-other-roles-help"
+              hidden
+              data-help-popover-panel
+            >
+              <p>{{ role_labels.responsible_officer }}と{{ role_labels.monto_sodai_formal }}の一覧、CSV書き出し、{{ role_labels.monto_sodai }}向け印刷をまとめています。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <article class="setting-card">
+          <div class="eyebrow">Roles</div>
+          <h2>役職一覧</h2>
+          <p>{{ role_labels.district_officer }}、{{ role_labels.responsible_officer }}、{{ role_labels.monto_sodai_formal }}を一覧表示し、CSVに書き出せます。</p>
+          <div class="meta-row">
+            <div class="summary-box">
+              <div class="label">{{ role_labels.responsible_officer }}</div>
+              <div class="value">{{ responsible_officer_count }}</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">{{ role_labels.monto_sodai_formal }}</div>
+              <div class="value">{{ monto_sodai_count }}</div>
+            </div>
+          </div>
+          <p style="margin-top: 16px;">
+            <a class="button" href="{% url 'office:responsible_officer_roster' %}">{{ role_document_labels.responsible_officer_roster }}</a>
+            <a class="ghost-button" href="{% url 'office:monto_sodai_roster' %}">{{ role_document_labels.monto_sodai_roster }}</a>
+          </p>
+        </article>
+      </div>
+    </section>
+  </div>
+{% endblock %}

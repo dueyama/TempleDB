@@ -1,0 +1,7 @@
+{% load office_nav %}
+{% build_office_global_nav current_section as global_nav_links %}
+<nav class="global-nav" aria-label="主要導線">
+  {% for link in global_nav_links %}
+    <a class="ghost-button{% if link.is_current %} is-current{% endif %}" href="{{ link.url }}"{% if link.is_current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+  {% endfor %}
+</nav>

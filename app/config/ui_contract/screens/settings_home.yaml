@@ -1,0 +1,181 @@
+contract_type: screen
+version: 2
+dsl_version: 2
+screen_id: settings_home
+title: 設定
+route_name: settings_home
+route_path: /settings/
+template: office/settings_home.html
+purpose: Administrative hub for operational settings, auxiliary data, backups, Google Calendar sync, schema map, appearance, starter-package generation, and AI maintenance handoff.
+primary_models:
+  - core.TempleIdentitySetting
+  - core.GoogleCalendarSyncSetting
+layout:
+  density: administrative_hub
+  structure:
+    - hero
+    - settings_cards
+    - identity_form
+    - admin_only_export_actions
+  responsive: Cards stack but keep existing order and labels.
+regions:
+  - region_id: auxiliary_cards
+    role: import/review entry points for hand delivery, postal, districts, reports, and fees
+    priority: primary
+  - region_id: maintenance_cards
+    role: backup, restore verification, schema map, Google Calendar, and user management
+    priority: primary
+  - region_id: appearance
+    role: show and edit the tenant-local UI theme stored in config/tenant_preferences/ui_appearance.json
+    priority: secondary
+  - region_id: ai_handoff
+    role: generate an internal AI maintenance package without reading individual operational database rows
+    priority: secondary
+  - region_id: starter_package
+    role: generate one distributable workspace for immediate synthetic demo use or Codex-assisted clean product setup and legacy-data migration
+    priority: secondary
+actions:
+  - action_id: download_starter_package
+    label: TempleDBスターターパッケージを作成
+    intent: build one reviewed distribution archive that opens as a synthetic demo and also guides Codex through creation of a separate clean product database and optional adapter-based migration
+    method: POST
+    route_name: download_starter_package
+    mutating: false
+    risk_level: medium
+    confirmation: none
+    authorization: superuser
+    csrf_required: true
+    result: Streams a no-store application/gzip archive built by the fixed demo factory without exporting the current operational database, credentials, or private legacy source.
+  - action_id: download_handoff_package
+    label: AI引き継ぎパッケージを作成
+    intent: export allowlisted code and documentation, physical schema, migrations, aggregate profile, backup status, policy, workflow, and UI contract for AI-assisted maintenance
+    method: POST
+    route_name: download_handoff_package
+    mutating: false
+    risk_level: medium
+    confirmation: none
+    authorization: superuser
+    csrf_required: true
+    result: Streams an internal application/gzip maintenance attachment without exporting database rows or updating canonical DB records; tracked source can still contain operational references or PII.
+  - action_id: save_temple_identity
+    label: 寺院情報を保存
+    intent: update temple identity used by reports and notices
+    method: POST
+    route_name: save_temple_identity
+    mutating: true
+    risk_level: medium
+    confirmation: inline
+    result: Saves temple identity singleton.
+  - action_id: save_ui_appearance
+    label: 表示テーマを保存
+    intent: update the tenant-local presentation preset without changing routes, labels, forms, or operational data
+    method: POST
+    route_name: save_ui_appearance
+    mutating: true
+    risk_level: low
+    confirmation: inline
+    authorization: superuser
+    csrf_required: true
+    result: Atomically writes config/tenant_preferences/ui_appearance.json and applies the preset from the next response without restarting TempleDB.
+  - action_id: open_backup_settings
+    label: バックアップ
+    intent: inspect and operate backup/restore verification settings
+    method: GET
+    route_name: backup_settings
+    mutating: false
+    risk_level: none
+    confirmation: none
+states:
+  - state_id: non_superuser
+    trigger: user lacks superuser permission for admin-only exports
+    presentation: hide download button or reject route with permission denied
+  - state_id: export_error
+    trigger: handoff package generation raises an exception
+    presentation: redirect to settings home with error message
+  - state_id: starter_factory_unavailable
+    trigger: runtime is a demo or this checkout does not contain the executable private demo factory and builder Python
+    presentation: hide the starter-package card and reject direct POST requests
+  - state_id: starter_build_error
+    trigger: starter package generation is already running, fails, times out, or produces no regular archive
+    presentation: redirect to settings home with a generic error message and never expose raw builder stderr
+data_bindings:
+  - source: config/tenant_preferences/ui_appearance.json
+    target: appearance.current_theme
+  - source: temple_identity_setting
+    target: temple_identity_form
+  - source: backup runtime status
+    target: maintenance_cards.backup_status
+workflow_refs:
+  - handoff_export
+  - starter_package_export
+semantic_tree:
+  node_id: settings_home.page
+  kind: page
+  role: administrative settings hub
+  priority: primary
+  children:
+    - node_id: settings_home.hero
+      kind: hero
+      role: settings title and admin context
+      priority: primary
+    - node_id: settings_home.auxiliary_cards
+      kind: grid
+      role: operational import/review/report settings cards
+      priority: primary
+    - node_id: settings_home.maintenance_cards
+      kind: grid
+      role: backup, schema map, users, Google Calendar, and handoff export
+      priority: primary
+      actions:
+        - open_backup_settings
+        - download_handoff_package
+        - download_starter_package
+    - node_id: settings_home.appearance
+      kind: form
+      role: tenant-local presentation preset
+      priority: secondary
+      actions:
+        - save_ui_appearance
+    - node_id: settings_home.identity_form
+      kind: form
+      role: temple identity singleton settings
+      priority: secondary
+      actions:
+        - save_temple_identity
+visual_signature:
+  density: administrative hub with many cards but stable existing order
+  rhythm: cards first, forms below or beside according to template
+  information_priority:
+    - existing settings cards are not removed or renamed
+    - AI handoff card is a superuser-only maintenance export, not a marketing CTA
+    - starter package is one distribution with two safe entry points: immediate demo or Codex-assisted product setup
+  disclosure:
+    - card copy distinguishes maintenance material from backup restore and private migration-data export
+    - card copy states that individual operational database rows are excluded
+    - card copy warns that tracked source/history may contain operational PII and limits recipients to trusted maintainers or AI
+    - errors return through normal settings messages
+    - starter package card is absent when the private factory is unavailable or the current runtime is a demo
+  responsive_behavior: cards stack while preserving visible labels and route affordances
+state_matrix:
+  - state_id: superuser
+    required_actions:
+      - download_handoff_package
+      - download_starter_package
+      - save_ui_appearance
+    required_behavior: submit package downloads and tenant-local appearance changes by POST with CSRF protection
+  - state_id: non_superuser
+    forbidden_actions:
+      - download_handoff_package
+      - download_starter_package
+      - save_ui_appearance
+  - state_id: export_error
+    required_behavior: return to settings home with error message
+  - state_id: starter_factory_unavailable
+    forbidden_actions:
+      - download_starter_package
+    required_behavior: direct POST is rejected and the settings page does not render the starter action
+evidence:
+  source_map_ref: source_map.json#/screens/settings_home
+  template_paths:
+    - source/templates/base.html
+    - source/templates/office/settings_home.html

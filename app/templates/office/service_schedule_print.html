@@ -1,0 +1,910 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ print_heading_labels.service_schedule_print }} | TempleDB</title>
+    <style>
+      :root {
+        --bg: #f3eee6;
+        --panel: rgba(255, 250, 240, 0.94);
+        --line: #1f1f1f;
+        --muted: #555;
+        --ink: #111;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+      body {
+        min-height: 100vh;
+        color: #2a241d;
+        font-family: "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
+        background:
+          radial-gradient(circle at top left, #fbf4ea 0, transparent 30%),
+          linear-gradient(180deg, #e9e1d4 0%, var(--bg) 42%, #f6f0e8 100%);
+      }
+      .app-shell {
+        display: grid;
+        grid-template-columns: minmax(280px, 360px) 1fr;
+        gap: 24px;
+        padding: 24px;
+        align-items: start;
+      }
+      .control-panel {
+        border: 1px solid #d4c7b3;
+        background: var(--panel);
+        padding: 20px;
+        box-shadow: 0 14px 38px rgba(46, 38, 30, 0.08);
+      }
+      .control-panel h1 {
+        margin: 0 0 8px;
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+        font-size: 1.55rem;
+      }
+      .helper {
+        margin: 0 0 18px;
+        color: #5f5549;
+        line-height: 1.7;
+      }
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .print-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.94);
+        border-bottom: 1px solid #d4c7b3;
+      }
+      .button,
+      .ghost-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        text-decoration: none;
+        font: inherit;
+      }
+      .button {
+        border: 1px solid #000;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+      }
+      .mobile-print-action {
+        display: none;
+      }
+      .ghost-button {
+        border: 1px solid #cdbfae;
+        background: rgba(255, 255, 255, 0.86);
+        color: inherit;
+      }
+      .meta-list {
+        display: grid;
+        gap: 10px;
+      }
+      .meta-item {
+        border-top: 1px solid #ded4c7;
+        padding-top: 10px;
+      }
+      .meta-item dt {
+        color: #6b6258;
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 6px;
+      }
+      .meta-item dd {
+        margin: 0;
+        line-height: 1.6;
+      }
+      .preview-frame {
+        display: flex;
+        justify-content: center;
+        border: 1px solid #d4c7b3;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 16px;
+        overflow: hidden;
+      }
+      .preview-scale-shell {
+        position: relative;
+        width: var(--preview-width, auto);
+        height: var(--preview-height, auto);
+        margin: 0 auto;
+        transform-origin: top left;
+      }
+      .preview-scale-shell > .paper {
+        transform-origin: top left;
+        transform: scale(var(--preview-scale, 1));
+      }
+      .sheet-slot {
+        display: block;
+      }
+      .sheet-frame {
+        width: 210mm;
+        min-height: 297mm;
+        transform-origin: top left;
+      }
+      .paper {
+        width: 210mm;
+        min-width: 210mm;
+        min-height: 297mm;
+        max-width: none;
+        margin: 0 auto;
+        padding: 12mm;
+        border: 1px solid #000;
+        background: #fff;
+        color: #000;
+        box-shadow: 0 18px 42px rgba(32, 28, 24, 0.12);
+      }
+      .paper-content {
+        /* Preserve desktop line breaks in both preview and print. */
+        width: calc(186mm - 2px);
+      }
+      .is-paper-print .sheet-frame {
+        width: 184mm;
+        height: 265mm;
+        min-height: 265mm;
+      }
+      .is-paper-print .paper {
+        width: 184mm;
+        min-width: 184mm;
+        height: 265mm;
+        min-height: 265mm;
+        max-height: 265mm;
+        padding: 7mm;
+        overflow: hidden;
+      }
+      .is-paper-print .paper-content {
+        transform: scale(var(--print-document-scale, 1));
+        transform-origin: top left;
+        width: calc(186mm - 2px);
+      }
+      /* Use identical measurement geometry before Safari enters print media. */
+      .is-print-preparing .paper {
+        width: 184mm !important;
+        min-width: 184mm !important;
+        max-width: 184mm !important;
+        height: 265mm !important;
+        min-height: 265mm !important;
+        max-height: 265mm !important;
+        padding: 7mm !important;
+        border: 0 !important;
+        transform: none !important;
+      }
+      .is-print-preparing .paper-content {
+        width: calc(186mm - 2px);
+      }
+      .paper h1,
+      .paper h2,
+      .paper h3 {
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      }
+      .paper h4 {
+        font-family: "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
+      }
+      .page-head {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 8mm;
+      }
+      .info-head {
+        margin-top: 6mm;
+        margin-bottom: 0;
+      }
+      .page-title-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+      }
+      .page-title-row > * {
+        min-width: 0;
+      }
+      .page-title {
+        margin: 0;
+        font-size: 1.7rem;
+      }
+      .page-subtitle {
+        margin: 0;
+        color: #000;
+        font-size: .95rem;
+      }
+      .summary-grid {
+        display: grid;
+        gap: 4mm;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+      .summary-box {
+        border: 1px solid #000;
+        padding: 3mm;
+      }
+      .summary-box .label {
+        font-size: .72rem;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+      }
+      .summary-box .value {
+        margin-top: 1.5mm;
+        font-size: 1rem;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+      .service-note {
+        margin-top: 4mm;
+        border: 1px solid #000;
+        padding: 3mm;
+      }
+      .future-plan-board {
+        margin-top: 5mm;
+        border: 1px solid #000;
+        padding: 3mm;
+      }
+      .future-plan-board h3 {
+        margin: 0 0 2mm;
+        font-size: 1rem;
+      }
+      .future-plan-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: .86rem;
+      }
+      .future-plan-table th,
+      .future-plan-table td {
+        border: 1px solid #000;
+        padding: 1.4mm 1.8mm;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+      .future-plan-table th {
+        font-size: .78rem;
+        background: rgba(0, 0, 0, 0.04);
+      }
+      .future-plan-note {
+        display: block;
+        margin-top: 1mm;
+        font-size: .72rem;
+        line-height: 1.35;
+      }
+      .service-note strong {
+        display: block;
+        margin-bottom: 1.5mm;
+      }
+      .card-grid {
+        display: grid;
+        gap: 3mm;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .cut-card {
+        border: 1px dashed #000;
+        padding: 2mm;
+        break-inside: avoid;
+        min-height: 24mm;
+        display: grid;
+        gap: 1.2mm;
+      }
+      .fact-grid {
+        display: grid;
+        gap: 0;
+        grid-template-columns: 14mm minmax(0, 1fr);
+        border: 1px solid #000;
+      }
+      .fact-grid dt,
+      .fact-grid dd {
+        min-width: 0;
+        margin: 0;
+        padding: 1.05mm 1.35mm;
+        border-bottom: 1px solid #000;
+      }
+      .fact-grid dt {
+        border-right: 1px solid #000;
+        font-size: .68rem;
+        font-weight: 700;
+      }
+      .fact-grid dd {
+        font-size: .78rem;
+        overflow-wrap: anywhere;
+      }
+      .fact-grid dt:last-of-type,
+      .fact-grid dd:last-of-type {
+        border-bottom: 0;
+      }
+      .name-line {
+        display: block;
+        font-size: .88rem;
+        font-weight: 700;
+        line-height: 1.3;
+      }
+      .kana-line {
+        display: block;
+        margin-top: .35mm;
+        font-size: .74rem;
+        color: #000;
+        line-height: 1.3;
+      }
+      .small {
+        font-size: .72rem;
+        color: #000;
+      }
+      .sub-line {
+        display: block;
+        margin-top: .4mm;
+        font-size: .62rem;
+        color: #000;
+        line-height: 1.35;
+      }
+      .kaimyo-line {
+        display: block;
+        font-size: .88rem;
+        font-weight: 700;
+        line-height: 1.3;
+      }
+      .memo-section {
+        display: grid;
+        gap: 1.8mm;
+      }
+      .memo-board {
+        display: grid;
+        gap: 4mm;
+        margin-top: 6mm;
+      }
+      .memo-group {
+        border: 1px solid #000;
+        padding: 3mm;
+      }
+      .memo-title {
+        margin: 0;
+        font-size: .9rem;
+        font-weight: 700;
+      }
+      .memo-list {
+        display: grid;
+        gap: 1.8mm;
+      }
+      .memo-item {
+        border: 1px solid #000;
+        padding: 2mm 2.2mm;
+      }
+      .memo-item-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: baseline;
+        margin-bottom: 1mm;
+      }
+      .memo-item-head > * {
+        min-width: 0;
+      }
+      .memo-item-head strong {
+        font-size: .88rem;
+      }
+      .memo-meta {
+        color: #000;
+        font-size: .76rem;
+        overflow-wrap: anywhere;
+      }
+      .memo-body {
+        font-size: .86rem;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .memo-empty {
+        border: 1px solid #000;
+        padding: 2mm 2.2mm;
+        font-size: .82rem;
+        color: #000;
+      }
+      .screen-only {
+        display: block;
+      }
+      .print-stage {
+        display: flex;
+        justify-content: center;
+        padding: 12px;
+      }
+      .is-paper-print {
+        background: #f2f0ea;
+      }
+      .is-paper-print .print-stage {
+        overflow: hidden;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+      @media screen and (max-width: 1080px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+        .preview-frame {
+          padding: 12px;
+        }
+        .desktop-print-action {
+          display: none;
+        }
+        .mobile-print-action {
+          display: inline-flex;
+        }
+      }
+      @media print {
+        html, body {
+          width: auto;
+          height: auto;
+          margin: 0 !important;
+          padding: 0 !important;
+          min-height: 0 !important;
+          overflow: visible !important;
+          font-size: 16px !important;
+          -webkit-text-size-adjust: 100% !important;
+          text-size-adjust: 100% !important;
+          background: #fff !important;
+        }
+        .control-panel,
+        .screen-only {
+          display: none !important;
+        }
+        .app-shell {
+          display: block !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .print-stage,
+        .sheet-slot,
+        .sheet-frame {
+          display: block !important;
+          width: auto !important;
+          height: auto !important;
+          min-height: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          transform: none !important;
+        }
+        .preview-frame {
+          display: block !important;
+          border: 0 !important;
+          background: #fff !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: visible !important;
+        }
+        .preview-scale-shell {
+          width: auto !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        .preview-scale-shell > .paper,
+        .sheet-frame > .paper {
+          position: static !important;
+          transform: none !important;
+        }
+        .paper {
+          width: auto !important;
+          max-width: none !important;
+          min-width: 0 !important;
+          min-height: 0 !important;
+          height: auto !important;
+          padding: 0 !important;
+          border: 0 !important;
+          box-shadow: none !important;
+          margin: 0 !important;
+          background: #fff !important;
+          overflow: visible !important;
+        }
+        .sheet-frame {
+          width: 184mm !important;
+          height: 265mm !important;
+          min-height: 265mm !important;
+          max-height: 265mm !important;
+        }
+        .paper,
+        .is-paper-print .paper {
+          width: 184mm !important;
+          max-width: 184mm !important;
+          min-width: 184mm !important;
+          height: 265mm !important;
+          min-height: 265mm !important;
+          max-height: 265mm !important;
+          padding: 7mm !important;
+          overflow: hidden !important;
+        }
+        .paper-content {
+          position: absolute;
+          top: 7mm;
+          left: 7mm;
+          transform: scale(var(--print-document-scale, 1));
+          transform-origin: top left;
+          width: calc(186mm - 2px);
+        }
+        .paper,
+        .is-paper-print .paper,
+        .is-paper-print .sheet-frame,
+        .sheet-frame {
+          height: 265mm !important;
+          min-height: 265mm !important;
+          max-height: 265mm !important;
+        }
+        .preview-scale-shell > .paper,
+        .sheet-frame > .paper {
+          position: relative !important;
+        }
+        .cut-card,
+        .summary-box,
+        .service-note,
+        .memo-group {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body class="{% if print_mode %}is-paper-print{% endif %}">
+    {% if request.user.is_authenticated and not print_mode %}
+      {% include "includes/app_quicklinks.html" %}
+    {% endif %}
+    {% if print_mode %}
+      <nav class="print-toolbar screen-only">
+        <a class="ghost-button" href="{{ pdf_preview_url }}">PDFで印刷</a>
+        <button class="button" type="button" onclick="window.print()">印刷する</button>
+        <a class="ghost-button" href="{{ print_preview_url }}">戻る</a>
+      </nav>
+      <main class="print-stage">
+    {% else %}
+      <div class="app-shell">
+        <aside class="control-panel screen-only">
+          <h1>{{ print_heading_labels.service_schedule_print }}</h1>
+          <p class="helper">
+            今回の法要対象と、各個人に紐づく内部メモをまとめた印刷ページです。
+            右側の札は個人ごとに切り取れる想定で、命日・{{ deceased_labels.kaimyo }}・{{ deceased_labels.kaimyo_kana }}・{{ deceased_labels.zokumyo }}・享年・法要だけを compact に出しています。
+            メモは切り取り札には含めず、下側にまとめています。
+          </p>
+          <dl class="meta-list">
+            <div class="meta-item">
+              <dt>家</dt>
+              <dd>{{ household_label }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>対象人数</dt>
+              <dd>{{ participant_count }}名</dd>
+            </div>
+            <div class="meta-item">
+              <dt>予定</dt>
+              <dd>
+                {% if scheduled_date_label %}{{ scheduled_date_label }}{% else %}未設定{% endif %}
+                {% if scheduled_time_label %} {{ scheduled_time_label }}{% endif %}
+              </dd>
+            </div>
+            <div class="meta-item">
+              <dt>場所</dt>
+              <dd>{% if schedule.location %}{{ schedule.location }}{% else %}未設定{% endif %}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>状態</dt>
+              <dd>{{ schedule.get_status_display }}</dd>
+            </div>
+          </dl>
+          <div class="actions">
+            <a class="button" href="{{ pdf_preview_url }}">PDFで印刷</a>
+            <button class="button desktop-print-action" type="button" onclick="window.print()">情報印刷ダイアログを開く</button>
+            <a class="button mobile-print-action" href="{{ print_page_url }}">印刷画面を開く</a>
+            <a
+              class="ghost-button"
+              href="{{ next_url }}"
+              onclick="return handlePrintBackNavigation(event, '{{ next_url|escapejs }}');"
+            >
+              戻る
+            </a>
+          </div>
+        </aside>
+    {% endif %}
+
+      {% if print_mode %}
+        <div class="sheet-slot" data-print-sheet-slot>
+          <div class="sheet-frame" data-print-sheet-frame>
+            <section class="paper" data-service-print-page>
+      {% else %}
+        <div class="preview-frame" data-preview-scale-root>
+          <div class="preview-scale-shell" data-preview-scale-shell>
+            <section class="paper" data-preview-scale-page data-service-print-page>
+      {% endif %}
+          <div class="paper-content" data-service-print-content>
+          <section class="card-grid {{ card_grid_class }}" style="margin-bottom: 6mm;">
+            {% for item in participant_cards %}
+              <article class="cut-card">
+                <dl class="fact-grid">
+                  <dt>{{ deceased_labels.zokumyo }}</dt>
+                  <dd>
+                    <span class="name-line">
+                      {{ item.person_name|default:"未設定" }}
+                      {% if item.is_current %}<span class="small">（基準）</span>{% endif %}
+                    </span>
+                    {% if item.person_kana %}<span class="kana-line">{{ item.person_kana }}</span>{% endif %}
+                  </dd>
+                  <dt>{{ deceased_labels.kaimyo }}</dt>
+                  <dd>
+                    {% if item.kaimyo %}
+                      <span class="kaimyo-line">{{ item.kaimyo }}</span>
+                      {% if item.kaimyo_kana %}<span class="kana-line">{{ item.kaimyo_kana }}</span>{% endif %}
+                    {% else %}
+                      <span class="small">未設定</span>
+                    {% endif %}
+                  </dd>
+                  <dt>法要</dt>
+                  <dd>{{ item.service_label }}</dd>
+                  {% if item.sutra_label %}
+                    <dt>読経</dt>
+                    <dd>{{ item.sutra_label }}</dd>
+                  {% endif %}
+                  <dt>続柄</dt>
+                  <dd>
+                    {% if item.relationship_label %}
+                      {{ item.relationship_label }}
+                    {% else %}
+                      <span class="small">未設定</span>
+                    {% endif %}
+                  </dd>
+                  <dt>命日</dt>
+                  <dd>
+                    {% if item.death_date %}
+                      {{ item.death_date }}
+                      {% if item.death_date_wareki %}<span class="sub-line">{{ item.death_date_wareki }}</span>{% endif %}
+                    {% else %}
+                      <span class="small">未設定</span>
+                    {% endif %}
+                  </dd>
+                  <dt>予定命日</dt>
+                  <dd>
+                    {% if item.planned_death_date %}
+                      {{ item.planned_death_date }}
+                      {% if item.planned_death_date_wareki %}<span class="sub-line">{{ item.planned_death_date_wareki }}</span>{% endif %}
+                    {% else %}
+                      <span class="small">未設定</span>
+                    {% endif %}
+                  </dd>
+                  <dt>享年</dt>
+                  <dd>
+                    {% if item.age_at_death %}
+                      {{ item.age_at_death }}
+                      {% if item.estimated_birth_year %}<span class="sub-line">{{ item.estimated_birth_year }}</span>{% endif %}
+                    {% else %}
+                      <span class="small">未設定</span>
+                    {% endif %}
+                  </dd>
+                  <dt>戸主</dt>
+                  <dd>
+                    {% if item.household_name %}
+                      {{ item.household_name }}
+                    {% else %}
+                      <span class="small">未設定</span>
+                    {% endif %}
+                  </dd>
+                </dl>
+              </article>
+            {% endfor %}
+          </section>
+
+          <section class="page-head info-head">
+            <div class="page-title-row">
+              <div>
+                <h2 class="page-title">{{ document_title }}</h2>
+                <p class="page-subtitle">{{ household_label }} / 出力日 {{ print_date|date:"Y-m-d" }}</p>
+              </div>
+              <div class="page-subtitle">対象 {{ participant_count }}名</div>
+            </div>
+            <div class="summary-grid">
+              <div class="summary-box">
+                <div class="label">対象法要</div>
+                <div class="value">{{ service_labels|join:" / " }}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">予定日</div>
+                <div class="value">{% if scheduled_date_label %}{{ scheduled_date_label }}{% else %}未設定{% endif %}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">予定時刻</div>
+                <div class="value">{% if scheduled_time_label %}{{ scheduled_time_label }}{% else %}未設定{% endif %}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">場所</div>
+                <div class="value">{% if schedule.location %}{{ schedule.location }}{% else %}未設定{% endif %}</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">状態</div>
+                <div class="value">{{ schedule.get_status_display }}</div>
+              </div>
+            </div>
+            {% if service_notes %}
+              <div class="service-note">
+                <strong>今回の法要メモ</strong>
+                <div>{{ service_notes }}</div>
+              </div>
+            {% endif %}
+            <section class="future-plan-board">
+              <h3>この家の今後3年の回忌予定</h3>
+              {% if future_memorial_rows %}
+                <table class="future-plan-table">
+                  <thead>
+                    <tr>
+                      <th>対象</th>
+                      <th>回忌</th>
+                      <th>基準日</th>
+                      <th>予定</th>
+                      <th>状態</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in future_memorial_rows %}
+                      <tr>
+                        <td>{{ row.person_name }}</td>
+                        <td>{{ row.service_label }}</td>
+                        <td>{{ row.target_date }}</td>
+                        <td>{% if row.scheduled_date %}{{ row.scheduled_date }}{% else %}未設定{% endif %}</td>
+                        <td>
+                          {{ row.kind_label }} / {{ row.status_label }}
+                          {% if row.completion_note %}
+                            <span class="future-plan-note">{{ row.completion_note }}</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% else %}
+                <div class="memo-empty">この家の今後3年の回忌予定はありません。</div>
+              {% endif %}
+            </section>
+          </section>
+
+          <section class="memo-board">
+            <h2 style="margin: 0; font-size: 1.15rem;">個人別メモ</h2>
+            {% for item in participant_cards %}
+              <section class="memo-group">
+                <h3 class="memo-title">{{ item.person_name|default:"この個人" }} に対するメモ</h3>
+                {% if item.has_notes %}
+                  <div class="memo-list">
+                    {% for note in item.note_items %}
+                      <article class="memo-item">
+                        <div class="memo-item-head">
+                          <strong>{{ note.label }}</strong>
+                          {% if note.meta %}<span class="memo-meta">{{ note.meta }}</span>{% endif %}
+                        </div>
+                        <div class="memo-body">{{ note.body }}</div>
+                      </article>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="memo-empty">この個人に紐づく過去メモはありません。</div>
+                {% endif %}
+              </section>
+            {% endfor %}
+          </section>
+          </div>
+            </section>
+        </div>
+      </div>
+    {% if print_mode %}
+      </main>
+    {% else %}
+      </div>
+    {% endif %}
+    <script src="{% static 'office/print_sheet_tools.js' %}?v=20260919-layout2"></script>
+    <script>
+      {% if print_mode %}
+      window.TempleDBPrintSheet.setupPrintSheet({
+        pageSelector: "[data-service-print-page]",
+        contentSelector: "[data-service-print-content]",
+        layoutWidth: "calc(186mm - 2px)",
+        prepareClass: "is-print-preparing",
+      });
+      {% else %}
+      function handlePrintBackNavigation(event, fallbackUrl) {
+        const referrer = document.referrer || "";
+        if (referrer) {
+          try {
+            const referrerUrl = new URL(referrer, window.location.href);
+            const cameFromPrintPage = referrerUrl.searchParams.get("print") === "1";
+            if (referrerUrl.origin === window.location.origin && !cameFromPrintPage && window.history.length > 1) {
+              event.preventDefault();
+              window.history.back();
+              return false;
+            }
+          } catch (error) {
+            // Fall back to the explicit next URL when the referrer cannot be parsed.
+          }
+        }
+        if (!fallbackUrl) {
+          event.preventDefault();
+          return false;
+        }
+        return true;
+      }
+
+      function syncScaledPrintPreview() {
+        if (window.matchMedia("print").matches) {
+          return;
+        }
+        document.querySelectorAll("[data-preview-scale-root]").forEach((frame) => {
+          const frameStyle = window.getComputedStyle(frame);
+          const availableWidth =
+            frame.clientWidth
+            - (parseFloat(frameStyle.paddingLeft) || 0)
+            - (parseFloat(frameStyle.paddingRight) || 0);
+          frame.querySelectorAll("[data-preview-scale-shell]").forEach((shell) => {
+            const page = shell.querySelector("[data-preview-scale-page]");
+            if (!page) {
+              return;
+            }
+            shell.style.removeProperty("--preview-scale");
+            shell.style.removeProperty("--preview-width");
+            shell.style.removeProperty("--preview-height");
+            const naturalWidth = Math.max(
+              page.offsetWidth,
+              page.scrollWidth,
+              Math.ceil(page.getBoundingClientRect().width),
+            );
+            const naturalHeight = Math.max(
+              page.offsetHeight,
+              page.scrollHeight,
+              Math.ceil(page.getBoundingClientRect().height),
+            );
+            if (!naturalWidth || !naturalHeight) {
+              return;
+            }
+            const scale = Math.min(1, Math.max(1, availableWidth) / naturalWidth);
+            shell.style.setProperty("--preview-scale", String(scale));
+            shell.style.setProperty("--preview-width", `${naturalWidth * scale}px`);
+            shell.style.setProperty("--preview-height", `${naturalHeight * scale}px`);
+          });
+        });
+      }
+
+      function resetScaledPrintPreview() {
+        document.querySelectorAll("[data-preview-scale-shell]").forEach((shell) => {
+          shell.style.removeProperty("--preview-scale");
+          shell.style.removeProperty("--preview-width");
+          shell.style.removeProperty("--preview-height");
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", syncScaledPrintPreview);
+      document.addEventListener("DOMContentLoaded", () => {
+        window.requestAnimationFrame(syncScaledPrintPreview);
+      });
+      document.fonts?.ready?.then(syncScaledPrintPreview).catch(() => {});
+      window.addEventListener("load", syncScaledPrintPreview);
+      window.addEventListener("pageshow", syncScaledPrintPreview);
+      window.addEventListener("resize", syncScaledPrintPreview);
+      window.visualViewport?.addEventListener("resize", syncScaledPrintPreview);
+      window.addEventListener("beforeprint", resetScaledPrintPreview);
+      window.addEventListener("afterprint", syncScaledPrintPreview);
+      window.TempleDBPrintSheet.setupPrintSheet({
+        pageSelector: "[data-service-print-page]",
+        contentSelector: "[data-service-print-content]",
+        layoutWidth: "calc(186mm - 2px)",
+        printOnly: true,
+        prepareClass: "is-print-preparing",
+      });
+      {% endif %}
+    </script>
+  </body>
+</html>

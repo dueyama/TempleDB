@@ -1,0 +1,24 @@
+contract_type: workflow
+version: 2
+workflow_id: household_record_lifecycle
+title: 戸主・家族レコード運用
+entry_points:
+  - home
+  - household_browser
+steps:
+  - step_id: find_household
+    intent: Search by gojuon, head name, id, address, phone, or person name.
+    screen_id: household_browser
+  - step_id: inspect_household_detail
+    intent: Review household core, current people, memorial people, services, delivery, and payments.
+    screen_id: household_detail
+  - step_id: edit_record_when_needed
+    intent: Open shared record edit for household or person changes.
+    screen_id: record_edit
+  - step_id: audit_change
+    intent: Save with change memo when useful and preserve field-level history.
+    screen_id: record_edit
+completion: User returns to household detail or list with updated canonical record and audit trail.
+guardrails:
+  - Do not add source_id/backend selectors to normal office forms.
+  - Treat delete as soft delete with restore path and audit history.

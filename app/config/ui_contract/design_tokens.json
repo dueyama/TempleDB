@@ -1,0 +1,58 @@
+{
+  "contract_type": "design_tokens",
+  "version": 3,
+  "density": {
+    "default": "work_dense",
+    "description": "Operational screens favor compact, scannable information over marketing layout.",
+    "card_radius": "0px unless a local template adds a small radius",
+    "touch_target_min_height": "40-44px"
+  },
+  "typography": {
+    "body": "\"Hiragino Sans\", \"Yu Gothic\", \"YuGothic\", sans-serif",
+    "display": "\"Hiragino Mincho ProN\", \"Yu Mincho\", serif",
+    "mono": "\"SFMono-Regular\", Menlo, monospace",
+    "letter_spacing": "0 for normal text; small uppercase eyebrows may use positive spacing"
+  },
+  "themes": {
+    "standard": {
+      "bg": "#f5f1e8",
+      "panel": "#fffaf0",
+      "ink": "#2e261f",
+      "muted": "#6c6258",
+      "line": "#d3c6b3",
+      "accent": "#7a3b1d",
+      "action_style": "rounded dimensional glass",
+      "action_radius": "12px",
+      "action_depth": "gradient, inset highlight, soft lower shadow"
+    },
+    "light": {
+      "bg": "#f5f1e8",
+      "panel": "#fffaf0",
+      "ink": "#2e261f",
+      "muted": "#6c6258",
+      "line": "#d3c6b3",
+      "accent": "#7a3b1d",
+      "action_style": "flat",
+      "action_radius": "existing local value or square",
+      "action_depth": "none"
+    }
+  },
+  "layout": {
+    "shell_max_width": "1120px",
+    "shell_padding": "32px 20px 56px",
+    "page_gap": "22-24px",
+    "panel_padding": "16-28px",
+    "mobile_breakpoints": [
+      "920px",
+      "720px"
+    ]
+  },
+  "patterns": {
+    "hero": "Work header with eyebrow, h1, optional help popover, and short context only.",
+    "panel": "Full-width operational section; not nested decorative cards.",
+    "help_popover": "Compact ? button; details hidden until requested.",
+    "action_menu": "Secondary and rare actions are collapsed in details/summary menus.",
+    "danger_action": "Destructive actions use danger styling plus confirmation.",
+    "tables_and_cards": "Use cards for repeated entities and tables for dense comparison."
+  }
+}

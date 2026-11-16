@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}メモタグ | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .catalog-shell {
+      display: grid;
+      gap: 22px;
+    }
+    .catalog-top,
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .catalog-actions,
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .section-card,
+    .summary-box {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.92);
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.05);
+    }
+    .section-card {
+      padding: 18px;
+    }
+    .summary-grid {
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+    .summary-box {
+      padding: 14px 16px;
+    }
+    .summary-box .label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .summary-box .value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+    }
+    .filter-bar {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: end;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field label {
+      font-size: .82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      padding: 0 12px;
+      font: inherit;
+      color: inherit;
+    }
+    .ghost-button,
+    .tag-badge,
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      text-decoration: none;
+      color: inherit;
+    }
+    .tag-badge {
+      min-height: 30px;
+      padding: 0 10px;
+      font-size: .9rem;
+    }
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tag-chip {
+      min-height: 0;
+      padding: 10px 12px;
+      align-items: start;
+      justify-content: start;
+      text-align: left;
+      gap: 4px;
+      line-height: 1.35;
+      max-width: min(100%, 300px);
+    }
+    .tag-chip strong {
+      font-size: .95rem;
+    }
+    .tag-chip .meta {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+    .muted-line {
+      margin: 0;
+      color: var(--muted);
+    }
+    .empty-card {
+      border: 1px dashed var(--line);
+      background: rgba(255,250,240,.68);
+      padding: 28px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+    @media (max-width: 760px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  {% include "includes/office_nav.html" with current_section="households" %}
+  {% include "includes/office_subnav.html" with current_page="universal_search" %}
+  <section class="hero">
+    <div class="catalog-actions">
+      <div>
+        <h1>メモタグ一覧</h1>
+        <p>自動タグづけで使っているタグの棚卸し用ページです。通常の検索結果には表示しません。</p>
+      </div>
+      <a class="ghost-button" href="{% url 'office:universal_search' %}">万能検索へ戻る</a>
+    </div>
+  </section>
+
+  {% if not available %}
+    <section class="panel">
+      <h2>まだ表示できません</h2>
+      <p class="muted">{{ message }}</p>
+    </section>
+  {% else %}
+    <div class="catalog-shell">
+      <section class="section-card">
+        <form method="get" class="filter-bar">
+          <div class="field">
+            <label for="q">search</label>
+            <input id="q" name="q" value="{{ query }}" placeholder="タグ名や説明で絞り込み">
+          </div>
+          <button class="button" type="submit">絞り込む</button>
+          <a class="ghost-button" href="{% url 'office:memo_tag_catalog' %}">クリア</a>
+        </form>
+      </section>
+
+      <section class="summary-grid">
+        <article class="summary-box">
+          <div class="label">表示タグ数</div>
+          <div class="value">{{ tag_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">初期タグ数</div>
+          <div class="value">{{ seed_tag_count }}</div>
+        </article>
+        <article class="summary-box">
+          <div class="label">AI追加タグ数</div>
+          <div class="value">{{ dynamic_tag_count }}</div>
+        </article>
+      </section>
+
+      <section class="section-card">
+        {% if tags %}
+          <div class="tag-cloud">
+            {% for tag in tags %}
+              <a class="tag-chip" href="{% url 'office:universal_search' %}?tag={{ tag.slug }}">
+                <strong>#{{ tag.label }}</strong>
+                <span class="meta">{{ tag.assignment_count }}件 / {{ tag.origin_label }}</span>
+                {% if tag.description %}
+                  <span class="meta">{{ tag.description }}</span>
+                {% endif %}
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-card">
+            条件に合うタグはありません。
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  {% endif %}
+{% endblock %}

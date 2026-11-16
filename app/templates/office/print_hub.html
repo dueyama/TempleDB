@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}配布・名簿 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .print-shell {
+      display: grid;
+      gap: 24px;
+    }
+    .print-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .print-card {
+      display: grid;
+      gap: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.94);
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(68, 50, 33, 0.06);
+    }
+    .print-card h2,
+    .print-card p {
+      margin: 0;
+    }
+    .print-card p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .print-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .print-actions.inline {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    @media (max-width: 920px) {
+      .print-grid,
+      .print-actions.inline {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="print-shell">
+    <section class="hero">
+      <div class="eyebrow">Print & Delivery</div>
+      <h1>配布・名簿</h1>
+      <p>配布物、郵送ラベル、地区別一覧、役職者向け名簿をここからまとめて開きます。</p>
+    </section>
+
+    <section class="print-grid">
+      <article class="print-card">
+        <div class="eyebrow">Memorial Notices</div>
+        <h2>{{ print_heading_labels.memorial_notice }}</h2>
+        <p>翌年に案内が必要なご家庭を確認し、文面を整えてそのまま印刷します。</p>
+        <div class="print-actions">
+          <a class="button" href="{% url 'office:memorial_notices' %}">{{ print_heading_labels.memorial_notice }}</a>
+          <a class="ghost-button" href="{% url 'office:memorial_distribution' %}">年回表配布準備</a>
+        </div>
+      </article>
+
+      <article class="print-card">
+        <div class="eyebrow">Postal</div>
+        <h2>郵送ラベル</h2>
+        <p>通常の郵送先ラベルを印刷します。封筒や宛名ラベルの作業入口です。</p>
+        <div class="print-actions">
+          <a class="button" href="{% url 'office:postal_labels' %}">郵送ラベル</a>
+          <a class="ghost-button" href="{% url 'office:postal_compare' %}">郵送比較</a>
+        </div>
+      </article>
+
+      <article class="print-card">
+        <div class="eyebrow">Membership Fees</div>
+        <h2>護持会費領収書</h2>
+        <p>手配り対象の護持会費領収書を、左右 2 面の控え付きで A4 印刷します。金額確認や受領記録の更新は護持会費画面から戻れます。</p>
+        <div class="print-actions">
+          <a class="button" href="{% url 'office:annual_membership_fee_receipts' %}">護持会費領収書</a>
+          <a class="ghost-button" href="{% url 'office:annual_membership_fees' %}">護持会費</a>
+        </div>
+      </article>
+
+      <article class="print-card">
+        <div class="eyebrow">District</div>
+        <h2>地区メンバー一覧</h2>
+        <p>地区ごとのメモを保存し、A4 の一覧印刷へ進みます。{{ role_labels.district_officer }}向けの配布準備もここから辿れます。</p>
+        <div class="print-actions">
+          <a class="button" href="{% url 'office:district_member_sheets' %}">地区メンバー一覧メモ</a>
+          <a class="ghost-button" href="{% url 'office:district_officer_roster' %}">{{ role_document_labels.district_officer_roster }}</a>
+        </div>
+      </article>
+
+      <article class="print-card">
+        <div class="eyebrow">Officers</div>
+        <h2>{{ role_labels.district_officer }}向け</h2>
+        <p>{{ role_document_labels.district_officer_postal_labels }}と、手渡し向けの{{ role_document_labels.district_officer_delivery_labels }}をまとめています。</p>
+        <div class="print-actions inline">
+          <a class="button" href="{% url 'office:district_officer_postal_labels' %}">{{ role_document_labels.district_officer_postal_labels }}</a>
+          <a class="ghost-button" href="{% url 'office:district_officer_delivery_labels' %}">{{ role_document_labels.district_officer_delivery_labels }}</a>
+        </div>
+      </article>
+
+      <article class="print-card">
+        <div class="eyebrow">Monto Sodai</div>
+        <h2>{{ role_labels.monto_sodai }}向け</h2>
+        <p>{{ role_document_labels.monto_sodai_roster }}の確認と、{{ role_document_labels.monto_sodai_postal_labels }}印刷へ進みます。</p>
+        <div class="print-actions">
+          <a class="button" href="{% url 'office:monto_sodai_roster' %}">{{ role_document_labels.monto_sodai_roster }}</a>
+          <a class="ghost-button" href="{% url 'office:monto_sodai_postal_labels' %}">{{ role_document_labels.monto_sodai_postal_labels }}</a>
+        </div>
+      </article>
+    </section>
+  </div>
+{% endblock %}

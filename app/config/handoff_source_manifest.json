@@ -1,0 +1,3717 @@
+{
+  "format": "templedb-handoff-source-manifest",
+  "version": 1,
+  "source_commit": "8d564b7a611792e02cdb7a99f76c8eaa7bc99c96",
+  "files": [
+    {
+      "path": ".python-version",
+      "baseline_sha256": "40411dc2c2726b4c7024d38318dd8df45c528b49491efb45939dd4a829847d94",
+      "executable": false
+    },
+    {
+      "path": "apps/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/core/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/core/admin.py",
+      "baseline_sha256": "a161c0fd564b36e303ff6d0c4f15d35d5f476fbb71521b2eae7e1bfc3ae36f9b",
+      "executable": false
+    },
+    {
+      "path": "apps/core/apps.py",
+      "baseline_sha256": "7f76ef871d30f8acc19c7b4cf3ec4498f36c79728f8cc6de4c0704d92b973537",
+      "executable": false
+    },
+    {
+      "path": "apps/core/checks.py",
+      "baseline_sha256": "794f3cfe3cb526a45f58ceaed1f8b057735811b11641fa53c9a8b3bdcc85c833",
+      "executable": false
+    },
+    {
+      "path": "apps/core/context_processors.py",
+      "baseline_sha256": "2d1a3bf9b353582af969ba5f68c1683f2bbfa6b5116fd94056dd4e97b72ef65a",
+      "executable": false
+    },
+    {
+      "path": "apps/core/forms.py",
+      "baseline_sha256": "b0a781be9094f68e06bfe8340a5d4568db44cf8ed45c00c70712b9b57b813b3e",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/__init__.py",
+      "baseline_sha256": "5384bfdb2df380b6557cc7a71d16891415bccaa87699406e236f752c6415389f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/__init__.py",
+      "baseline_sha256": "5384bfdb2df380b6557cc7a71d16891415bccaa87699406e236f752c6415389f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/activate_tenant_operations_candidate.py",
+      "baseline_sha256": "3b1d58140b67a7cdaea729d6134c6dcea3e1ee2a2cc44d7c31e96bc5c21571ba",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/apply_tenant_operations_pack.py",
+      "baseline_sha256": "331191c9f6ec790fd3465c7d3201bf3645f6c1c699517e503d047015420b34f0",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/build_handoff_source_manifest.py",
+      "baseline_sha256": "c34957959f7b27e5bc9ee083fe19c1d727c10638818371f5b28b5683ec09d1d3",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/capture_product_database_contract.py",
+      "baseline_sha256": "2424124578f7b2f01aa23e820ed0864504cad58e181fa88f7f7ccdb92962265e",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/create_product_postgresql_clone.py",
+      "baseline_sha256": "17b45320999c8630828a2f89df5ff7a446d9798095963638b31836b49d6ea803",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/create_product_sqlite_clone.py",
+      "baseline_sha256": "76f77c5b186f1658b3e80837adc12b94ae3f55192e5834bff25ed5e5868272c9",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/deactivate_tenant_operations_candidate.py",
+      "baseline_sha256": "d9b940481b360fbe6c8d8b081ec4e342db138c9a4c2aec69b78c019c8f9e7207",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/export_handoff_package.py",
+      "baseline_sha256": "7aec1dbd696e7108c9682a76051d33e852bc15e807bff03fcedc60aa17196f1d",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/export_tenant_operations_pack.py",
+      "baseline_sha256": "e5b2e0561d7054057732d721733d4069c3318975da9b347d00052d9eb8a6d975",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/prepare_realdata_preview.py",
+      "baseline_sha256": "0bcdd5d4d3366f06e6ef9b3f666c746c660ae470226b4e94aec6171c597da599",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/reconcile_google_calendar_sync.py",
+      "baseline_sha256": "d8661e9ff6c523022a037ffcf0636f4ab9f0dc2ad1538409333c20d540f3363f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/run_database_backup.py",
+      "baseline_sha256": "fc8b789e2c60946f1b2330a9fb1ea7f3f5358255613f54f63871a91d679dc03a",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/run_google_calendar_bulk_sync.py",
+      "baseline_sha256": "21f69b2b0f77d9cf3313d6c9d504521d1268e38aa4cfe51d7e82ff5286d5644e",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/templedb_ai_probe.py",
+      "baseline_sha256": "a8e836b395214e89613639165593be4d2b978904f4fb6470a2a131ebe27a5604",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/templedb_mcp_server.py",
+      "baseline_sha256": "8126b135d6eb7a4e62c53e1e8207134ce9b3ba330ff6fcaad15e853bd15dd1a8",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/verify_database_backup.py",
+      "baseline_sha256": "4ae522052db4ccd456b732e2936207b6088ae64d727d884e1bab24fc5e7dcbd4",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/verify_primary_promotion.py",
+      "baseline_sha256": "0ff3c96601c5513313cc868ebaab8c6b89f4eec889139a6687ba948f03cdf166",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/verify_product_database_binding.py",
+      "baseline_sha256": "a7812ca6e5dab8373bcfa7ca4373cf6c3a3eea31221d6dbd08b511dd67a0f606",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/verify_runtime_contract.py",
+      "baseline_sha256": "8155d2a82804b63b055ce8e1e4d9ec1d0ea2ee93d4b530ce1e56701a96a2ffe5",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/verify_tenant_operations_candidate.py",
+      "baseline_sha256": "58476f136b16fe7d5c1c341e00542ede9c728231a9eb392c52ea00abce1f9793",
+      "executable": false
+    },
+    {
+      "path": "apps/core/management/commands/verify_tenant_operations_pack.py",
+      "baseline_sha256": "eb71e6cff95137454cb54e496f52d4bfb1faf7722091f66bcce9888cae431602",
+      "executable": false
+    },
+    {
+      "path": "apps/core/middleware.py",
+      "baseline_sha256": "0fde66bfd43e0c0c8748e2a3e9e135eb4ce3bcb2d2ec3c719acd94c61667a61e",
+      "executable": false
+    },
+    {
+      "path": "apps/core/middleware_realdata_preview.py",
+      "baseline_sha256": "9eee683f734610d9436889d075f4d226e98fb908ac8e1bcd22e8c78e8ef95f81",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0001_initial.py",
+      "baseline_sha256": "e9293f7d40035d60d68c3caac67c39578e8f3339674bd7bf493b7ace44e8d32c",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0002_templeidentitysetting_and_more.py",
+      "baseline_sha256": "2fce6578297abc47eadb5fd7af75279e68e9012e5d8853a7d6da7a287cde4994",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0003_googlecalendarsyncsetting.py",
+      "baseline_sha256": "0ea66bb3667682bd798bdf52028c21224b2f65f715311dbf4d86850d9cf9192e",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0004_googlecalendarsyncsetting_base_url.py",
+      "baseline_sha256": "a1b83af9cb45add4278d59d5ed9b679b46b966ca5e30166fe9000ae3a2ab1978",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0005_templeidentitysetting_service_schedule_sutra_cycle.py",
+      "baseline_sha256": "afac8ea79fc331f15791eb2c39e869844c93c9bba23f616ab6fd3c9e02f75819",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0006_googlecalendarsyncsetting_external_base_url.py",
+      "baseline_sha256": "ab0cfe6ff75f12b3e750da4dadf7394403a14930b254c6c570981bcec03748fc",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0007_templeidentitysetting_notice_identity_fields.py",
+      "baseline_sha256": "da6e792b6699618178a1387d492e428dcb2bfad5ede185d1cc1ac8be608f8caf",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0008_templeidentitysetting_postal_and_priest.py",
+      "baseline_sha256": "7faf778941885aef47543d1a28021510c6ee466a03dc7a618bf75b31b95356b0",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0009_templeidentitysetting_generic_defaults.py",
+      "baseline_sha256": "57253d93dd9fe7613c751157b4c758fb721bdbb7a5b62ea9da0dabd9f70905a5",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0010_bereavementforecastsetting.py",
+      "baseline_sha256": "d0167e9e13224ad6d1fdeea84843d4e23838121e05fca973eef61239e6fe2f66",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0011_uiappearancesetting.py",
+      "baseline_sha256": "7526e33226618631db99ffb1fd9999a6b6e580c8db09656f38916e54b48a82f4",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0012_retire_bereavement_forecast.py",
+      "baseline_sha256": "9e154ec64264fcac1a933fe8617f06c36c9f4dce367ec6be267301bf60e60cad",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0013_weekly_backup_verification.py",
+      "baseline_sha256": "9d2089c23ac1b9144f6a9cd78e565ba7c8293445b07cde861a2deb337cccecd2",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0014_database_runtime_identity.py",
+      "baseline_sha256": "43037ecd25043178ae4794b44be728d4365b5a2f0ee06ef7968b96ec9cd1594f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0015_database_backup_engine.py",
+      "baseline_sha256": "ceca603b83c5f4cda506382ad31282e61cb6570cda7ccb5f0abccf21adeec32c",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/0016_remove_ui_appearance_setting.py",
+      "baseline_sha256": "e417eb2e3a9de25529c2276a87e0ecfc91c824ddb84bbb0683cb39aad12559cc",
+      "executable": false
+    },
+    {
+      "path": "apps/core/migrations/__init__.py",
+      "baseline_sha256": "5384bfdb2df380b6557cc7a71d16891415bccaa87699406e236f752c6415389f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/models.py",
+      "baseline_sha256": "238c7af5e57899c97ecdc773c165aeafd04b173af91ef0d5f32d1bdd406b4a9f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/realdata_preview_control.py",
+      "baseline_sha256": "9939b2ec3d95a9db0559d7317f21a35f14171eace2f33b981837b152962c9dd8",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/__init__.py",
+      "baseline_sha256": "5384bfdb2df380b6557cc7a71d16891415bccaa87699406e236f752c6415389f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup.py",
+      "baseline_sha256": "461f88704f85ebca92f5d21506591ca0c42d271e975f357fc5383e9060464d1b",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_bundle.py",
+      "baseline_sha256": "d27fb925dd99e33180beac903cd3bc654208d5a08fec28dbfc3beb50e6cc7d6d",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_config.py",
+      "baseline_sha256": "727663990e0f2b047f27625f4a3c18491c5a5088616aab7b83f293db640508cd",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_execution.py",
+      "baseline_sha256": "2c371436ad58d23ae7f00eb45a807e8ac719659c122485c31fe9e3de3a84e78f",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_migration_archive.py",
+      "baseline_sha256": "d7bfb0fe69633a0c8ba3cc53dbe9135e0df696303b04c1c657c1b32a5d1d2dc3",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_restore_contract.py",
+      "baseline_sha256": "8ba6e48b964a9d0ddcc8ff60bd4d34de8c53e30d0608abe4f413a7c17c0b211a",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_schedule.py",
+      "baseline_sha256": "d8993f022d10184dc7af36e130dfc8e24d152983dbb34ee4df6c47e63f9cd35d",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/backup_sqlite.py",
+      "baseline_sha256": "a4a6f8bebe0f3b6051474e839222b2563cd7cb57425ffa95d7145261d0b59e84",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/contact_normalization.py",
+      "baseline_sha256": "1047ed9f003d20263ec374186cf45e93d477cbfadd216790007e8e34feb8a94d",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/database_transfer.py",
+      "baseline_sha256": "a459b76999b6f47b3a929bf20ff8e70d3b498493f51acdbcf00a2031dad1e9c5",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/database_transfer_postgresql.py",
+      "baseline_sha256": "380066b63f44ee59367b281915deb881105574643404459c83985252b0ce7d2b",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/google_calendar.py",
+      "baseline_sha256": "8b5324000f1c35c62f7b1222a1cff04cf1e7637438b060ffd60afdae2a875384",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/handoff_archive.py",
+      "baseline_sha256": "23ca5f42aa413339125ec2a5078b3be9467b96885bbcbbf691d5d729d4ec291a",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/handoff_package.py",
+      "baseline_sha256": "4e5f5db2f6db9ba7cde154701091598bdde14e92131e42ab8b64d249236829a5",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/handoff_repository_snapshot.py",
+      "baseline_sha256": "64d78f6fa2fe20d8f6d98f22f044c6877a014fd46df28aee98a40075a99bc530",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/handoff_runtime_snapshot.py",
+      "baseline_sha256": "08d909edb04c96e30a84f8484c08b7ad819cdeb80797559a550208832567ee09",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/kana.py",
+      "baseline_sha256": "f99fd852072c61ad6c7ec50127e4361348b191ea0e1a983a743b5f4d239848a0",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/label_paging.py",
+      "baseline_sha256": "eec3f313f30301d2506025d05a924201cad7a25a119f644d550b9ea2aedff7a0",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/memorial_dates.py",
+      "baseline_sha256": "e0faf16fb0223ad0fd3e99584d2a9fcbe35c6e96bcb6ac06364e76cf7aa321ad",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/postal_label_markers.py",
+      "baseline_sha256": "7aa53b8de61cb79fb5e9b3710d125085e7f3e217a809ba9aabf8a58a8022322d",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/primary_promotion_guard.py",
+      "baseline_sha256": "1b23801591e26a88c4dcf01239719ccb25daa3af86e4282e1074358741ae4bc3",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/recovery_health_display.py",
+      "baseline_sha256": "2110e7821e679d6db47e52de77c63ee26fc41f234f2c6c1c252b7be20d5ed286",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/rokuyo_calendar.py",
+      "baseline_sha256": "758a470e5304fdba6d507719f1398fe1838d5fcf14e0f01bcd85d61c05739b83",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/role_badges.py",
+      "baseline_sha256": "c2346aff37b424bb4ef9ac56ebb9b824a58a3f2b8095b0bd58e149748f36c6b0",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/runtime_database_contract.py",
+      "baseline_sha256": "638786a64cb21af3a81b6a9cc6ee06e13916ba62598cdef36d7b1d9c781996f5",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/runtime_identity_guard.py",
+      "baseline_sha256": "5dcc5d7eb5bab2046814fc5bb6576554c2b0956b5a3bdfeba1413dba50d55ef4",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/runtime_role.py",
+      "baseline_sha256": "a988fee66f2dbe3cf4909e11dea6870b102d3113bac94559439aef5d25c91dab",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/schema_map.py",
+      "baseline_sha256": "20ee49ae74b6b50e2e9f8849caa883b9dc203fa176b5dd1eff29df377884f803",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/schema_map_business.py",
+      "baseline_sha256": "006e56ae2de75b97bebdb857026b8984eca1ed4bf52a2f23c7f5382d07ad09af",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/schema_map_database_catalog.py",
+      "baseline_sha256": "316594a89cde03753791d6283cfd0e581b5980366c97b8dd480544d61818ba48",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/schema_map_mermaid.py",
+      "baseline_sha256": "0fe31750e024c1e55bb01a8046b3e4c4493adb61360c97eb2a00643b76aa51e8",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/schema_map_model_catalog.py",
+      "baseline_sha256": "06c8ef30301c43962a56dda3bdac7a8b3e1b382dc0eb7eb66dd1ae023c2e0c19",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/starter_package.py",
+      "baseline_sha256": "5f5496874e5cd45f9567dc39dfd7654830e3d6340983b3ecf91e12e975fed9b1",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/temple_identity.py",
+      "baseline_sha256": "dd1eada28a4b47e20a617b2251c2a5250811ebc66a63931b20f6d901d269ac66",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_operations_candidate_activation.py",
+      "baseline_sha256": "749f08ff3f5bd8867b3cad2788e5b220e247bd2df26ef50633bf7014fac8d6f3",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_operations_pack.py",
+      "baseline_sha256": "cc3100ffc9c0b08d9dcb2d8056a7aa2cfd033269fc375e7901f08aad0dda6cf8",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_operations_pack_apply.py",
+      "baseline_sha256": "48f273b02e69e616e229d10dbe15caf99845e8cf1e70f1a68a534a58e2eff7df",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_operations_pack_contract.py",
+      "baseline_sha256": "7245bcf775b71c3488281a104170c8a9014835592193c96d635f0d8556d3b286",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_operations_pack_verification.py",
+      "baseline_sha256": "cf24fc08768fc2d0398ceb22702fb7c5e45614ff10289ef986fe35ec36ec8eec",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy.py",
+      "baseline_sha256": "862fdaff665f7d430710d15ffe0694315b71c8a12420cfdae9a49c5c10d2a43b",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_defaults.py",
+      "baseline_sha256": "d63fefd57c4793c976cb54f3c7d1fda7b7746a6f411515c22cd5a50c53345a02",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_labels.py",
+      "baseline_sha256": "0ec40c8e9b2aea7048db2cf2c2fd1b276b76a446678b9023797313eb76204a76",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_map_links.py",
+      "baseline_sha256": "ab261939eb28af54d81df1e8da159dc6e8427bffa07b0b4ce59d80462cb444a2",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_memorial_notice.py",
+      "baseline_sha256": "4f07e8e03d2933301dee55d377b300a00b875026202cd4d9580aa6d6548242ab",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_memorial_rules.py",
+      "baseline_sha256": "ae70608fa122d07323a7ecda6b8b6aa17cbb44e10a41d33ce373283e38c6f7b3",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_relationship_labels.py",
+      "baseline_sha256": "495a703312c8afe230b75dd84d5424a570ad07354b0f47cede9a0faf90156793",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_service_schedule_categories.py",
+      "baseline_sha256": "7b063d863534be1145a4e53965578fd79c9a41fa8339ed33be99b7c907846ee7",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/tenant_policy_terminology.py",
+      "baseline_sha256": "5a1779a173f1dc75d44d1378b75678bf612907af450e4e766ceccc3fe15afd1e",
+      "executable": false
+    },
+    {
+      "path": "apps/core/services/ui_appearance.py",
+      "baseline_sha256": "d7aa5b7b639db60302e0a5340ea0a3f9563863f9a3b7160de1d35d312f208bb0",
+      "executable": false
+    },
+    {
+      "path": "apps/core/views_auth.py",
+      "baseline_sha256": "dc2cc7382983fec3a3e257536f0cc35b1198f49b649632931236dfde452be1eb",
+      "executable": false
+    },
+    {
+      "path": "apps/core/views_realdata_preview.py",
+      "baseline_sha256": "9b5c12cf550b5c9455dfaf4176395d16415df7ab9834da30b10af9443942b6df",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/admin.py",
+      "baseline_sha256": "5085ff61e82931ae79b915c816bd2ec40ab44a3bf32cb75bd1f7a6c8520e7dca",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/apps.py",
+      "baseline_sha256": "f2100d3b8a5fbc112817c0d130769c98f3bed1f93e9ca576a6d4dbc7a0c19eb6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_generated_ids.py",
+      "baseline_sha256": "ea4406429173dd2789289938505b0c9a7ccb2909c136cab153e8fd4c3fbe7c6a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_hand_delivery.py",
+      "baseline_sha256": "a48544eac85161a21499ec151beeaf42eae17af37c31c6a82bd2bd73f85c9f70",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_input_support.py",
+      "baseline_sha256": "e104a2b94042433daea49a7093c85fbfd7dda53a842a663bdc7f489009fdf153",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal.py",
+      "baseline_sha256": "677b67ef0f7cb1b3b203a06b29874796bf0a16869ded17e9ad98b65d87744dc3",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_analysis.py",
+      "baseline_sha256": "2308448bf11100b854cd031b80ecfe97260cf2154082730dbb53c281b933f02f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_compare_support.py",
+      "baseline_sha256": "783120c0672ca81e310e5d27f9021a900aa830acfd026b34f55ac66f52be570d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_import.py",
+      "baseline_sha256": "755143b040b1035a8be224743bd1e8860fe89355b9bbdb5cf0b9b7e25397934e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_import_support.py",
+      "baseline_sha256": "d8050e0ce53b3d4848deeb87dcbce3728e74d3cc68457b458c8dcec5cd8e8c55",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_label_paging.py",
+      "baseline_sha256": "3745d05343a5c12d5dbeb6a3ed56308ccf510dbfb2b91288ba7b787d749e5988",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_labels.py",
+      "baseline_sha256": "55a224e4cdda5011ba52815451192f9f9987dabdbdf4f56dd06cf5e789615fb9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_review.py",
+      "baseline_sha256": "008902b33079088ebf64173ec5b4fe5a37105aff00fbe14ba7019b24aeb87091",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_sources.py",
+      "baseline_sha256": "39920dcbe681f9f9fa1cb1bfef1fefa29fa699f3f079dd109e759bce0f87f149",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_postal_support.py",
+      "baseline_sha256": "e17f7be243ea09d075a623a76f72a38ca313c7dcc332553f7aebd15c3e9079c4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/auxiliary_role_support.py",
+      "baseline_sha256": "f4fdeaee23b0082b740a64778d78d144c27e7e3d7d817b8e46976663bc0a5b0b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset.py",
+      "baseline_sha256": "a926938e754812baf5d15ec49f5212c0f5fd2e9f993e60af73844af6bff69178",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_builders.py",
+      "baseline_sha256": "947442ec4aa4d2e1f1db9a9a1cda5f66fbc9e85264cc87a4785f99a2e290a9e9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_csv_loaders.py",
+      "baseline_sha256": "a55910145f0aaa767fea49319018da5ffaf0e9396dcc1fcdcdd7b78e45743ef2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_detail_builders.py",
+      "baseline_sha256": "c5fd064a80b2cbb7dc1d4b46f6da6c445dfb4c9c4774df7b4560e6c8c20fae41",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_display.py",
+      "baseline_sha256": "06513fa7386e3d90124aa8c3954f9cdbb37b4477dabeefff678e835bef6db5aa",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_filtering.py",
+      "baseline_sha256": "4ddb91ec6aab11ebd73453f50dba2210b461735b11532334ea5990d425fc7b53",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_household_event_rows.py",
+      "baseline_sha256": "9ceff117b307de153390ca54b3de0896ccd2c426debc343ea7b3023bbcdf0c4f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_loaders.py",
+      "baseline_sha256": "6dd6721d36d3c82cc1be513d8e23c17457b5c9862103c83387ab1df603a2d182",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_member_rows.py",
+      "baseline_sha256": "2e65b65a18441e7e1fa22dd73066616a681cb144491e762eccf309744d1f7b98",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_model_rows.py",
+      "baseline_sha256": "21b73b2dbcd5c45ee9683d002734615e2aaaccd8ef5de43e8866cfa806cb33bb",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_rows.py",
+      "baseline_sha256": "725d1e4e0fb78fdb6991849dcf3d708e3a12d89c5568ee98bed4b70c8617dc90",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_runtime_loaders.py",
+      "baseline_sha256": "42f13dcc03c7d91925a942f64dd514816bea26b1ae9290931fdae3419beaf378",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_same_name.py",
+      "baseline_sha256": "3a80398d893e7adb38dcfa717753800391b6f45180183e016966900423e697e8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_sqlite_loaders.py",
+      "baseline_sha256": "b883902122d139a7794b9b38a9a0c86e1f20871f9106f6ed6d72780061582dac",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_dataset_summary_builders.py",
+      "baseline_sha256": "e7076d470d1781bda60f67126a848bc38a63ee60aecbf476c0f13e438927aa48",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/browser_virtual_heads.py",
+      "baseline_sha256": "7d2e04a7b854bb9a7cde35f901bfc29e68b18f0f0a66e9ebbda92b37733531b3",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/canonical_population.py",
+      "baseline_sha256": "26c2d29742d4541b5d2bdb918aa0367746466fdd4b8827109e39ac7cc29c128b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/checks.py",
+      "baseline_sha256": "b58b2ca4cbb96b412b747c06f69582b16fcfe5a29ce2a9c38c3604ca41399021",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/console_views.py",
+      "baseline_sha256": "5987498e65fe706781f9fd5c0d0af1b9c656b4a8b693c947068b2f98cfe26da6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_quality_duplicates.py",
+      "baseline_sha256": "bd7f62cb1af3a03a6965950bdc446ebd0f574c06c3f2341122f49a8c16235e1e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_quality_page_context.py",
+      "baseline_sha256": "782d42396ea5fee3326356140877fbc2a189f5150170ae33fb1deb7fd14bf31f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_quality_runtime.py",
+      "baseline_sha256": "fef6de949ac0013d62dba79e7e1f04f9e4e8622451690d42835fd792c013eb5a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_quality_same_name.py",
+      "baseline_sha256": "29b6deb5bd13d1f94aaa8d96fac7f86818f803103f702e2a710cd19871ca941c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_analysis.py",
+      "baseline_sha256": "9d8784c3a8b654e09543fafc7f87a426b01b442c2f471a3ad8a8cd6e202c383b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_analysis_calendar.py",
+      "baseline_sha256": "0709168f8c161ed8f47651f930736d720a94b2299de3d9bf9c6ced2eb188dd7b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_analysis_demographics.py",
+      "baseline_sha256": "d2bdf1223889307990701f2dcfbf5557b7a2d0ded0f003a1170f636040cbe677",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_analysis_homyo.py",
+      "baseline_sha256": "153743b4910af59fca15ee14e840258f2f3dbd46f592b1a1fb07454043b59d13",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_analysis_intervals.py",
+      "baseline_sha256": "c2500db8f40fd397b4832fb765a1b9e482a088f3be6b3969bf58830c6643f4ff",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_chart_bars.py",
+      "baseline_sha256": "4e06936e8acff2eba7dbe77aff1e14ddbfbbdcb53a366c2c3872df4774d8ac50",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_chart_lines.py",
+      "baseline_sha256": "70f5a193fc6381cb67a1e74ee151895c74ad8eba58d820ff6133b27584ad74a5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_chart_stacks.py",
+      "baseline_sha256": "c18eee0569c35a69242fb22a7485f65cb34d3769b1577c87f935c319039005ad",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_charts.py",
+      "baseline_sha256": "4183557b728482f4b1a7dd2ef2b9d12a4e8529312bebad82c97a1f6d40a980ef",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_charts_bar.py",
+      "baseline_sha256": "eaae9f76a9e1286ec66aee71751ad1f9c69f3792c13c81cfe3a2c80519ea18b2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_charts_heatmap.py",
+      "baseline_sha256": "73dfe6ff46b827789ddb56d62e53b3695cd2e8d81801c3fe4742b069feedc2c8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_charts_interval.py",
+      "baseline_sha256": "9ec63c5e6007d077fafb99bbf285f3ed6d8f48b020f743d817e4b891dfad14bc",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_charts_support.py",
+      "baseline_sha256": "42175a9d992d868625af693d4fbf7ffeb5124fc7af5a00070730702cb0ea5f46",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_context.py",
+      "baseline_sha256": "0bd8f29fd93ea379919086195e22916db60c9d2c7b7fd274db394761fecec046",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_context_charts.py",
+      "baseline_sha256": "49ecf8bd359f4b509b3e3e5cba01793852a3d9bb2417e433aa5643dad1b40b1d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_context_dataset.py",
+      "baseline_sha256": "37d2f4937dc77cde53b0529f43efb14975b6e85ea8596127c240847b9df5f3ed",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_context_metrics.py",
+      "baseline_sha256": "3dba1012a192ec0f4ef4176e2892c38c04b3417b017f4ca5e697422c4b238db5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_context_payload.py",
+      "baseline_sha256": "f71f5dec758cd9dd91dee3391cea8aa3a86cc86e40a15a9af13a2e862ebb0d32",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_context_sections.py",
+      "baseline_sha256": "974912fc79e8c2a176476bf9f64c14cef9caf850e1e631e5bd639e6c1ba30931",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_csv_export.py",
+      "baseline_sha256": "5d4d66298de391dbbce7d7c7ee3b560c3f7792e8061ee3b234737e00bc2030ce",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_demographic_clusters.py",
+      "baseline_sha256": "3e59e6a60d8b8eac7d6b3c3e69ea5a7a17465ff49b9277118b54f6981842ce6f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_demographic_cohorts.py",
+      "baseline_sha256": "203870f9f54e5b394ed329022dc6fe88f6512f50c02002ca1c890e205859a622",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_demographic_completeness.py",
+      "baseline_sha256": "cc4f0928d8d078e178c3cd94bdcf3847e13edeaed1220b495a5323d9174cdcc9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_interval_distribution.py",
+      "baseline_sha256": "a236f5882c54d0661fe4582d1df7144771dada91c47b995d1e36907b683f3941",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_interval_models.py",
+      "baseline_sha256": "c57023d403e9e205ec362940b4a17234a265035a47db5dd7adc3fc7a083afa3e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_month_day_analysis.py",
+      "baseline_sha256": "55103aae55bf7508a2dff3779691a95f85ee1912248422f99070f94ea3eb63ec",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_month_day_details.py",
+      "baseline_sha256": "b4a3f0055a0a2e773c57e16d48cfbad3996225c16a6fb188de6273f59345132c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_page_context.py",
+      "baseline_sha256": "4167858229e08b08637b9de520c7e7fcdd6b33e99412f55ba02540d6ba9bcbe9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_runtime.py",
+      "baseline_sha256": "9a56b2f72f2423adc7272967ae6ceb93a08f6e57a2409f0106b7794773a22d6b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_shared.py",
+      "baseline_sha256": "4c7990c251e375ba28cd3b7acc0d0efebd6bbd6ac54f992404df231f3a65ceeb",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_year_count_analysis.py",
+      "baseline_sha256": "4959a1faf8616634d60861036f89b2c39050e5d3962a654690734436fea3c36a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/data_science_year_month_analysis.py",
+      "baseline_sha256": "eca604a43944fcf861f1e5bf661fdd8d67b68c13c3e1d23dbbeb25d8c0244489",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/district_authority.py",
+      "baseline_sha256": "00b86f70a68b25f46a21441f964e6a1d34f2a61603b060fef43a98e3f8e4c4f8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/district_delivery_labels.py",
+      "baseline_sha256": "a4f956744ba0f22da8c20550dd23b7c212844c1b5c783f9368532095632bc21a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/district_member_sheets.py",
+      "baseline_sha256": "bc3f3480efe9e918d179cf35a4819a177851b87c61f1801e25f445d196473441",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/district_officer_rosters.py",
+      "baseline_sha256": "c0ffa486942d731440a857ca6c20d9dbc7383c0ec7d7601fbd7d70be45ee9f9e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/exporters.py",
+      "baseline_sha256": "a35988a5abcbec2a2df5ed2b4c9e59c09ff6a445b0cc976388b44553070e0d19",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms.py",
+      "baseline_sha256": "24edee6d9d386f75941b4af6d90757805ce8e55a1636ba2160ed35d9f096d8a6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_accounting.py",
+      "baseline_sha256": "e22f43c6be8fa6dc41d311e0e7874b34ed224108661f484913522a06bd7ddf4b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_admin.py",
+      "baseline_sha256": "8ba976b5b703accaceb7303a5c101d8ccd505c399f9180214acb903d5a14c587",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_households.py",
+      "baseline_sha256": "ba34ea753449ac327d29326ac2c5f84cb8f00186065a85e12d3fce663a9822ca",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_people.py",
+      "baseline_sha256": "e2c523da80ee375d905c14ba9817dc378617ed78a6477610147f3cb2a3a42e7f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_services.py",
+      "baseline_sha256": "fa2564f0f579f5d52d3e77b196096a282c7401e44866716e192359dff6243f2b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_shared.py",
+      "baseline_sha256": "1e1dc8942b15d1d62b36e6c26931518ea09c944dedc72f7733911fc086a580d3",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/forms_terminology.py",
+      "baseline_sha256": "1f30a55f3e1d3f5505f82f1dcfe118878702ac2e812563dc521374a084d77d2e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser.py",
+      "baseline_sha256": "cd4ff8f9d76f3252a260f415bbd3d9d4a9adaee8fbd6008cdaedf371abe94c7a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser_dataset_runtime.py",
+      "baseline_sha256": "fef9a8e8dd486f91cb423b2246db7b1a3b5f592a56dcd68875d559747b329831",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser_detail_context.py",
+      "baseline_sha256": "2517ebef9ad8ca38861f8f6c2055f1e88f989be2552f019e6b699250bce546b2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser_detail_fields.py",
+      "baseline_sha256": "9fa37cf0546a80a8191fa98c531d96da08364f33ac1400a75f05ffd4d07bfaa8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser_detail_runtime.py",
+      "baseline_sha256": "6bcae2ffd427a16a8000721e66cfeb44f9b70d032b5a19595bb1764bca1f6694",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser_detail_status.py",
+      "baseline_sha256": "5d27bad4ee4cd7ebc690dac63daeecb9b7f70997cf94813f3fba6e35666bfc03",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_browser_runtime_shared.py",
+      "baseline_sha256": "56f2fdea36ea7becf278dc5fa89716f5889f07603ebcde457577226b3c1f9233",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_head_audit_runtime.py",
+      "baseline_sha256": "7f7a6e6084a907f6d2853e9be20d791784f29f7bc2915fb27e7e913c6c37e758",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_head_creation_runtime.py",
+      "baseline_sha256": "770dcfc784df3eafc873feb2430c1980acfbb5e4dceff352c33b581e85fb2b72",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_head_runtime.py",
+      "baseline_sha256": "72cef3b265712fa9868dec6a2d83b23e2c57cbb46c45bfecfaa44e97a6528f28",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_head_snapshot.py",
+      "baseline_sha256": "591575803d40ef192b3d6425c67f6d1661ff130e5d19745024badfaff0f5c808",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_head_sync_runtime.py",
+      "baseline_sha256": "bc04c5002aa65a73ac1a4dccf61a047097904fc2ad6c2cb1cbb1f085dec6c9ad",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_memorial_candidate_actions.py",
+      "baseline_sha256": "477972ed1b2d173738a157911cbe8918942a0b81e4abda92a253b2dcc9199b1d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_memorial_candidate_dates.py",
+      "baseline_sha256": "0b99b99e4e1268c409e17622078fbffe1c0c98455b5d80e4215960b1386f9c05",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_memorial_candidate_members.py",
+      "baseline_sha256": "8e9cb296051dfd12f50c610b67422dc5f0ef97815cc070c975062169c7293395",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_memorial_candidates_runtime.py",
+      "baseline_sha256": "9d39b5ed6e7ed3f1eb6e58ad4c7fd6c920b72e9089d36922d67c451ccafe1120",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_memorial_list_runtime.py",
+      "baseline_sha256": "f374b116bc81a8a9694d06652f8579352ce035670de43b830be4a261398937a7",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_memorial_runtime.py",
+      "baseline_sha256": "472a9b75faca1ef85d47a589e2f550ba31b4c98886a9695ed07fcfc4f9b637f1",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/household_profile_runtime.py",
+      "baseline_sha256": "bd99e9e3d59fec2ead0c0207a2ca0f3abeb0cc6a7f6f6f13186802e88b767db0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/import_batch_retirement_audit.py",
+      "baseline_sha256": "18559147fc8d7fbc1994df413f269998924cbe9d5cd1cd19844416ce4229dc2c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_batch_lifecycle.py",
+      "baseline_sha256": "2e8ec452f3f0532435541179f091c495c7d162af214ec7c8b9a9aa44013424b9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_household_rows.py",
+      "baseline_sha256": "3ccf0d042dba57bdf09424168e3de5df64275d03f0f9d7aa81197611efdd6dd0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_ingest.py",
+      "baseline_sha256": "57cce39c59816dea4407897eca1f74689e1468d1a4b6f29f4e559527510ec2a2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_parsing.py",
+      "baseline_sha256": "0b13930c14c0e8213995d080e2ffe9becd210073be090f1c2851c648fdc8285e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_person_rows.py",
+      "baseline_sha256": "dedf9cd3d05701686cce794e0a6931971be010b09bcdb21dd805db963308b976",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_postprocess.py",
+      "baseline_sha256": "9ba366f6156e3056f5dcd9db7d1bedfce121fa99509e294889499820744dd374",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importer_sources.py",
+      "baseline_sha256": "78d503813ff72aa2a4d5a88d00c22adde482c3e225db9dc41cf140ad9ea747b0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/importers.py",
+      "baseline_sha256": "7552b0044836a1729cbf88baa05a0cc4c2ec0edb13720fb70d7913089f52a53e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/kana.py",
+      "baseline_sha256": "90d6b612806d2f7ea986ad7b509c41bf388bbce631203a68ae1dd287893576c9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/kana_cleanup_runtime.py",
+      "baseline_sha256": "61609bda04f8ccdce78846091da359e3fe95b4ab9569a89602ae209799b36319",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/ledger_categories.py",
+      "baseline_sha256": "8727917b5c225c2cd40ab8fc965797d1c95e285cab2040afe0c90c8a6146ad3b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_household_views.py",
+      "baseline_sha256": "35d150d804337f670834c0f7ec24941a6e52481243cc0f4b60ce20abfcdb49ee",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_memorial_views.py",
+      "baseline_sha256": "695fca6cf3f40d43d009ca75512f7e2668052d4575bea38d2fe752103fd38b67",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_quality_views.py",
+      "baseline_sha256": "d04fcdc6c92883ef1ed3f22cfe88dd231311436622e2a50375f4ba185612e094",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_reference_artifacts.py",
+      "baseline_sha256": "54d1b65b52a6cdcebc191ef231c130f5a42ecf177abf124812fd086e88497200",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_reimport_guard.py",
+      "baseline_sha256": "896e7328017b22d7fd3a7e5437c73f0bf127d3f5fe9343188865c567945f2ae4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_settings_views.py",
+      "baseline_sha256": "9634566fe88889208e751e3e8deac36d284a3e284f64fcb32e910aa5ffb16105",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/legacy_source_retirement.py",
+      "baseline_sha256": "a38ff271ea4ef645e97f953fe385d6096613580440833732b3a75b94afd2b6c9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/apply_person_kana_suggestions.py",
+      "baseline_sha256": "be6bacd183ef8899b403ed554148a7ea5f4435b6062797fe87fe0f36adce0320",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/assign_virtual_household_head.py",
+      "baseline_sha256": "dfc49477e4c051e1e7b4da16108dc32d7a16dc81f979914365fed05d4d053531",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/audit_import_batch_coupling.py",
+      "baseline_sha256": "a9415902ea016cfa2176cf003c0d68f92759c61f8f2aac5129dd134ac5ef1090",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/audit_import_batch_retirement.py",
+      "baseline_sha256": "420c67043311b1fd1f68c8c09959f470f78bfa3b7c598433deb44c12b488e221",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/audit_person_authority.py",
+      "baseline_sha256": "bd8660ffe8ec08e97b9421e13c1abed3d532402d14f1354352a30a3d2e054ca6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/bootstrap_admin.py",
+      "baseline_sha256": "11ccb8b9deac66b2d5cd994626c804ec236247ab61bc068556fdf88835433f69",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/bootstrap_admin_from_sqlite.py",
+      "baseline_sha256": "d89561ca24b5f3665c8e4b8130a7d10623a11aa431eb5c9dfa005fa1f0161914",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/export_portable_snapshot.py",
+      "baseline_sha256": "64d1158e39e9d7eaad73e6a76f3e16377c9090c77bc039cbc55a591bb9be02e1",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/generate_demo_dataset.py",
+      "baseline_sha256": "441147ed5e59490cfe1e4f2078928eed40a85e0fb1ff0c989f315e1b60fbf5ae",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/import_households_persons.py",
+      "baseline_sha256": "d64695c62e1dae2c6c5ba116cb5de2f438813fe16d49a846829e597bfa58d30b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/import_yuen_memorials.py",
+      "baseline_sha256": "48a073bbdbbb79700f2d4977a883fb5ea02dbf0d36a833f9c389db1fed3fbdb6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/load_demo_dataset.py",
+      "baseline_sha256": "be3cc74301f97bbd94d885e6a55d2c4bd3eabfe5ece4e1656f02a786de6ff115",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/mark_households_extinct.py",
+      "baseline_sha256": "9877fd81a1cf811d09cd9ea91c55c509beb4b0c9e808b03b9859060a6f424d2b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/normalize_kana_storage.py",
+      "baseline_sha256": "d81772c571ae9e26acda34ff81167c377b73c7735d4fabf428fb9cca4e9d2dbb",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/normalize_legacy_source_paths.py",
+      "baseline_sha256": "d549b3a5ed134bf6e4f418901ea9dd456927df77af03d4c2ae28ec4065a4cfd4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/retire_import_batch_data.py",
+      "baseline_sha256": "c2dfeccbb6efdf0844987436ddc0041b17e0e57df914af51d9a6b28c3c5bb6e5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/retire_legacy_source_data.py",
+      "baseline_sha256": "584142c3764969a4c564918b9b122d5750f2dd60dbe4442569554e69ed36c01d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/run_import_pipeline.py",
+      "baseline_sha256": "a6fb33a8b8a721188970aa3bb8337dd2a158ae50f2567c4045a3faf036de9f82",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/sync_household_head_authority.py",
+      "baseline_sha256": "9d3524a46fc0bd2e12c7143c5bdf8bc03718f706f5486704c645152a4370ddfb",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/management/commands/verify_legacy_reference_artifacts.py",
+      "baseline_sha256": "5a1c834db677bce7784b068fea1d2ddd3b1f663959922d2030d9a536957bfc7c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_documents.py",
+      "baseline_sha256": "79d54a778680117ff590d8457c8122d72ceb10233244116ca8f7c4849af103ca",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_notice_columns.py",
+      "baseline_sha256": "08073c5337c2c2764a54e50be79c43730e3219c8f865646e30a561e54a80a93d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_notice_context_runtime.py",
+      "baseline_sha256": "2934e534496959de391c563bd6834726a9398739399302d727792943be15320d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_notice_layout.py",
+      "baseline_sha256": "f9989f7cfa19eeb24666798d4fa0d64705b8f12589c63a5f81bcce63195ccf04",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_notice_runtime.py",
+      "baseline_sha256": "6c25c4869df73945339b6e00772df3a09950dda6726a91e09d3b6e4cbbbe93c4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_notice_template_runtime.py",
+      "baseline_sha256": "57a735496bfe23aa25c49ce182ca48c198e4f1dcdc6c1bf013c90bce3bd8b5e8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_shared.py",
+      "baseline_sha256": "ccbe55412237bc0df9a66a069322d84616c5a98aa34903298e819393002f2ba8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_sheet_document_runtime.py",
+      "baseline_sha256": "e854a650170e8336595e5ec358afb0339152d815125b6975ba1b9c9c61910ef3",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/memorial_sheet_runtime.py",
+      "baseline_sha256": "b6c25a014440f4a711fe8f741fe62fec877a2a4ffbe540f37f01276d4326e04b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0001_initial.py",
+      "baseline_sha256": "9e243d9fbf323b7f29684b033da5b2a8c348c481346108e6426dbb5e1460c7e1",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0002_importbatch_service_schedules_imported_and_more.py",
+      "baseline_sha256": "34d63d0a5e7f7f1da4565f02a08a58c19d01c54f4a7ba7e3f7273968a0a4ff4a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0003_recordeditlog.py",
+      "baseline_sha256": "9c0723ec303ed3e6ad02010c99ee6f4108af94a126367537d368f10f7af70d1a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0004_soft_delete_fields.py",
+      "baseline_sha256": "ae6362da5657be46341f120da808be2acbbcc1037b2c6e90d418eaf9127cbf11",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0005_serviceschedule_link_group_key.py",
+      "baseline_sha256": "16555691615755e6b5136d3bf66ecc2ed5d3814601d21e8408534f4cb8f8ac62",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0006_memorialnoticetemplate.py",
+      "baseline_sha256": "c17ee4de18ad530f7bb1fc8f6cc373b2c4e48584641d602346c23382fb068cc5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0007_memorialnoticetemplate_style_fields.py",
+      "baseline_sha256": "d786033e31a2bc356637a6466910e9ec3782be2414fc38952ce5b61b358cc353",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0008_district.py",
+      "baseline_sha256": "017c1079b9936e70ca0c780a1624c90b81cab14190750a7671c993977e6f3737",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0009_district_officer_keys.py",
+      "baseline_sha256": "c8f86433d3e61e857ebc26f01f7db1c8a21e50534fee5e6d918a4bbb6db01814",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0010_householdprofile.py",
+      "baseline_sha256": "4aea7e9c83f1d3fe271c81f5614ab9430eb7b7e62570da1c321b4a0ebc4b3d02",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0011_householdprofile_delivery_method.py",
+      "baseline_sha256": "1848c185db9ff52d1d268fe50201e035c19d672d3ed7d6e579698b528e25be9d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0012_household_head_person.py",
+      "baseline_sha256": "7831b36beee88fdc2c2855da93d273db9191b68f2feaf7164d1f3607cae28618",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0013_backfill_missing_head_people.py",
+      "baseline_sha256": "423581fd3a906085ae5243c8c9304b7b3456fda7a3d04e2cda1cff0973cc544f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0014_soft_delete_legacy_imported_schedules.py",
+      "baseline_sha256": "d7ce8dacc3f69d5798ca1ebae916885ef60addd89c60f77236634c3f08c6574f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0015_householdprofile_mailing_fields.py",
+      "baseline_sha256": "87be8bdfa3f4d430293e9412ab278c477903e4ef34cd0e30b363e26886e344af",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0016_householdprofile_mailing_person.py",
+      "baseline_sha256": "35104f07337e50785dc90e2abbec53c09f10dabeaaad72948aba119455f166dc",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0017_legacysource_active_import_batch.py",
+      "baseline_sha256": "d37d6d75fa81eb2ef0987a2a00f4d09d9beec731b6a08e0d97d7716fb4d4cc98",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0018_record_history_v1.py",
+      "baseline_sha256": "f1979bb1648eab32818e86f0868ecc1e88c84c56bed33030c060a7a0257d88f1",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0019_postalreviewresolution.py",
+      "baseline_sha256": "8f21c77791c5cc471e2d1c04c912c024349a08af14e434c3a648154a3d242c8e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0020_alter_postalreviewresolution_resolution_kind.py",
+      "baseline_sha256": "8e0421117d1bfffdfb524136b932fb4210ba1d09f5098e5a98e2e917fc93fbe4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0021_householdprofile_memorial_notice_opt_out.py",
+      "baseline_sha256": "b651b26029af4362a2a8058dff2f2c0f72552c032421654542c980661f5e4eed",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0022_alter_offeringpayment_payment_category_and_more.py",
+      "baseline_sha256": "896824890ddfc6e6eea895d715face6dd042b086fd82064c3932e06e866c8d5b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0023_handdeliveryreviewresolution.py",
+      "baseline_sha256": "8da49268c3531a7fb2740128dd7848c7e18beeaa61f0d150c43f0311751993d2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0024_backfill_anonymous_editor_labels.py",
+      "baseline_sha256": "7ab3c5765b790c2df8eb43904d7c5f3d5d3cd0902b8a5a2f9653887348b1e9e5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0025_person_role_flags_and_district_person_link.py",
+      "baseline_sha256": "5350d591da9e89a743965403d4f83f06debf7c3be4812c54dd25c700b86f1cb6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0026_backfill_person_based_district_officers.py",
+      "baseline_sha256": "549ca3e16a8609af315b7e8a44e145b8b13bcd147c49bee2106c3513a08bab91",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0027_backfill_district_officers_from_household_head.py",
+      "baseline_sha256": "d7b67b960b1a9edf5ef492d4a14fa243252e64cb130a8a66bd877ba26ae6e795",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0028_remove_district_legacy_officer_fields.py",
+      "baseline_sha256": "f6f0002b4464624d12f4643048bf63d4a1a4c39c0de41f9413998a4357b4de94",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0029_district_member_sheet_state.py",
+      "baseline_sha256": "7ed1150284fe486aef3734e78bbf994838c44a6ceb6ea6b9e24caca8d6a5f260",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0030_drop_household_snapshot_fields.py",
+      "baseline_sha256": "f1d3549fb243f71b8d540bc28ea98d6a7f21a64d2b024d192a6471cf7171ef4a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0031_deceasedprofile_kaimyo_kana.py",
+      "baseline_sha256": "0c405476a42ccd391641be298110db3182f10341b2c9c398cc42172c5b588f78",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0032_person_memorial_fields.py",
+      "baseline_sha256": "358e28764e06438273fd96d6dbbfc9ff8eb186bdc4eedce4b07692fa36291a78",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0033_householdprofile_general_notice_opt_out.py",
+      "baseline_sha256": "84e7ad85907702f7228ada3ab01a22c61920701dc59d770827efd170e2b031e5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0034_person_kana_is_auto_generated.py",
+      "baseline_sha256": "db19535ff886fe8f66e98e48f2dc459bfb028d836077905575766d67381413cf",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0035_memotag_and_assignment.py",
+      "baseline_sha256": "2cb9c450eee555eea488aab180fc566e70463bc7e385e5619ed62babfdd74266",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0036_alter_serviceschedule_category.py",
+      "baseline_sha256": "8d070ee70e471fb8cb50f58687715cd7d4c63831696648cd6c14645b3dd6c6df",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0037_googlecalendarsyncbinding.py",
+      "baseline_sha256": "03a6c2865dca8b90f2b874091d9c7f8e71759d324b3bb36cba0828aa8b06d9f0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0038_alter_sourceoperationlog_operation_kind.py",
+      "baseline_sha256": "42525130a39e66ce64484a39ab0b3862761ff5808776e9ea4b92930fe0682d92",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0039_bereavementforecastsnapshot_and_more.py",
+      "baseline_sha256": "0adfa00c51604a627c128d05d8f508f49a4d95c87ab34c9e1d91f51283e69f24",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0040_alter_recordeditlog_record_type.py",
+      "baseline_sha256": "7ff0195a8cd65ea6c6319e3cd84a44f11911a141f3bf7ef283fd200dae8be210",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0041_alter_offeringpayment_payment_category.py",
+      "baseline_sha256": "553c28d10dacb78ebf1d71fa2c063d555f2a2b0a54bb8e9d9783adb44cbd3a98",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0042_alter_serviceschedule_category.py",
+      "baseline_sha256": "6a7bb34f0d871adbcb1603bf4081579678618088cfd7da92251fa2b1f3d6e4f3",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0043_annualmembershipfeepostalscan.py",
+      "baseline_sha256": "0b045dea2a10f3b3706b0c5b423f95133d7e47318c93c5e412908383ec454ae8",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0044_postal_scan_pages.py",
+      "baseline_sha256": "5c5c56fedc487a7fff880e45bb9caba9fa5a55efc3d18b97ff8481645171379f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0045_postal_scan_statement_date.py",
+      "baseline_sha256": "42ae1b924c8d79c9b736078117ca672f2213397a7b92ce5d337b9a23410bf82f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0046_add_chuin_service_schedule_category.py",
+      "baseline_sha256": "d609dbf2aea91cf88749048ebbb3269b1b855cdf6b7aedc0c25e5aee74bec7ab",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0047_retire_bereavement_forecast.py",
+      "baseline_sha256": "01029413082ca570371560561f65fd0099d53da4e5a1d3a104f5324d24274377",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0048_protect_import_batch_records.py",
+      "baseline_sha256": "58a48e8152dd50f70cbf0f2742d059531dc9e13b59a057fbe3e9308b05e0e4ee",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0049_promote_household_uid_model_field.py",
+      "baseline_sha256": "abc6576f88926e21b12e1748a859523f6a6cf91c8c498af855f4276aaf6b4344",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0050_promote_person_uid_model_field.py",
+      "baseline_sha256": "077e28c38be67292d75ce42642e2f8d0deec46266d85940561e57f80be3a9315",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0051_promote_schedule_uid_model_field.py",
+      "baseline_sha256": "53d60ca2c60e4b68ecb3d671c07da4035d69459433690bc5145871989df7dc3c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0052_rename_uid_database_columns.py",
+      "baseline_sha256": "2e07f735074df100a663d32bd94f049862c7f137c4766dc8e860bd42fe314311",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0053_promote_annual_fee_household_uid_field.py",
+      "baseline_sha256": "6c80d443b89317112c8c4d230e5e3c958ea3e98089073f45a5a0a104dbadebb2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0054_rename_annual_fee_household_uid_column.py",
+      "baseline_sha256": "e4fe3bfec9d49767124c34b40b1a66731a5e1c9246537f91d7e202a9c42b5a44",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0055_promote_hand_delivery_selected_household_uid.py",
+      "baseline_sha256": "ba0af7cb846e951eb457e5766caba6efba6523f1c51bc67dd6c0746b2347906f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0056_rename_hand_delivery_selected_household_uid_column.py",
+      "baseline_sha256": "e149c63a710a87ccb9298813f4e7a23dd59f1b5e511bfbb9af29951777b1f18a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0057_promote_postal_review_selected_household_uid.py",
+      "baseline_sha256": "c241c08e9eb4f3060f692f5e027b30132614f514ac56e30fd9ec13ff4286f3e4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0058_rename_postal_review_selected_household_uid_column.py",
+      "baseline_sha256": "1528e4fd2770163b18956a1f7e4e678a3d4c51f183d8f2507f5ecd9aacd04fbd",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0059_promote_household_profile_mailing_person_uid.py",
+      "baseline_sha256": "2f36e629d8f9d761a986798d8fb10398d7b7f5b4d6ee0b418a282bc34c6c37ab",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0060_rename_household_profile_mailing_person_uid_column.py",
+      "baseline_sha256": "47ddfc07d690d2f15b30798382fb533983cef431fe1e64eb34115ae2c57d1ce2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0061_promote_annual_fee_postal_scan_selected_household_uid.py",
+      "baseline_sha256": "072667c772fd8c1367e7a7d991e8ee51d3c719cda77789c5634405d5d3efbecc",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0062_rename_annual_fee_postal_scan_selected_household_uid_column.py",
+      "baseline_sha256": "5b712fc00eb59b5333709a35173c634e91ab36104031c3376535f14f5a14a0a4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0063_promote_operational_household_uid.py",
+      "baseline_sha256": "2e3beef203610b5122cd9b265d4ecc7ab2763c2569203bbdb3fb140f39df38d6",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0064_rename_operational_household_uid_columns.py",
+      "baseline_sha256": "f5ee1120bca093dee0a5acdc36b77c3cfdbaa7f1dd7ab81478b3ab88af918cc0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0065_promote_operational_person_uid.py",
+      "baseline_sha256": "c27bc5e33bb621d9a7528c27a38030e12c7349f081683fe45d7b269f3136ee55",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0066_rename_operational_person_uid_columns.py",
+      "baseline_sha256": "c18b1c993861891f674f8fe7fa2ec40760b2b066c90388167d4144d4082a10ae",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0067_remove_legacy_source_active_import_batch.py",
+      "baseline_sha256": "7f2c17ee959b8db530801693cbf9f2fc63baeb33710d4555c2f4f95321aded0a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0068_retire_active_batch_operation_kinds.py",
+      "baseline_sha256": "5da457aae9628ba40977bdeb90938194cdf19017fa8aa07fb7810f3d7a723d4d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0069_promote_household_profile_household_uid.py",
+      "baseline_sha256": "7fe280ac0fd984904f863f085497c2add3406e436104a6f12f6f92a0b55a8813",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0070_rename_household_profile_household_uid_column.py",
+      "baseline_sha256": "db5a14d1d93e99eeb9cae485142fa352afa5f530248a891d1b3e4faa751b977a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0071_remove_person_legacy_household_id.py",
+      "baseline_sha256": "983a29d06707f780493116386ff36911a0b478e7dd12e23dda818ce03698fad5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0072_annualmembershipfeechecksheetscan.py",
+      "baseline_sha256": "f2228f6fa65a19eda2a30dbaabec11fcbaedd96f8901892e7ad8bdfe8094e462",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0073_temple_events.py",
+      "baseline_sha256": "82682122522edb5a2cf3caf4d002ff42d4b29e12bf4036bb2b38cfece456a3b9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0074_google_calendar_pending_deletions.py",
+      "baseline_sha256": "9ce3c9ae896cb1853c74b0d054a6ecdd34416de34d73d4aae1894714ffc740e5",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/0075_business_record_history_types.py",
+      "baseline_sha256": "435b2fc41f84d629b07451cb155d5f7906650be6482864480588f264b0f9d04a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/migrations/__init__.py",
+      "baseline_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/model_households.py",
+      "baseline_sha256": "bbfb98547f15d608b5c9f1a031c1f98a04834dc7387e5a858fa33c3692a75163",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/model_memorial_sync.py",
+      "baseline_sha256": "20a856b6f741071868c6e4050aecf18d54c17f45c931dbf369b46f69dffa1c84",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/model_operational_sync.py",
+      "baseline_sha256": "c148c44bdef85e8f874f7deced6020125de07e3305531a814eab84a5d3b64f21",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/models.py",
+      "baseline_sha256": "fe36b2e4f5fe41969fd1411a0aee474e4491f195785c4400141f2484560fefa7",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/models_household_domain.py",
+      "baseline_sha256": "e0ce1764581b706957aa49e1b1c06edafd09576a691a880a16763ff1168905c0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/models_operational.py",
+      "baseline_sha256": "2cba541d35efa780d54841b73a19b3f8a82046c69855bf3e9c0e60833bbd21ea",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/models_registry.py",
+      "baseline_sha256": "30778e9fbf1a2c137b4d5ef8b92d8528320d9f1889c30e53bb3b53aba78d76ef",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/models_reviews.py",
+      "baseline_sha256": "b5d1bbb186c915d6f5ac3a2147329d733a231fc8822467871cc17bf118b47d08",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/models_shared.py",
+      "baseline_sha256": "a59c0949b147af9528bca9724519170feb6751c75223b211f99d98a73c52e2dc",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/monto_sodai_analysis.py",
+      "baseline_sha256": "db5320500c4291f095ba36153c5705f65a54b5edab0bb72c77b53d5555663a95",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/monto_sodai_db_reports.py",
+      "baseline_sha256": "dd5b02ed25c090d31727456975164583b565da141a1982817c9b937190182fc1",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/monto_sodai_reports.py",
+      "baseline_sha256": "dbdaf22f502a3baaeb88d92327ca7b5325fc71744f731620342f6641aadb1d9c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/monto_sodai_sources.py",
+      "baseline_sha256": "eaaf1056b8cfa55c9f8f7a72f3498cbd9d23dc0a809f6b338b6024fccad38086",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/operational_source_bootstrap.py",
+      "baseline_sha256": "d056161d504605b2bacaeca3ab9d775c1ae55f7a6eb53e88b4bb961541d978eb",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/operational_source_records.py",
+      "baseline_sha256": "463b1f1a3fd9a59e4d837fd0a4830116602064b1569563ac8f6ca0910d35836e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/operational_source_runtime.py",
+      "baseline_sha256": "292d3329aea8b0a77620fc25597573f9069f0ceec0bea55ef6b1e1059c44fedf",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/operational_source_status.py",
+      "baseline_sha256": "8e9ce824d9d896a63e04a07849a7dcd8d46da7db976a22feae0b86ee1f21927c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/pipeline_console_runtime.py",
+      "baseline_sha256": "40f3301751380223c4c6a10b2927407f6b3e0d3c0e8f9ae5b0ea3d8c70160418",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/pipeline_execution_runtime.py",
+      "baseline_sha256": "bca9207327c5e3ae2d6ee84cf273947619abf957ccb68c1f7a2ca8ca590f19ac",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/pipeline_runtime.py",
+      "baseline_sha256": "ad7d0093ef1a56f96e68b356d450af8cf3cc791ef13acec755313b562cccd8ba",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/pipeline_status_runtime.py",
+      "baseline_sha256": "1b39526550f824608cd1e3ace6cbbcc739765d3877cd8e23ab187cf01d831546",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/postal_recipient_rows.py",
+      "baseline_sha256": "6063e4d8a858fee55fd7ad82462bcbb77f06d71e0467ad41bae69160861e6420",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/quality_reports.py",
+      "baseline_sha256": "3a9f7cdf45e63d31b7c2fe1a4834a0001b79e3053feaa40e29e6c860fbdca304",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/quality_runtime_shared.py",
+      "baseline_sha256": "bb803cd9cb35aa3c211166e2683a38f279d2a35530a6db3cf2ae5404024ba20d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/role_roster_rows.py",
+      "baseline_sha256": "6a4d12acfba823ceab8b64ee32f018e139afadf775786db1a97c872e1250d5ca",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/runtime_shared.py",
+      "baseline_sha256": "640fd364cc5647bfbb3326bd4dc4428af6fb2d081600e5b01088ecf0f37e09ea",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_candidate_entries.py",
+      "baseline_sha256": "a2a807b0afaa92153d0abf068ceedd4f94f09ac27ef31efe10c1bee6daf19f82",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_context.py",
+      "baseline_sha256": "de1d12b8a8ff6a5d0ca606e19206c28e32d5aa537f747a7f677a693d1aa8e222",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_context_sources.py",
+      "baseline_sha256": "54be50766288e3c99c68c3c6244af1437b805ed9bad474f2eb433e6619014fb7",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_entries.py",
+      "baseline_sha256": "05109bcb4e6c4b6f7332d84c68f1214d4438ac934c332b43384b5ac3a0e37f4e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_event_groups.py",
+      "baseline_sha256": "26158f587cbf476d22e79287ffa131c13ddf75a76a84a8c53d1d34a39befeb5d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_runtime.py",
+      "baseline_sha256": "ecaeb8b78717f1f6b119aeeb130f1c6f62765f21429ba92df3fda6ca756ee332",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_schedule_entries.py",
+      "baseline_sha256": "781d7934bfc477e169743b8454bd34d75e39c404b52b72bc9453499ad2286f5b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_search_context.py",
+      "baseline_sha256": "bf4c20bb99bd64a9f48a149432ad761e9aa6ae8101aa7d901c3640056ce2639d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_sources.py",
+      "baseline_sha256": "9e3bfed6dc1750dc98ce70b76e4b0c2cf04a2ae8f5f965bddc7745bb5e2525a9",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/service_ledger_target_entries.py",
+      "baseline_sha256": "b447bfa0d8ba079227f8af9e4f04000221d9c8dbfa11569660453fab5a2db230",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/services.py",
+      "baseline_sha256": "3211e2bbcd8eb02164cc5972520ecda9eb7d77092c52a6d5d6f8a06f9f3762dc",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_operation_history_compat.py",
+      "baseline_sha256": "dc4320f3983f3b64de8cf3d66b5d1641f00968513215a2d0311277c7d3cba7a0",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_operation_runtime.py",
+      "baseline_sha256": "3ea836830ead196f7d41c3d9ef4b5d046081d5087074c72ff49d0fa887dfb41c",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_registry_catalog.py",
+      "baseline_sha256": "175c28a7f7644f5f3cc3e46b5508e7dd1694121116e703d079b6a4edc255d009",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_registry_paths.py",
+      "baseline_sha256": "ebf12f4e1ebc65b9c236a4a5ec30781e703dcece1b2577eccb8c6b52269a08b4",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_registry_registration.py",
+      "baseline_sha256": "6301265592abc78a63fa085c7866bc42025fe4cb5dc4f6c71a68f49b9dab6398",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_registry_runtime.py",
+      "baseline_sha256": "ba980ece679b7b06523c5e931691311bbefa6af64efc9f73b921e9bc853940ed",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/source_runtime.py",
+      "baseline_sha256": "6a7943bc42d02855b10146cc3e3c4d737ba63ce64f01be28a53274206fe7090f",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_batch_entries.py",
+      "baseline_sha256": "e0a1f81425c80e2c30cfe69baedb36e6c1887da805520354592a1366adb37c06",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_catalog.py",
+      "baseline_sha256": "314a7a850035be7cab436cd7f608c04dbefcee39c397b8849ff610e87b4d691a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_context.py",
+      "baseline_sha256": "972f110521098a8b134168167834b05efbe608e5784144dca80531f3f9a7aa64",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_counts.py",
+      "baseline_sha256": "2330b6dae60ccebf708c1813b02a578032ead8d5aa9669e00c194bc3e4c01a5a",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_dataset_entries.py",
+      "baseline_sha256": "4b97049a7497f4a070072769109bfca0f07f99b507100fbf6ad312ebfdf4fb3b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_db_entries.py",
+      "baseline_sha256": "2082098fd4c968e4d096a4f896af888755d725e1fce710e0a1d3b37d7681a00e",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_runtime.py",
+      "baseline_sha256": "4d6a4bf088e1f6795e8d28a21ec2095877ecbb155a73e418671046d7d3237b77",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/special_search_selected_entries.py",
+      "baseline_sha256": "715e39093a267ab13b8a0bfefb5ad8b2c4faba3834f822d052e63a9616523556",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/synthetic_extinct_runtime.py",
+      "baseline_sha256": "6f8fa746edc52ed6ebcbfbdb96b0165829dc511d0984bab7a76a592bacbd82a2",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/synthetic_household_runtime.py",
+      "baseline_sha256": "1e3034514159ca29470e087360bc7e9b81282bb7c165875d68d4c8f06069b93d",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/synthetic_household_support.py",
+      "baseline_sha256": "9bc35d821613a0921e357d5cc553c8d0418899310edf9dc5ced1f63a0aa84185",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/synthetic_yuen_runtime.py",
+      "baseline_sha256": "853eb5496488c2dcc9163b25bd2fb9ec3eb715dab67ebea032656d818f807644",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/templatetags/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/templatetags/imports_extras.py",
+      "baseline_sha256": "49ab48b5fd44b5c297567ec9ebae9d3d207fbda0497b7a270e508da44918abad",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/urls.py",
+      "baseline_sha256": "5199af018672644997b0bd6c166dd761d2a5327a1f80051229e47904ac233c42",
+      "executable": false
+    },
+    {
+      "path": "apps/imports/views.py",
+      "baseline_sha256": "e2315ab9f6f7e01d3af9dd71057231a372c2800c99babf1e9eccfbe127ed5983",
+      "executable": false
+    },
+    {
+      "path": "apps/office/__init__.py",
+      "baseline_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "executable": false
+    },
+    {
+      "path": "apps/office/api.py",
+      "baseline_sha256": "aa22b32badac080c2df4e94ee8e92b9109fbe6a641ac21997abcc9a90067aeac",
+      "executable": false
+    },
+    {
+      "path": "apps/office/apps.py",
+      "baseline_sha256": "a8ea2361fdfad0def4f7af92d41b1707eb81a9441949137879d5375a8bca2cd0",
+      "executable": false
+    },
+    {
+      "path": "apps/office/assets/fonts/OFL-NotoSans.txt",
+      "baseline_sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/assets/fonts/OFL-NotoSerif.txt",
+      "baseline_sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/assets/fonts/README.md",
+      "baseline_sha256": "d60b60494d387c503493f4ec43a94052aedcdd8de0ddf03b83d7d810951017e9",
+      "executable": false
+    },
+    {
+      "path": "apps/office/forms_funeral.py",
+      "baseline_sha256": "09a77cfef1d21f7a58b92c93ad2f290602a8d925d12839bd7689b456bf349903",
+      "executable": false
+    },
+    {
+      "path": "apps/office/forms_home.py",
+      "baseline_sha256": "2b154168345d96cca132812eff025ecd6ef35cd2ee7f87052aad736c709dd136",
+      "executable": false
+    },
+    {
+      "path": "apps/office/forms_person_calendar.py",
+      "baseline_sha256": "50ea526cfb3a866e5b127b8beb42b3c6f1b51debbbb5ee61f87876800300bc15",
+      "executable": false
+    },
+    {
+      "path": "apps/office/forms_temple_events.py",
+      "baseline_sha256": "c1290f95271fc964c330524b333e7c87199f65a029867097e33f2152b4af509b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/management/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/management/commands/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/management/commands/extract_memorial_sheet_fonts.py",
+      "baseline_sha256": "fb4fedaa6067927d81400d10dc4f14deac23d9080889598fddcd78d065649fa6",
+      "executable": false
+    },
+    {
+      "path": "apps/office/management/commands/verify_membership_fee_postal_scans.py",
+      "baseline_sha256": "5a9f385a339a24cd43dfc08593168361453f9c5f9ef2b14758f76d50fcc8793f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/__init__.py",
+      "baseline_sha256": "0bbb19db393c0bd0cffbe0bcc593e9e909abc9db3dfc79d2935285e532c0df8f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/accounting.py",
+      "baseline_sha256": "dd8f6e5fed05d4300a3e068467e6217b4827c7067d1fe32fcca28253e938bae3",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_check_sheet_pdf.py",
+      "baseline_sha256": "c19096bbd907791b253d1bf92be7581fabfc0b2532e2c4e177e09a986c74f149",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_check_sheet_records.py",
+      "baseline_sha256": "b199cd4bb6a2beed6458b913498343b1a3398d2a075206c0ce80ac533a0ee4cb",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_check_sheet_scan.py",
+      "baseline_sha256": "5aaf0d7084fb88ed748fa4233a881f10f8359bc723185b4adf54d401a7dc8a17",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_context.py",
+      "baseline_sha256": "f59d1edf545a4b923f7c32ef6ba29cc62d8f9a6531f64c78804e40a714235bdb",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_history.py",
+      "baseline_sha256": "23823aa661b341c09e6ec84bfd45b67f04a8e2bbefc8467882732a1bcc9f98df",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_mutations.py",
+      "baseline_sha256": "254c8a84d9120f0524c08856ca5c141415539bf25441a2599bb7f9b2ada60dd7",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_artifacts.py",
+      "baseline_sha256": "c6c572cc09373d2cd7a2b679e8136ed99d37a301efcec49174060cf35fc5132f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_jobs.py",
+      "baseline_sha256": "0b7bc4798716e3c6b94495cd53a02c47a76502dadf495925ad0815a13db610e2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_matching.py",
+      "baseline_sha256": "5da46cb7f7ec864aa19947e6c4ae20cabe8e9257623195b7ffadef1eb3f53fe4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_ocr.py",
+      "baseline_sha256": "ffd96a3003fec03456a92d09cd7548fe1a4a2ec9d4a13c756c45ef61afd89c7c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_payments.py",
+      "baseline_sha256": "e6b73f73e87533f69137cb8eb35929126bd8c3f6aa34778cecd608a741cfe8b9",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_pdf_moves.py",
+      "baseline_sha256": "885cc1ffe88ea08e84e7254ce5e5934c486c8141be87a6af5c063ae344203dd0",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_reasoning.py",
+      "baseline_sha256": "1a3839cb3c1022043a7d89d0ebdce3fd53bcf8ca66ca5ebf68375ae944148884",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_receipts.py",
+      "baseline_sha256": "eb2856e1a4a1eeaa51a47593aaa8fa7825c09808c5341cdd233c4449d99064f2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_statement_dates.py",
+      "baseline_sha256": "3d0dba0e8e6b31686973ca78a23e5b348f686454f361af599d4ca4385c5dfbca",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scan_storage.py",
+      "baseline_sha256": "cb2d966cf61d82bfe8d81e796f78fb9c107889b63c5bc7361fb48da062ffbe97",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/annual_membership_fee_postal_scans.py",
+      "baseline_sha256": "ae308e6b200cd02b962dd5443f1076135cf4e0cd39df7f4cd50222231263a331",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/auxiliary_hand_delivery_households.py",
+      "baseline_sha256": "17b4777ed26b6548cdb26771a0cb16800e6b6ec0c2f52bf4cec6aa386ea36069",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/auxiliary_head_replacement.py",
+      "baseline_sha256": "e49395434aa0b672dd468126cde4e272e2e425eae1f570a1829ffeb979856240",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/auxiliary_household_ops.py",
+      "baseline_sha256": "e184a5555a2fb7acb5e3fd8f5c2bd8ec501dfe2bfa9a0409744980ef4b148cc1",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/auxiliary_postal_households.py",
+      "baseline_sha256": "931fd73a92aba8db5ab2709c6fe0901cfa3c763d89647f58cc1e263d2943ecc0",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/canonical_ledger.py",
+      "baseline_sha256": "7c8e04f38cca5d0c66db58cd4502d1e0c9a5e3746543067b1f85bb0d749792f2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/district_authority.py",
+      "baseline_sha256": "a25df58debeb599844301d4fd59a84a0c056853ebad57c9c06ddd69455499d23",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/district_history.py",
+      "baseline_sha256": "08ca7ec7eb5aff909a686ed7df76dac83ab1bfb1452fe4ac194deef0680eb509",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/district_member_sheets.py",
+      "baseline_sha256": "1944d40e4052565d310306104391682db44db5adb7c76154dc706859072896ac",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/district_officer_rules.py",
+      "baseline_sha256": "9f858ae365576568b7bd0ffee21a62d64d12017f504bab69ca7b448072130640",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/district_ops.py",
+      "baseline_sha256": "b6c6ec619d7b8d3ffc25bb73144c9bed7dde1e2ff694096d356a530d041993bc",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/funeral_first_seventh.py",
+      "baseline_sha256": "528189a8828fadd8ea0153835dab328bec95b8bc11ca65d857596610f776f433",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync.py",
+      "baseline_sha256": "9ba880e7a0fa082932d9b41d478dc7968aba60010391434dc70c93a8f4b31e58",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_bindings.py",
+      "baseline_sha256": "e3f1929fabbfed050ecf2340b796242720a070def4f5433f8551966e4837070c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_bulk.py",
+      "baseline_sha256": "dfb67a2815c902d80a1aaa09a2849777d7cf52c7d4125a6640e63fddca8be7b4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_lock.py",
+      "baseline_sha256": "8a7e2b69c322af0308d4919226d9b4b80ca9817ad9926aac5c25158913cad7e3",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_payloads.py",
+      "baseline_sha256": "e26a3f6ef071c36baa60a56135a5c6dd105d4a8845212f45070fdcc1d3e974c8",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_state.py",
+      "baseline_sha256": "d816ecdc9b8b06c48e91fab841b4135fb0af1328e40a11fa1409858845178281",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_status.py",
+      "baseline_sha256": "6aefc0ef4c9871795dc4994d74d3df8de834f6e8aa1a718a41b0bf089213dd22",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_targets.py",
+      "baseline_sha256": "868dca9d7c385626333481079d8c203b234372e14350ba40f7251c235c3c7be2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/google_calendar_sync_types.py",
+      "baseline_sha256": "b0d222f5ac179361cf4336171af33a201c86a1b66912edb7706f769fdf98bf23",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/history.py",
+      "baseline_sha256": "620f67d87cf65baf3266a034058f3bab9263ff52c41541e5e2814e3eeea4a7bf",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/home.py",
+      "baseline_sha256": "e7137f0678a86f5e12b3c5d2f3eb22d173810ae5bb64988f5e32c3b93b7aad4b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/home_memorial_calendar.py",
+      "baseline_sha256": "a888bba7420277fb98774b9dc6cb23233e8dba2bcd917253c52b5ed5cab375b5",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/home_service_completion.py",
+      "baseline_sha256": "4aa9e626b3ea54986155cbe2a0392517aa574ccabe09ea173c29ed18f7197968",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_browser_event_history.py",
+      "baseline_sha256": "b6c0faa753336110620eccf2e79800bb4e66912474e4890afa266f01189b621c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_editing.py",
+      "baseline_sha256": "5827aaabcf7a3f00d98c832293255647fba2d7c36ded8db762dbb9fdf5a42599",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_editing_core.py",
+      "baseline_sha256": "1ef856163ffcbfe12d217e205cea16281d33f138d7f20c52eac325e805f18c8f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_head_editing.py",
+      "baseline_sha256": "c7c5fbd71bf0e20d3facb345a8515d361412d62517c21e58f55c5fab68d44841",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_head_extinct_service.py",
+      "baseline_sha256": "8ec68fdc59481fb9a0c663d58cb37bacf2b923a769447b2b8ac6ba3765a13a75",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_head_transition_service.py",
+      "baseline_sha256": "70283a5afdfc45d6418ae840e97d8526fbcba793e1299d1f8c93437002f631f7",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_information.py",
+      "baseline_sha256": "ed99047e5456675e84d3d6f109bb16d4144286303588de72b503e1b86f83c90a",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_person_lifecycle.py",
+      "baseline_sha256": "ad1a705cc204f2424ba4409d56ab914587cd4e009a7048e9538918b79769be07",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_postal_assignments.py",
+      "baseline_sha256": "f81dd4dd4db2eb86a8631e26dcf7fd9ae7edce59bd216723c7f3cd6631aa676e",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/household_profile_editing.py",
+      "baseline_sha256": "164fe6b9145bf8011bc4805d13d6b2876d81b7e56c9dbb7d5f9cfb4be8e3d795",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/households.py",
+      "baseline_sha256": "5e9da6f1093f459fadf2402f219419531fe39a2a0355407aeaf40d5bc412df94",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/label_paging.py",
+      "baseline_sha256": "3745d05343a5c12d5dbeb6a3ed56308ccf510dbfb2b91288ba7b787d749e5988",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/label_pdf.py",
+      "baseline_sha256": "9beac29524765687235cc86a7321dc30fdfb68ca6a1173e04d13f3d6d5996afd",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/legacy_helpers.py",
+      "baseline_sha256": "4d9d60d272f1773a5b12b62f3b26bc2368afff951862b26c2b476de4d52701be",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/manual_household_creation.py",
+      "baseline_sha256": "36a157b066acbdb7f6438a334a9b90ef560bc4baa02c92465279190e7dc0af07",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search.py",
+      "baseline_sha256": "31d86e72d5ce7af9b70918dc28e06a29d8fb3cbe646c2bfa06c98565141a3fbf",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_assignments.py",
+      "baseline_sha256": "f642f72887ef393d1d02455a27e973bff413dde5e10297e9a8475f8696ad4b56",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_catalog.py",
+      "baseline_sha256": "8e3ee4765bf5486bd9008a54ac32131dd1ead04113b1a6a4207d16e80627df00",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_client.py",
+      "baseline_sha256": "bfae3c69be95ad5e5e57528eecb298e58f88305a374081950bf51d11c41e5dd6",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_entity_entries.py",
+      "baseline_sha256": "faa60ecd39e09bb445ef6fd3b656af1f1350e61eae0edbb0ef566246fd26adb2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_entries.py",
+      "baseline_sha256": "04b5769be299b4c5307792dbb50dc5f8d98e78e4439f5df34538b3f55638bd7b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_entry_builders.py",
+      "baseline_sha256": "1749ef90536d3b73a1651ce9a3e416c419aba3485581a7e6d528541f5e00a35b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_entry_support.py",
+      "baseline_sha256": "91597348ccef6d3e883fe254ed742a0e8093269a1270d159ad45bab726dc7d54",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_note_entries.py",
+      "baseline_sha256": "b17fec5218b3059f20ce8938de62064c04dc69bfadfe264c0495887a24eaf01f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_query.py",
+      "baseline_sha256": "cebac4ad8ad8b1b8d7d563eca227e56e2d408a76379ac684632b83dc2dc42787",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_ranking.py",
+      "baseline_sha256": "a3221213ca8ebc8e11661f24720f7a5c681058b1551346362fe947b2aed40692",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_scope.py",
+      "baseline_sha256": "979835e176406582c9f823d83fc8d8d595c7f8106c80044d40d805ef00e338a3",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_shared.py",
+      "baseline_sha256": "0dee6834f2ca683e8eeccf88f794dcc3a9085ff7b01320184cac4a5ba95c3b4e",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memo_search_tagging.py",
+      "baseline_sha256": "04db481fe510a95f27e5049a605edb7cc1f5994c71b0d24d17f8ddd9caf89c06",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_distribution.py",
+      "baseline_sha256": "c9a87b4c733f5f39641f1e29fda6201f5b9677debf2e1475a8f96aba04f92a47",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_notice_pdf.py",
+      "baseline_sha256": "77e8b802e8f171adc56728e1de1470518c4557cc233615350be89ac4e30a2953",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_person_household_move.py",
+      "baseline_sha256": "bbfa22e4a8d8ec8843c2aa5309bf921a3b25ef4eebfbcebdd7553cd793f47529",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_sheet_pdf.py",
+      "baseline_sha256": "82a7105aa9f9e39216bdcf471dded9c6c1611d4ef5cabc48e460daa7b28c6daa",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_sheet_pdf_layout.py",
+      "baseline_sha256": "f729444c02416a89f20f1c3bd8a4e39bb220c23b83653feaf2d61a86ad4457ee",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_sheet_pdf_support.py",
+      "baseline_sha256": "d069879c3b2fa0da958d014e3712f021342a0fb937f1d49a745f5720c58e39d4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorial_sheet_web_fonts.py",
+      "baseline_sha256": "b2ada1ec3f6f620a4898d1a02be4cc450d90d04a54b39ab208e6cd5db3f77755",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/memorials.py",
+      "baseline_sha256": "146b17b67005655b836bd4507bed75ffb6cced73c3ad1baffe0174e42cabf7c5",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/monto_sodai_assignments.py",
+      "baseline_sha256": "bdd6bfd8d963bce6db51c675bb48c2a99744e612727f92054d801890b74bb967",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/monto_sodai_reports.py",
+      "baseline_sha256": "2ccb41297e0e836de5990b48e0f522c84f56197393173be566924527ef3d347c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/offering_payments.py",
+      "baseline_sha256": "a22091356ab9e5c886d6cefe0245ae9d13b22d55e70d1657c18d3612403d54ec",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/pdf_rendering.py",
+      "baseline_sha256": "5c720b53be3f2621021252814be9d77f9e98802956bc953365eac0394b01e1c4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/person_schedule_names.py",
+      "baseline_sha256": "3dcb1461452bc2a9232d1d662fa8f7d1e7543332f43c48eddba7f046eb77fd3f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/person_search.py",
+      "baseline_sha256": "0042e60e57946cd62c6ed0c6ac10e7725364874d6f001ca6b5c94098b5a956ca",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/postal_label_reports.py",
+      "baseline_sha256": "c57d20756e5bcea1a2d7993c9b1e6e9ceba34f50ea007cd52f02ee5cb0792655",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/postal_recipient_order.py",
+      "baseline_sha256": "8486ad363ca2e528072379679fdb81fa2f60bb985ddab13e021e8caaa5d7bb28",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/quality.py",
+      "baseline_sha256": "1a1cf5c2d0a36f10e85612addab5ac535abc97ba89d41ff2a5735cb30829f664",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history.py",
+      "baseline_sha256": "66f34dfd5f09e0710489f9669d4a0ffb3f6dad60c19f0ad893e4f61b33e7406c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_entries.py",
+      "baseline_sha256": "4bc9b9a0391e3eb762a26541517b850efec935111dfa26f6db695e070cd7187c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_entry_context.py",
+      "baseline_sha256": "7620fbfb1d9f8f23c7a3f8d1cafae4de2c177f7a71532e7fb159ecafd4f8d7ae",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_entry_labels.py",
+      "baseline_sha256": "58a8945950f55be898e8156e00dd38e0ff04c08cd831f9fce8b3a9efb6f026d6",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_entry_rows.py",
+      "baseline_sha256": "586a3183f88d66d027517f879a4ecd47cf87bffbc9818a0764eb3a1cd0a303ff",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_feed.py",
+      "baseline_sha256": "847773fe041193297a0cec97a5ee209bca12eb1eaed003d4896f74eb41328e45",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_mutations.py",
+      "baseline_sha256": "8dfc2ea5886bc73ca50ee2190c3d023f6c06807b7f639eab5f78cea79ee5e68b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_snapshot.py",
+      "baseline_sha256": "77adf0552a5facd4c1ebdc8d223ac0225f8387b2045c3933c0441f88ffa51bff",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_source_ops.py",
+      "baseline_sha256": "e71b4920ef81149c5b7caf715d7cc7486ffce28328cb5d1377484a41805f015a",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_time_machine.py",
+      "baseline_sha256": "93e0e7552f1a6ae55774d5b602b2bfd02d0a31d686e4e69447ae54569a8b6ce1",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/record_history_urls.py",
+      "baseline_sha256": "9bb84d1b0928029c3eeb314fb62aa5c5887ad9b7d92e721fd747e2d5c743e771",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/role_report_rows.py",
+      "baseline_sha256": "597c6ba27ea6490163a20ccbf18d76513cea451564f82e31a4bbb6b1d7f93084",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/role_reports.py",
+      "baseline_sha256": "48a4318f8d2650a064798b67fa99c0a3431392cd8f9e87921eb4618927350a60",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_information_pdf.py",
+      "baseline_sha256": "fcdf1c4fa4357621bc95fa2b1efbe435b69ec58a5d72249e70595977c344aa74",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_core.py",
+      "baseline_sha256": "71625b330f0dc0e9903b112e0ed205b81a15139c6f0744ccd34ca7869a4a77a7",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_editing.py",
+      "baseline_sha256": "34d85af75178c12997c23aacada818d692e39cc26536f5b8a5743fbc99d752e2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_lifecycle.py",
+      "baseline_sha256": "d401ab22c4a8d929170057435c6caef1edf5a142d52bf9ebc650cae889224268",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_link_candidates.py",
+      "baseline_sha256": "d085e21a5f5a0ae25af307dacd5b2062aead738f7ba579308b953385cdfce7cc",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_link_creation.py",
+      "baseline_sha256": "869903b2f19865d0f373fb4193bc391190bd0de4c11a30b29e844554abe55550",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_link_groups.py",
+      "baseline_sha256": "06e2aaa3470dd406cc6cbfc42873e6d5754999ca3b74f221452fe1a6c415ac35",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_links.py",
+      "baseline_sha256": "59ce8a42cc1f2bc3011a73ec6aae27847061da1a92442393279be932e1a51c5b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_printing.py",
+      "baseline_sha256": "da99c47255bd96c782ed76e0e4a69172578cca6c172cdbd36ea0c1c8edc94a4f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/service_schedule_save.py",
+      "baseline_sha256": "98ec430726d448b64643d747372a47618c5259ce92e0529e636dfaed6365a96f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/settings.py",
+      "baseline_sha256": "b0f92fd11dd3f6e1c869458bd047215e17d7fd1326033d4ad94d056a73b2e323",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/temple_events.py",
+      "baseline_sha256": "801109b971f06547f5474357c23f090bbbec3faaddbe74ddbeab4766e4fe8490",
+      "executable": false
+    },
+    {
+      "path": "apps/office/services/templedb_ai_read.py",
+      "baseline_sha256": "886d143d2b56d4b7644fb415ca18d993704dcaf8f18fd21c04229bf7dd1d71c9",
+      "executable": false
+    },
+    {
+      "path": "apps/office/templatetags/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/templatetags/office_nav.py",
+      "baseline_sha256": "81816f13e2c9d6b2ab75a68fcc2cad9689dda419245899e5ad4ed618954fead4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/urls.py",
+      "baseline_sha256": "834fe742090ee191913bf9dab9a735b5b1b122ccc7a328e612cf1c791c7042a2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/__init__.py",
+      "baseline_sha256": "0c7c939362b4886df74e3481dad3d881508191de4b62b7ad740a83f148996034",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/accounting.py",
+      "baseline_sha256": "e4db37f62d67bf78c01848dc55963b6f6eb200c91f3f5a489f99bd2b4a6f3af4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/common.py",
+      "baseline_sha256": "1144a8bcef1149076b795bf9d7b59eaf68415c2a124e72c03a657d282f0827d3",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/home.py",
+      "baseline_sha256": "105dfcceaeb359122ac23a6f93b788ad77c1d76da8860f06840dd22b09399cec",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_browser_actions.py",
+      "baseline_sha256": "2d827f6e318efbc289630011cdae3aee335a6d22090e1d18c396799291b5b569",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_browser_delivery_action_views.py",
+      "baseline_sha256": "d6532b66bab9688457eaabf542b37ce32dca7fe3a7ac0354b7389a403a1a961f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_browser_person_action_views.py",
+      "baseline_sha256": "a110bff0ddbeea74a50ac549b5d1e608e8538b432f8847a924f55505faf12cbc",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_browser_views.py",
+      "baseline_sha256": "6a8b0040f5ce1722eb39797a6a93deff21ab21d4a5ff5115eddaacbe491b04f1",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_create_views.py",
+      "baseline_sha256": "88823292f3d94c17f791917b7bb584cad59cbdaec696aa374296ced9a079c02e",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_edit_views.py",
+      "baseline_sha256": "456d934708ff188738720498a59a3611a6026e7eea122fc707371ad071749293",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_extinct_views.py",
+      "baseline_sha256": "4d45276eb307c544894740e1040fde40cee918f7287f199e35d0fbbb8bf190be",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_head_transition_views.py",
+      "baseline_sha256": "162acdeb37dad808fe1892ebed7f6a1834ddcee0c746a4c1b037d13fb4add4a5",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_information_views.py",
+      "baseline_sha256": "a386d7881accf410f79d1ffb90e06d0c6741fb054cbf236f901696aeb21cc01b",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_person_edit_views.py",
+      "baseline_sha256": "2aec1af4745374c8ed29e42f66724a2440b81b46eede6234ccb489ed0cd1e52d",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_person_transition_views.py",
+      "baseline_sha256": "69312d37caf9da7e73df485cdadfd2b5ab67d6f8ba304fee766cf0570b0404e6",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_person_views.py",
+      "baseline_sha256": "b262c3974add23b2e88f286db9aa0008b8283d90dea623e190d466ff2379870e",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_record_edit_views.py",
+      "baseline_sha256": "8b72ead1c7dddd7c49d4c270e2fd66cbac67c406fac4f5c3587ca3bdc8d94d00",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_transition_shared.py",
+      "baseline_sha256": "6e0bb135661caaa182c4b6e32dc8b7d6d649f0a15217f5605474e68b12f4f1bd",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_transition_views.py",
+      "baseline_sha256": "1769da595a54472ce04ad5c8614074d23563cc62b969aefe299c15b4792a89d3",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/household_virtual_head_views.py",
+      "baseline_sha256": "d42116d029fdb7f1fde261b93ce33e4365d8b43095572110ba2973ad625ed36f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/households.py",
+      "baseline_sha256": "ebd1f87490cfc81045340cd45cfc5895c42c852cb8ab6ca10f2db9122b41a80a",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/memorial_distribution.py",
+      "baseline_sha256": "4c768e4844e7d18108fc13713538eea3d63d899f3dfbc4d91743006ffeb6a3f2",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/memorial_notice_views.py",
+      "baseline_sha256": "542ca4ad3baa08433bd09a4696920f118b70aaac72248cdfa5bdb2ad55ef45f8",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/memorial_person_move_views.py",
+      "baseline_sha256": "c3d3239eb94997003a3350a7ccef145fe9c6b3c42a79bab29bdc82a8a18a37cd",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/memorial_sheet_fonts.py",
+      "baseline_sha256": "09345a0e661b76f3f4b4bd410ebaada6a999371abbce68dea49ba10e956581c4",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/memorials.py",
+      "baseline_sha256": "70508c2277af6b23036d8c2148fb41346a46e11a045c05cbaf570ee79f4a2a64",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/offering_payment_views.py",
+      "baseline_sha256": "c3326be572e3ee1049f1b31b8254204c644606cb879500c9e5ed5000c52e2874",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/person_search_views.py",
+      "baseline_sha256": "cf7f0698b35a60cc947cc0e97a63ff68131f8d98ebff57d37614101007709f6f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/print_hub.py",
+      "baseline_sha256": "30decedc9b0282e00405654799b16a6d0789af710be73fe6f4592aabd470fe81",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/quality.py",
+      "baseline_sha256": "0e7fc6bcfa18d005b39187dcd896a0d89558b97dc479a9f4de38d6bdf5df63d7",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_ledger_views.py",
+      "baseline_sha256": "92d9a6f621c946ce51e03753c1e48ce209512d04f54846ce01edfd4b3fb42017",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_candidate_views.py",
+      "baseline_sha256": "16d7a85ebebc1a55c3503121c3b95911456dfc7455ab71fe70419f4918c54484",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_create_views.py",
+      "baseline_sha256": "4f32cf74f1ecc56f01ef2a651e828d45b2892a1c7fee8dbadf215a96738910b9",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_edit_actions.py",
+      "baseline_sha256": "a38e20fa668950ae2ac66c7770160c9608b94fbe2d1663a921837ba2c59520cc",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_edit_form_flow.py",
+      "baseline_sha256": "6e43def9f9dfbe5927a22f7a69fdf7c773953dcec6d888bda731a960b384ce4d",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_edit_state.py",
+      "baseline_sha256": "839d3c553ca79511097145a5d7b0ce3bd7c337a82eeb6a289b990f6bfcc70bc5",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_edit_views.py",
+      "baseline_sha256": "b91366d109cd64e62a0240299ef7a5dc54f681c7db5263cbad99893c7cd24f2e",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_view_shared.py",
+      "baseline_sha256": "b1884c073f697bc425fd8aebed57d5874c926113dafd89ef266ab6a1c018f916",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/service_schedule_views.py",
+      "baseline_sha256": "db04e41a33b166ec13bd3d516346623499398d3613de53f0ca66acaa1f1e1391",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings.py",
+      "baseline_sha256": "4552f767c7af5a17f1a5e7244e0cad2651bb21dc2fbf3832eebd7693dc6ad4bc",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_admin.py",
+      "baseline_sha256": "3f763951110a60e5b766922712b69781e68e4df1528b4e1b58b66a6e2042561f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_auxiliary.py",
+      "baseline_sha256": "1066c605baab92e92c7d4696c27df88f10947b4f182c6e3bfcbcfecc2e1cc00f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_auxiliary_shared.py",
+      "baseline_sha256": "5d7d8d78322f0a9da6d09a772ca337209416833b22c3b0bf777f227b0e1639c3",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_backup_admin.py",
+      "baseline_sha256": "d440e7cfe66ba3ed0e7c257a6720bb7e12f03909e09f033632951effb373376f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_data_imports.py",
+      "baseline_sha256": "0fcb0c10688b39b2139b749df224e2f25df3563fd33c2c1e8edb3cf8526df77a",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_district_admin.py",
+      "baseline_sha256": "61fc875b51dc8362fef1c57334a2ddb95a4164ae04192247ecf85e334ddaf150",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_district_member_sheets.py",
+      "baseline_sha256": "53d348080f8fd8ffbf6ea3e44e27532c217c61ee82139fb7e860e4739ba8839c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_districts.py",
+      "baseline_sha256": "cc0ca0949bb1bfad729a57a931148a59d453c9378c5fdd6c1dd5acc5762554a9",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_google_calendar_admin.py",
+      "baseline_sha256": "9c0822b928932784e79fbc7be708368a9ce06f9807a263d39783cafda2018c2c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_hand_delivery.py",
+      "baseline_sha256": "1d4cfb6ee2ee1f2d79c574eee986bdb8490ae38ab61808eddd7046201c8ece37",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_hand_delivery_actions.py",
+      "baseline_sha256": "fc4478438e01aeb32f475c649dc046a112bbfc77dcea1fa227c3f80c3b252b0c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_hand_delivery_head_actions.py",
+      "baseline_sha256": "2094f1e66dfffd8631ca561b7cdffb84bcf3791cd4ff2618820157ce436e76ab",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_hand_delivery_household_actions.py",
+      "baseline_sha256": "cef24079fe763cc2f71ebfe2a5a6aa78c38f4c08f4c9d9af870626b08d5b8ad1",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_hand_delivery_review_views.py",
+      "baseline_sha256": "b1b508e5d4d3b891f6a4ec3fcbeefcf503961b266be139c869cc2b195e64e1ed",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_handoff_admin.py",
+      "baseline_sha256": "0d8511b12864f67d4b456c01c160edf618accde14b79b51efb17b29d054f9a49",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_home_admin.py",
+      "baseline_sha256": "d6e5f389552084e378a63d5ad9149c51eee4ee8ad21e4431c4bb14b50621c690",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_household_delivery.py",
+      "baseline_sha256": "9f2ec6b3726803501a40a66b30d365e1bc29a4014b2a538ec4580811a48757df",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_membership_fees.py",
+      "baseline_sha256": "8baf859698b0f4caa28bad6fa7f46e0595025f735c3c15448690fc88a0396b1f",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_officer_rosters.py",
+      "baseline_sha256": "7f2b9fba9a934fd6d0dc2fe42dab6a92d6b0d2d304b3d2d81b7d33ec88b239f9",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal.py",
+      "baseline_sha256": "48ed079e2c28c9aa1c2de58e26fb8789876012b0ade336e806d017b26b34660c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal_actions.py",
+      "baseline_sha256": "9b7eb27df7515ab49fc7b86f4c2ec6e211c54c96aaa0581dddd991b93ae1bcbe",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal_head_actions.py",
+      "baseline_sha256": "25bf03297a284125cb53b10dac61a92325a96e8013182c43130ffd4abeafc70c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal_household_actions.py",
+      "baseline_sha256": "41bd5a4f3fac9c5ea5282682de9ed34dd5b18404dbe9aa81ab2dc86c40cd874c",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal_override_actions.py",
+      "baseline_sha256": "7373fa032d1061af991c42d6eebc9482a249a39c0b0a95e9d5e0df3086f6a3dc",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal_reports.py",
+      "baseline_sha256": "50b8f41a02f19e5c3556a944f46979a671ad06825a730b5fad6c78c05aec4b33",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_postal_review_views.py",
+      "baseline_sha256": "1f0890bcb383450d80e11673413fb74588ec224f2d4dc03c98de3bcc661249a7",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_reports.py",
+      "baseline_sha256": "299e94a07a80ec995290bbe5cdc5650a01c1f7e4c0ffabdd621dbce57b8d4a97",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_schema_map.py",
+      "baseline_sha256": "edd24280a70fe7d0a12974144300af67232fa736ed2a1aa42e3ab53d45b197d6",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_starter_admin.py",
+      "baseline_sha256": "40ea137b148c34804d8dae395fcaad495e5388efa7b13dae652445f385553978",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/settings_user_management.py",
+      "baseline_sha256": "f059a758e0e6dccc48819ff49b78856971a18a91a3fc1718c10a1b99d20a4493",
+      "executable": false
+    },
+    {
+      "path": "apps/office/views/temple_events.py",
+      "baseline_sha256": "1e202ebada08421ed520e5a8d3400ca6e8a532fe767096b529b164046c42bfe6",
+      "executable": false
+    },
+    {
+      "path": "apps/office/web_actions.py",
+      "baseline_sha256": "f5d37d19d1a68f0c538029208cf25bebff5282639bca8b5f5429ea4f46be7a5a",
+      "executable": false
+    },
+    {
+      "path": "apps/office/web_support.py",
+      "baseline_sha256": "ef601f1913da89ed439367c266603656e2719d40cfa6ea110a3b5642337a6627",
+      "executable": false
+    },
+    {
+      "path": "config/__init__.py",
+      "baseline_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "executable": false
+    },
+    {
+      "path": "config/asgi.py",
+      "baseline_sha256": "51c2b9cca91b3826ac9476be084a20cf605dc824fb52421c9bfa6ef952c745e1",
+      "executable": false
+    },
+    {
+      "path": "config/dependencies/build.txt",
+      "baseline_sha256": "15f60b186d942e62d289ae5e6a506f23b94be7eaf5328432894a67a118f6e525",
+      "executable": false
+    },
+    {
+      "path": "config/dependencies/dev.txt",
+      "baseline_sha256": "e1feffe4e1f160cb03fdf31f11ff8eade85a9d426bd3da123ad4b2a91e3ac0e0",
+      "executable": false
+    },
+    {
+      "path": "config/dependencies/runtime.txt",
+      "baseline_sha256": "c146370a5a6b14ca148e56393cafd5f0946d3255e65289a57ec987cb6f75fb26",
+      "executable": false
+    },
+    {
+      "path": "config/dependency_baseline.py",
+      "baseline_sha256": "ac2a28cf90d3d5bdd2d7649d8c545c7942c5e81326aa80f029549cc833b18145",
+      "executable": false
+    },
+    {
+      "path": "config/env.py",
+      "baseline_sha256": "c17ee4ee056f74c6f54acba3cbcf7141be4cd8b8c110796d2cce9a5a4d85fdd8",
+      "executable": false
+    },
+    {
+      "path": "config/instance_runtime.py",
+      "baseline_sha256": "578002df81cc0985ce7feb1263add2a6f2dd4a5e589778f86f3c76989f51bd2e",
+      "executable": false
+    },
+    {
+      "path": "config/platform_file_lock.py",
+      "baseline_sha256": "6004462e37d3157ebfa1603b44a3438a2ae2f555f0bc8177b0a24b9680d6b01a",
+      "executable": false
+    },
+    {
+      "path": "config/platform_process.py",
+      "baseline_sha256": "37bee5b68cf7c3a6c7fb2bb4d264a3dafb781d1741873d9e2e1ff6f4cc0c945a",
+      "executable": false
+    },
+    {
+      "path": "config/realdata_preview_guard.py",
+      "baseline_sha256": "1deea63516ef28ba5add2d0c8b7df928914920579c356e9e846a27717706694d",
+      "executable": false
+    },
+    {
+      "path": "config/runtime_paths.py",
+      "baseline_sha256": "67917f388eb177d50aa3f9215c852e928b86653628b69133f62ae18479fe65c4",
+      "executable": false
+    },
+    {
+      "path": "config/settings.py",
+      "baseline_sha256": "3afbe36bbe13fb99b5d4cbf2f7f0d02eb471b178e503462e74016c83ba276b20",
+      "executable": false
+    },
+    {
+      "path": "config/settings_helpers.py",
+      "baseline_sha256": "fbfcb4056a7a2505d67fabc72f02a0c49941884a6a527aa47e0f4aa5b2f4a8a1",
+      "executable": false
+    },
+    {
+      "path": "config/settings_local_preview.py",
+      "baseline_sha256": "2cafedc69421ff34a0058b9d13671079d0ef4e01785db517fec694c4f6ce2478",
+      "executable": false
+    },
+    {
+      "path": "config/settings_product_sqlite_initialization.py",
+      "baseline_sha256": "6563714c2fae9437f87960f1e1e04e8aeabcdd5c50b6d86adced75ffd75079fb",
+      "executable": false
+    },
+    {
+      "path": "config/settings_realdata_preview.py",
+      "baseline_sha256": "126f6787150a14f5f3472caaf624ac8ea821d5ac1dca20d23aea11f709865701",
+      "executable": false
+    },
+    {
+      "path": "config/source_registry.json",
+      "baseline_sha256": "91d54d148e8977ebbf0ae4a0fe7c9194cf442cd459f10e541324caf1456430ae",
+      "executable": false
+    },
+    {
+      "path": "config/source_registry.py",
+      "baseline_sha256": "2902732f7b89424cc12d228404e574f73a931347c9ed832e5303605be81a3d43",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/labels.json",
+      "baseline_sha256": "550dd5f9922f55f375ebfb6b431c11d22987e510f47e80b3c361d5d57ca419b5",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/map_links.json",
+      "baseline_sha256": "84ac043aa0baf275d58307f322b6401bf267310d90893862ac66a83e9ed2312f",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/memorial_notice_defaults.json",
+      "baseline_sha256": "f5807bb7e2fbda5044a7cb382985038d0149307805619f9d6b5d8584b7bdffc3",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/memorial_rules.json",
+      "baseline_sha256": "90c30a267de24b84399ffc48dcb273856d6c8e4950211b1b03e48f673d688b07",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/relationship_labels.json",
+      "baseline_sha256": "debfc93be1ed959e08c7b265488190374e86703812e78d6d4c6fadf45735a26d",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/service_schedule_categories.json",
+      "baseline_sha256": "75485f8f1be48cd574e5c9f94bd696b4865d089e4a0f1175edd2013a9525d47c",
+      "executable": false
+    },
+    {
+      "path": "config/tenant_policy/default/terminology.json",
+      "baseline_sha256": "05f30af7dd7e8394e2dad32fbc0318f6bf84b5c35ffa1c770ff34499785ab3c5",
+      "executable": false
+    },
+    {
+      "path": "config/ui_contract/RECONSTRUCTION_GUIDE.md",
+      "baseline_sha256": "8b24f9add6fb23f904e8424ee35c93f9c71dd6e2d8b99cd36460317cc6aa8a59",
+      "executable": false
+    },
+    {
+      "path": "config/ui_contract/SPEC.md",
+      "baseline_sha256": "8b335f23e62b3ff3b8ee85e3d1cfb363619404c21ce8eeb7762a3a546f351cf4",
+      "executable": false
+    },
+    {
+      "path": "config/ui_contract/UI_LANGUAGE.md",
+      "baseline_sha256": "c05208ad2f08cd1ea7c71b528a9767339c38d7340db45b50110b5b89d95e47e1",
+      "executable": false
+    },
+    {
+      "path": "config/ui_contract/design_tokens.json",
+      "baseline_sha256": "a0f46a47d501881387892354811cca761437d436a248794e698962f0c509bdb3",
+      "executable": false
+    },
+    {
+      "path": "config/ui_contract/schema.json",
+      "baseline_sha256": "a4a36ffdb27273cf5c5fb167e6393ca2ebd48e922e6548994dc13886e52a3d76",
+      "executable": false
+    },
+    {
+      "path": "config/ui_contract/source_map.json",
+      "baseline_sha256": "bce5e9930990fadeb23e3e703b5dc1329e40b5d6e363585bd44a0f91132330af",
+      "executable": false
+    },
+    {
+      "path": "config/urls.py",
+      "baseline_sha256": "636c868245dab6ead6a7c9841a5394cc70db8fd5fa12f46b10e7b6b0fd16c2b0",
+      "executable": false
+    },
+    {
+      "path": "config/urls_realdata_preview.py",
+      "baseline_sha256": "67acbe2ba217a6bd14fbb44998e49e828856b4716acb719daab75e0eae7ed611",
+      "executable": false
+    },
+    {
+      "path": "config/wsgi.py",
+      "baseline_sha256": "dfc2103dccdce48fc230d14b17edd49a3f8d34b4c32a79ee7a782d224f939ac6",
+      "executable": false
+    },
+    {
+      "path": "config/wsgi_local_preview.py",
+      "baseline_sha256": "c3f4db90db3b9428cf995d264bd2a04a604e29a573ebba5dc31e554c6dd346eb",
+      "executable": false
+    },
+    {
+      "path": "config/wsgi_realdata_preview.py",
+      "baseline_sha256": "92b3c26bf00468c0218cb8f663c4a55321a35138640498fd19b83ad0e30ef501",
+      "executable": false
+    },
+    {
+      "path": "manage.py",
+      "baseline_sha256": "550491a6eb911daac1ecd7a44647ae346b63823551c3035032a6a8b860d211ba",
+      "executable": false
+    },
+    {
+      "path": "pyproject.toml",
+      "baseline_sha256": "19911dc24204ccf19234a91e770810d38d0cf02374ce12c443f08808a23ed3db",
+      "executable": false
+    },
+    {
+      "path": "static/icons/templedb-mark.svg",
+      "baseline_sha256": "ff887b66a84ca3b5f88039fc079b8e8bb6a3f6a8b0981c5fb8d6da1093da3071",
+      "executable": false
+    },
+    {
+      "path": "static/office/home_day_refresh.js",
+      "baseline_sha256": "765614ace7f948c019931599d9760a1d0fdf0783345fb1465c76a2bd38cb8f62",
+      "executable": false
+    },
+    {
+      "path": "static/office/household_panel_navigation.js",
+      "baseline_sha256": "59186107708e6e8623b28af6ea6acf3f961dcbff2e891bf75d8e7cee4bb4c137",
+      "executable": false
+    },
+    {
+      "path": "static/office/print_sheet_tools.js",
+      "baseline_sha256": "50802a61ccc13663bc0a21fc6d4160fa08d0829b660e3c1de4ee643f9f038710",
+      "executable": false
+    },
+    {
+      "path": "static/office/realdata_preview.css",
+      "baseline_sha256": "09af730a09155e4a70a495df82bbc3995c90a5cd6f68fe5dfe8476c543feb3c0",
+      "executable": false
+    },
+    {
+      "path": "static/office/schema_map.css",
+      "baseline_sha256": "966bf9f3a6079d8cced39bec24cabff338b55dea6dc5f90d861c2e280360ebe6",
+      "executable": false
+    },
+    {
+      "path": "static/office/schema_map.js",
+      "baseline_sha256": "2068e1c4cc7f952fd608a0982a8f924191268099774271f3236a08c915113608",
+      "executable": false
+    },
+    {
+      "path": "static/office/service_link_horizon.js",
+      "baseline_sha256": "a844c48496cb8675418537949e0eb07189fd2b4091606fb1124e26f0506929ae",
+      "executable": false
+    },
+    {
+      "path": "static/office/service_payment_rows.js",
+      "baseline_sha256": "a9c3bd408c5b56ad7db6970201e59390bf74661110a11c75043775dca071e70f",
+      "executable": false
+    },
+    {
+      "path": "static/office/service_pdf_print.js",
+      "baseline_sha256": "a503906a03ef6ac8271e4e74884ef2020e3bf471bb1e65b0ba66c0b748a16180",
+      "executable": false
+    },
+    {
+      "path": "templates/base.html",
+      "baseline_sha256": "4fa16a65af04aacefefba006c0bf37b9767e276ec3c686353e5ed108b8eea504",
+      "executable": false
+    },
+    {
+      "path": "templates/core/_realdata_preview_banner.html",
+      "baseline_sha256": "04405351901aa79fbfeb7ad33675622c715f991ce9abd34910a74fe4c9a09297",
+      "executable": false
+    },
+    {
+      "path": "templates/core/realdata_preview_exit.html",
+      "baseline_sha256": "016e78a1ab3a6cf459597bc11490d6827bd9a9bde8c20645ad83815cac8d4cac",
+      "executable": false
+    },
+    {
+      "path": "templates/imports/console.html",
+      "baseline_sha256": "626e1dabc10b85466165f1a57c43114f87063963c09ed51c2f9817afe6c3e94c",
+      "executable": false
+    },
+    {
+      "path": "templates/includes/app_quicklinks.html",
+      "baseline_sha256": "0b730f36bd550b4cac638107a8950fa9acad95a5b3c71cbac84fa3202cff8ec5",
+      "executable": false
+    },
+    {
+      "path": "templates/includes/office_nav.html",
+      "baseline_sha256": "c539eaed5fdf1649824a1c25c778f061602fb83f2d37cecefc3f3959ebd05603",
+      "executable": false
+    },
+    {
+      "path": "templates/includes/office_subnav.html",
+      "baseline_sha256": "4046a5f68cb6be7324bd26065599a3de1b24df7248d9e65b755cc4b67181b432",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_accounting_entry_table.html",
+      "baseline_sha256": "351e2c1855e36eba5ef1e56de4e2aae2a06208925d07580c1753517b23140234",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_accounting_month_grid.html",
+      "baseline_sha256": "49413ae8f22c9cbbb3e778819770f8e44cc63982887a3fcfb38ab6dafbce8d6c",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_annual_membership_fee_row.html",
+      "baseline_sha256": "8db8b0813c912aeb3c43495c172e72ee0069e57bb4ddb8bff455b61757efcb49",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_data_quality_sections.html",
+      "baseline_sha256": "04abb7ff5a99c4c51812db3edee8ad7febcc1899f8265846c495e3c26b38ee19",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_data_science_fragment_base.html",
+      "baseline_sha256": "8fa87709e7013ad93b29f5e0ee67b612b4a4c8c3db70072c63ddbf5c9fbc3e4f",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_home_service_completion.html",
+      "baseline_sha256": "bd3987f34f8ff7367371dfc63f5310e9b8bca1c44fdbcde751e330952f6ee79c",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_home_temple_event.html",
+      "baseline_sha256": "df0b3435333cdf3419ca6b9adc3ab291e0bbb68b88739460326b1ba66f15732a",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_household_browser_detail_content.html",
+      "baseline_sha256": "b3a0fb7d0245d347f73eadc43f22ca274c41078d4ab6f66042945ff1fe7ce932",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_household_browser_list_items.html",
+      "baseline_sha256": "eeff37467eef111f69598124962da7635c41cca0ae9bfafa087c7ae4ed103f69",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_household_rinju_records.html",
+      "baseline_sha256": "4114f68a5b9d226b155bce8af548c6d12aaad449c2e1bfa401230e32f8a80e17",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_recovery_health_warning.html",
+      "baseline_sha256": "815eb3a71d297af512e01b4104b9aa4d9228e48d0af408abcdca2392f109b682",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_service_ledger_candidate_pagination.html",
+      "baseline_sha256": "13ecd90d04fe9db944032a587b8df743bc8b5f43d866455221d4ac38bce88823",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_service_ledger_card_styles.html",
+      "baseline_sha256": "61db2b5cadc2639a68133fab1866eafab6900f3d326d6f081f13be7019b818dc",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_service_ledger_section.html",
+      "baseline_sha256": "9fc095536aa0e3d8b2ed75dad37a7eda1cdaab4569051fe72a914043c691ebcf",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_temple_event_payment_form.html",
+      "baseline_sha256": "4a9dbb1ca4c57d07a95fcc6afa9a61fc3c79ad1f5efc9f3b3d1ae13821d436a4",
+      "executable": false
+    },
+    {
+      "path": "templates/office/_temple_event_styles.html",
+      "baseline_sha256": "abad1b4111b38011827cd0c9d42e0e4fd8c3d1cc101a9d93bca7a767794743aa",
+      "executable": false
+    },
+    {
+      "path": "templates/office/accounting.html",
+      "baseline_sha256": "9b92ef09cb29be3fc33ebdd8370767376928ea6eafc9f3a84a219441d8475353",
+      "executable": false
+    },
+    {
+      "path": "templates/office/annual_membership_fee_check_sheet_scan_detail.html",
+      "baseline_sha256": "f53c967a460a9bd08ead7474ed337a1729f326b7dc1116b94fe2add854b98de6",
+      "executable": false
+    },
+    {
+      "path": "templates/office/annual_membership_fee_check_sheets.html",
+      "baseline_sha256": "1ed1b8d504782853afffb48bad555c017a370939219f8b9983aae1d31a55e243",
+      "executable": false
+    },
+    {
+      "path": "templates/office/annual_membership_fee_postal_scans.html",
+      "baseline_sha256": "721e338135097ca0929afe0a57059495375038a8e229498899392759dac8343c",
+      "executable": false
+    },
+    {
+      "path": "templates/office/annual_membership_fee_receipts.html",
+      "baseline_sha256": "5af2f5e92b46965711ef924c047e8d7f2fc9765e2cdd84963fceb9e3c83d74b1",
+      "executable": false
+    },
+    {
+      "path": "templates/office/annual_membership_fees.html",
+      "baseline_sha256": "525d287809f57aefcbe6dbe55e1e5c9212a8f0f2026dd0529e2fc0515f651c17",
+      "executable": false
+    },
+    {
+      "path": "templates/office/backup_migration_guide.html",
+      "baseline_sha256": "a4c5f441784a9f38b0eef7d6e60bf65c97df08f00ad9eb71d06eda1e0aa99e85",
+      "executable": false
+    },
+    {
+      "path": "templates/office/backup_settings.html",
+      "baseline_sha256": "5897b03327b8b2ada5ca5761531fdc156a27a7e999b05f98776468357ca66682",
+      "executable": false
+    },
+    {
+      "path": "templates/office/data_imports.html",
+      "baseline_sha256": "e217708450a67d232789140d04226581f41432a0000d55b7a90d2aa1bb101cfe",
+      "executable": false
+    },
+    {
+      "path": "templates/office/data_quality.html",
+      "baseline_sha256": "d0c837d93c9cb2a197fef0f911d6af7c3792bbc7583907f949d357170dd5e310",
+      "executable": false
+    },
+    {
+      "path": "templates/office/data_science.html",
+      "baseline_sha256": "f473362f54003faad34be6f7f8b21badf686d5ae732d598e374b8256f14af14c",
+      "executable": false
+    },
+    {
+      "path": "templates/office/district_member_sheets.html",
+      "baseline_sha256": "f6b7c59b05370bf1516697e637e2db19fb48fb8e7ca42eb5afb58229dfa7f089",
+      "executable": false
+    },
+    {
+      "path": "templates/office/district_member_sheets_print.html",
+      "baseline_sha256": "7def4187916f0f8d5df46a560b12a2755d97666d3dd1567db9ad96d31df73971",
+      "executable": false
+    },
+    {
+      "path": "templates/office/district_officer_delivery_labels.html",
+      "baseline_sha256": "dcc2776167179a8b2c92adaebc0c83dc5aaf4c5f7ee6314c7e309705daca7ae1",
+      "executable": false
+    },
+    {
+      "path": "templates/office/district_officer_postal_labels.html",
+      "baseline_sha256": "7ece2808f327f32b099a213b6384747205a917bf58dd2ca909c8c12a9328c226",
+      "executable": false
+    },
+    {
+      "path": "templates/office/districts.html",
+      "baseline_sha256": "80e9f4fcdd11e12cb9e79c84e993700455f2438eea321fce710cc1e5e4a8340e",
+      "executable": false
+    },
+    {
+      "path": "templates/office/google_calendar_settings.html",
+      "baseline_sha256": "f9988defcd961c71da90745ccba156d562eeb74292fe5e18c70a93891b8365aa",
+      "executable": false
+    },
+    {
+      "path": "templates/office/hand_delivery_review.html",
+      "baseline_sha256": "cdce467ad9c538fd51264e3e71576155d4b770095db89798a43a967eb4d014fd",
+      "executable": false
+    },
+    {
+      "path": "templates/office/home.html",
+      "baseline_sha256": "a4ad9ef85b8e4ff5e14e3a6739bd5295cd5f48ee256ac52576b4292a5022e807",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_browser.html",
+      "baseline_sha256": "1dd7e56c7d9fafe4ade120974c55fa332b8a5716dc8ecf43a0220a3ee4cd06a0",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_districts.html",
+      "baseline_sha256": "fe401e357c23b21f6a7383f9c70d78328ef6327bfa256764118d882631f85e84",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_extinct_confirm.html",
+      "baseline_sha256": "636140ffcbb637c6d92132bba2fc83346d3605aea2d99490d9769e9d7037c6cc",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_head_transition.html",
+      "baseline_sha256": "a161c24c26a68a0fcb7213c603ec52f46e42bd1a1da445442ad8a87e7fedb3d3",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_information_pdf_preview.html",
+      "baseline_sha256": "258c4c52e423b4aea8998ee6dede73249a8492bc866bf9cc7e569dec49f02f78",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_information_print.html",
+      "baseline_sha256": "b6b7b9b6190e297ddb5dbc026d604183a95d8852b02ce59a011c11e135440210",
+      "executable": false
+    },
+    {
+      "path": "templates/office/household_memorial_list.html",
+      "baseline_sha256": "8b50ac03f9a8d731b2bcb992f39b32ba311d78197abea41278770030ea6892fa",
+      "executable": false
+    },
+    {
+      "path": "templates/office/includes/memorial_sheet_document.html",
+      "baseline_sha256": "1c176ea539579ee97005259f312151379854a7a5c8b2dac68366b97afb50bebc",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memo_tag_catalog.html",
+      "baseline_sha256": "4e9122a3c0a9d83176df10cd27ded2b1df8723502094f3842700568d62a7bc75",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memorial_distribution.html",
+      "baseline_sha256": "d88cd04606cb3c9d00e927d3161bb1c55a8d6a75785709c1c980ca68116f6811",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memorial_distribution_print.html",
+      "baseline_sha256": "1ae36b20110d2e0279a6f7015ab70c51bbc2f730b52cb8f097ef6c96096b81b6",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memorial_notices.html",
+      "baseline_sha256": "5be7589648b5cd2c223a0d9e9d36c7f2b0da25380795642e73d9f28d1d10a4fa",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memorial_sheet.html",
+      "baseline_sha256": "fcf3cbcd303264ac30f436c80228753e5f737e3686833c632aa6c0eff4ee35ed",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memorial_sheet_pdf.html",
+      "baseline_sha256": "fb88746b25d6ebd8c1c316f569bd04dc9fa9cf76e1a1e9a24b17ca8f7d74d507",
+      "executable": false
+    },
+    {
+      "path": "templates/office/memorial_sheet_print.html",
+      "baseline_sha256": "50461a62079a28f79125cab0c75b7cbc449cf8d8c7aa697d9ea40fd52d581f5b",
+      "executable": false
+    },
+    {
+      "path": "templates/office/monto_sodai_postal_labels.html",
+      "baseline_sha256": "2b1025a96f796428fcbddfe88f24e1b0f8447fe7d3885662996d535b399199e1",
+      "executable": false
+    },
+    {
+      "path": "templates/office/move_memorial_person_confirm.html",
+      "baseline_sha256": "2c3a1ca8fb102e3c72bcf98fed2d2b0619ffb5940921f2e3ed40df29fa80aafe",
+      "executable": false
+    },
+    {
+      "path": "templates/office/move_memorial_person_household.html",
+      "baseline_sha256": "9dbabb147f0c3ee847c4e555acb5326a06957f1357466ba8650af7950c5eeeb3",
+      "executable": false
+    },
+    {
+      "path": "templates/office/new_current_person.html",
+      "baseline_sha256": "2b6056c7e7bbab6682a2e506111dc3c6262af94f7283e97f0896ae01b18e2352",
+      "executable": false
+    },
+    {
+      "path": "templates/office/new_household.html",
+      "baseline_sha256": "c7c45cb9731f071d7d0ad0644982769349cd5040e83507d926600393f5c25090",
+      "executable": false
+    },
+    {
+      "path": "templates/office/new_memorial_person.html",
+      "baseline_sha256": "6e2be9c5de46c99a14ef7290c16f553491800149bfe87fc477891fe86fd13d6e",
+      "executable": false
+    },
+    {
+      "path": "templates/office/officer_roster.html",
+      "baseline_sha256": "43792886c5c639d9abc507c748c15094d51acbf977abf415a3e4f1fa1e4f6e43",
+      "executable": false
+    },
+    {
+      "path": "templates/office/partials/district_member_sheet.html",
+      "baseline_sha256": "4cbd48721264dcc91db8f48fc9035e4fb491a77c563e4efc88e098c75157cc1f",
+      "executable": false
+    },
+    {
+      "path": "templates/office/partials/district_member_sheet_styles.html",
+      "baseline_sha256": "6f580a615f9aa55db9820601c9c6a633c83b3a82335a1e0169bebb3c5d0fc0d3",
+      "executable": false
+    },
+    {
+      "path": "templates/office/partials/memorial_notice_page.html",
+      "baseline_sha256": "1cd7b8cb57c478e5161b28039a669baa8d448a66583a2f76c5423633f851b13f",
+      "executable": false
+    },
+    {
+      "path": "templates/office/partials/memorial_notice_styles.html",
+      "baseline_sha256": "fd14afcc749f3899d4029217cc99511ed3e63473230a14a797c4202ab7cfcdda",
+      "executable": false
+    },
+    {
+      "path": "templates/office/person_memorial_transition.html",
+      "baseline_sha256": "8dfc47559d26e7c62916675d277288628e9381be08fb87e416a0a73ae082d287",
+      "executable": false
+    },
+    {
+      "path": "templates/office/person_search.html",
+      "baseline_sha256": "f28a20c8c1782410363dc0a02cff155e3c6ae10420c2a76db674b8b2e2c61c28",
+      "executable": false
+    },
+    {
+      "path": "templates/office/postal_compare.html",
+      "baseline_sha256": "d60035006df64319554536af27623bb7d5b16d88229e9a86ba43706a0ef09146",
+      "executable": false
+    },
+    {
+      "path": "templates/office/postal_labels.html",
+      "baseline_sha256": "7df53af6f35326679d91e69c0551cda58c93d4a24911ab9322f03660f9be0309",
+      "executable": false
+    },
+    {
+      "path": "templates/office/postal_review.html",
+      "baseline_sha256": "102484064e1954e774456ef4245b90c2b8e3e27c68aae784792720a13eb7d63a",
+      "executable": false
+    },
+    {
+      "path": "templates/office/print_hub.html",
+      "baseline_sha256": "765e959ba79667072c54cd5e7b0abdd93c48ec837288a927586d84fe4e56e6ba",
+      "executable": false
+    },
+    {
+      "path": "templates/office/record_action_result.html",
+      "baseline_sha256": "afe8a55ff4a8e93e259143d88c728c066e11655595da4a3179cbe2af3a4913a6",
+      "executable": false
+    },
+    {
+      "path": "templates/office/record_delete_confirm.html",
+      "baseline_sha256": "237a0173dc5b1566ec5c22a31eb6b73d37c44efbdd82bc3b039ee30323742e80",
+      "executable": false
+    },
+    {
+      "path": "templates/office/record_edit.html",
+      "baseline_sha256": "aa46f1b80cb61669060600d470a27704c3f69762058d85ef46cd14e99d7a91f6",
+      "executable": false
+    },
+    {
+      "path": "templates/office/record_history.html",
+      "baseline_sha256": "bbb0efdf7bb4ac86c40a1d45fa5fcbe63a02e3071c95a2104033bc05992f65cd",
+      "executable": false
+    },
+    {
+      "path": "templates/office/schema_map.html",
+      "baseline_sha256": "97f6a4ab969d73570b7fb9b177274105e7d4d08afa33c1ec678cb10ff573131c",
+      "executable": false
+    },
+    {
+      "path": "templates/office/service_candidate_cancel_confirm.html",
+      "baseline_sha256": "f8fe32d66b655f7b386412f77908a7cc6099ba3c3e361972599cf861ec3f6525",
+      "executable": false
+    },
+    {
+      "path": "templates/office/service_candidate_funeral_confirm.html",
+      "baseline_sha256": "3b53594d2f59d23d5ab2799b0062d4bbcf97ec7e07c9e8b207c59921d496d1b0",
+      "executable": false
+    },
+    {
+      "path": "templates/office/service_information_pdf_preview.html",
+      "baseline_sha256": "d01f3da9dfe8771c73abb04d76aed4646d636d1b1ece743ae5069d3fcf2538e8",
+      "executable": false
+    },
+    {
+      "path": "templates/office/service_ledger.html",
+      "baseline_sha256": "7080c1a06eb678ba93551b9534e405d36c0c8c56b44051c0cd536cc679d9fa1c",
+      "executable": false
+    },
+    {
+      "path": "templates/office/service_schedule_print.html",
+      "baseline_sha256": "8f54ac2b2fbed65cca43e1bdca5ab84275dbeb8c063c60187151959721eb7d75",
+      "executable": false
+    },
+    {
+      "path": "templates/office/settings_home.html",
+      "baseline_sha256": "15ac68202ee23a9b1b55d28afa2d831a327b6be5ced18f044091680b22862ad1",
+      "executable": false
+    },
+    {
+      "path": "templates/office/special_searches.html",
+      "baseline_sha256": "fba66c0fcc6e600a78b8c0df5019cc1722e3a01e491d528f9b8144e2f2bcc6b0",
+      "executable": false
+    },
+    {
+      "path": "templates/office/temple_event_edit.html",
+      "baseline_sha256": "ecc309b7e1685519cd82dae53e26e246cf13406929a606ef03576ea0f773a58b",
+      "executable": false
+    },
+    {
+      "path": "templates/office/temple_events.html",
+      "baseline_sha256": "daabb033d70ab84c54c90bffaa0993c10623f526ea70ec1b9028e0ef4943b6d3",
+      "executable": false
+    },
+    {
+      "path": "templates/office/universal_search.html",
+      "baseline_sha256": "81675edba6a425316ffe0d1247960f59ee11367aa391b638b84d1c83b68d9871",
+      "executable": false
+    },
+    {
+      "path": "templates/office/user_management.html",
+      "baseline_sha256": "12b726f7ed558e5144ee6b13779e04e5b8632513e7b22cff221cf36df7ad65d6",
+      "executable": false
+    },
+    {
+      "path": "templates/office/virtual_head_replace.html",
+      "baseline_sha256": "37c6c188c9bba8f76ea5cec7f0dbb0af65c3d954dee67cb7c3849d98da568f3b",
+      "executable": false
+    },
+    {
+      "path": "templates/registration/login.html",
+      "baseline_sha256": "24750ea1ce6f0d1db4715a661d1dee296bf37426dc741cf9f1dc3b80e8f5845f",
+      "executable": false
+    },
+    {
+      "path": "templates/registration/password_change_done.html",
+      "baseline_sha256": "fcb2741af2c78e5266a46c8e645cf86a79314acab366d323ef9db11dd5c14bf3",
+      "executable": false
+    },
+    {
+      "path": "templates/registration/password_change_form.html",
+      "baseline_sha256": "25b24bcb78e163b2fd2b007c18fe578e333b9be447d5626e79dd3193a4e190e9",
+      "executable": false
+    }
+  ]
+}

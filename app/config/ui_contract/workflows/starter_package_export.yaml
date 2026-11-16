@@ -1,0 +1,42 @@
+contract_type: workflow
+version: 2
+workflow_id: starter_package_export
+title: TempleDBスターターパッケージ出力
+entry_points:
+  - settings_home
+steps:
+  - step_id: open_settings
+    intent: Superuser opens settings home in a product checkout that contains the private demo factory.
+    screen_id: settings_home
+  - step_id: request_package
+    intent: Submit the CSRF-protected starter-package form by POST.
+    screen_id: settings_home
+  - step_id: build_in_private_workspace
+    intent: Invoke the fixed reviewed demo builder once with a minimal environment, private temporary paths, and a non-blocking process lock.
+    screen_id: settings_home
+  - step_id: receive_archive
+    intent: Browser downloads the no-store application/gzip package without seeing raw builder output.
+    screen_id: settings_home
+completion: One archive can be extracted for an immediate synthetic demo or opened in Codex for guided creation of a separate clean product database and optional adapter-based legacy-data migration.
+authorization:
+  role: superuser
+  method: POST
+  csrf_required: true
+package_contents:
+  - runnable synthetic demo workspace
+  - Codex-first setup and maintenance instructions
+  - safe clean product database initialization path
+  - private source placement, adapter, dry-run, validation, backup, and restore-verification guidance
+package_exclusions:
+  - current operational database rows or backup
+  - credentials and local environment secrets
+  - private MDB, CSV, SQL dump, or other legacy source supplied by a future user
+guardrails:
+  - The current production runtime and database configuration are not changed.
+  - The demo database remains synthetic and is never converted into a product database.
+  - A clean product database is created separately during Codex-assisted setup.
+  - The web service invokes only the fixed tracked builder with shell execution disabled.
+  - The builder receives a minimal environment instead of the production process environment.
+  - One non-blocking lock prevents concurrent builds from sharing or racing over factory state.
+  - Builder stdout and stderr are never returned to the browser or copied into flash messages.
+  - Demo runtimes and distributions without the private factory do not expose the action.

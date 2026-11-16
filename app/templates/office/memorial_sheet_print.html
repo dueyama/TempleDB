@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ print_heading_labels.memorial_sheet }} 印刷 | TempleDB</title>
+    <link rel="stylesheet" href="{% url 'office:memorial_sheet_font_css' %}">
+    <style>
+      :root {
+        --font-print-body: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif;
+        --font-print-homyo: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", "游明朝体", "Noto Serif JP", serif;
+      }
+      * { box-sizing: border-box; }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        background: #f2f0ea;
+        color: #000;
+        font-family: var(--font-print-body);
+      }
+      .print-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.94);
+        border-bottom: 1px solid #ddd6c6;
+      }
+      .button,
+      .ghost-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 14px;
+        border: 1px solid #7a3b1d;
+        font: inherit;
+        text-decoration: none;
+      }
+      .button {
+        background: #7a3b1d;
+        color: #fffaf0;
+      }
+      .ghost-button {
+        background: #fff;
+        color: #1d1b15;
+      }
+      .print-stage {
+        display: flex;
+        justify-content: center;
+        padding: 12px;
+        overflow: hidden;
+      }
+      .sheet-slot {
+        display: block;
+      }
+      .sheet-frame {
+        width: 190mm;
+        height: 281mm;
+        transform-origin: top left;
+      }
+      .a4-page {
+        width: 190mm;
+        height: 281mm;
+        background: #fff;
+        color: #000;
+        border: 1px solid #000;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        padding: 10mm 9mm;
+      }
+      .document-blocks {
+        display: flex;
+        flex-direction: column;
+        gap: 8mm;
+        height: 100%;
+      }
+      .upper-block,
+      .lower-block {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 12mm;
+        min-height: 0;
+        flex: 1;
+        padding-top: 10mm;
+      }
+      .upper-block {
+        padding-bottom: 4mm;
+        border-bottom: 1px solid #000;
+      }
+      .column {
+        min-height: 0;
+      }
+      .vertical-text {
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        letter-spacing: 0.08em;
+      }
+      .person-column {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 3.5mm;
+        padding-top: 30mm;
+      }
+      .kijitsu-columns {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.2mm;
+        padding-top: 2.5mm;
+      }
+      .kijitsu-col {
+        display: grid;
+        grid-template-rows: 42mm auto;
+        align-items: start;
+        row-gap: 2mm;
+      }
+      .memorial-columns {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.8mm;
+        padding-top: 2.5mm;
+      }
+      .memorial-col {
+        display: grid;
+        grid-template-rows: 24mm auto;
+        align-items: start;
+        row-gap: 26mm;
+      }
+      .homyo,
+      .zokumyo,
+      .death-line,
+      .age-line,
+      .kijitsu-label,
+      .kijitsu-date,
+      .rank,
+      .year,
+      .temple-name,
+      .temple-phone {
+        margin: 0;
+      }
+      .homyo {
+        font-family: var(--font-print-homyo);
+        font-size: 2.25rem;
+        font-weight: 700;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .homyo-text {
+        display: inline-block;
+        transform: translateY(var(--homyo-center-offset, 0));
+      }
+      .homyo-small {
+        display: inline-block;
+        font-size: 0.72em;
+        transform: translateX(0.18em);
+      }
+      .zokumyo {
+        font-size: 1.05rem;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .death-line {
+        font-size: 1.18rem;
+        margin-top: -10mm;
+      }
+      .age-line {
+        font-size: 0.74rem;
+        white-space: nowrap;
+        inline-size: max-content;
+      }
+      .zokumyo-block {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 1.8mm;
+        margin-top: 25mm;
+      }
+      .age-under-name {
+        margin-top: 3.1rem;
+      }
+      .kijitsu-label {
+        font-size: 1.26rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .kijitsu-sub {
+        font-size: 0.68em;
+      }
+      .kijitsu-date {
+        font-size: 1.14rem;
+        color: #000;
+        white-space: nowrap;
+      }
+      .rank {
+        font-size: 1.42rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .year {
+        font-size: 1.22rem;
+        white-space: nowrap;
+      }
+      .temple-column {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-start;
+        gap: 3mm;
+        padding-top: 40mm;
+      }
+      .temple-column-upper {
+        margin-left: 5mm;
+      }
+      .temple-column-lower {
+        align-self: flex-end;
+        margin-left: 17mm;
+        margin-bottom: 6mm;
+        padding-top: 0;
+      }
+      .temple-name {
+        font-size: 1.14rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .temple-phone {
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+      @media print {
+        html,
+        body {
+          width: auto;
+          height: auto;
+          margin: 0 !important;
+          padding: 0 !important;
+          min-height: 0 !important;
+          overflow: visible !important;
+          background: #fff !important;
+        }
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .screen-only {
+          display: none !important;
+        }
+        .print-stage,
+        .sheet-slot,
+        .sheet-frame {
+          display: block !important;
+          width: auto !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          transform: none !important;
+        }
+        .a4-page {
+          width: auto !important;
+          height: auto !important;
+          min-height: 0 !important;
+          margin: 0 !important;
+          padding: 10mm 9mm !important;
+          border: none !important;
+          box-shadow: none !important;
+          background: #fff !important;
+          overflow: visible !important;
+        }
+        .document-blocks {
+          height: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="print-toolbar screen-only">
+      <button class="button" type="button" onclick="window.print()">印刷する</button>
+      <a class="ghost-button" href="?">戻る</a>
+    </nav>
+    <main class="print-stage">
+      <div class="sheet-slot" data-print-sheet-slot>
+        <div class="sheet-frame" data-print-sheet-frame>
+          <div class="a4-page">
+            {% include "office/includes/memorial_sheet_document.html" %}
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="{% static 'office/print_sheet_tools.js' %}"></script>
+    <script>
+      (() => {
+        const fontStorageKey = "templedb.memorialSheet.fonts.v1";
+        const fontValueAliases = {
+          '"HGGyoshotai", "HG行書体", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif': '"TempleDB-HGGyoshotai", "HGGyoshotai", "HG行書体", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif',
+          '"AGENDAJinmeiGyoshotaiL1", "AGENDA人名行書体L1", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif': '"TempleDB-AGENDAJinmeiGyoshotaiL1", "AGENDAJinmeiGyoshotaiL1", "AGENDA人名行書体L1", "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", "Yu Mincho", serif',
+          '"DFPGyoSho-Lt", "DFGyoSho-Lt-MP-RKSJ-H", "ＤＦＰ行書体", serif': '"TempleDB-DFPGyoSho-Lt", "DFPGyoSho-Lt", "DFGyoSho-Lt-MP-RKSJ-H", "ＤＦＰ行書体", "Hiragino Mincho ProN", serif',
+        };
+        const normalizeFontValue = (value) => fontValueAliases[value] || value;
+        const root = document.documentElement;
+        const bodyTargets = document.querySelectorAll(
+          ".zokumyo, .death-line, .age-line, .kijitsu-label, .kijitsu-date, .rank, .year, .temple-name, .temple-phone"
+        );
+        const homyoTargets = document.querySelectorAll(".homyo");
+        const applyStoredFonts = () => {
+          try {
+            const raw = window.localStorage.getItem(fontStorageKey);
+            if (!raw) {
+              return;
+            }
+            const parsed = JSON.parse(raw);
+            const bodyFont = parsed.body ? normalizeFontValue(parsed.body) : "";
+            const homyoFont = parsed.homyo ? normalizeFontValue(parsed.homyo) : "";
+            if (bodyFont) {
+              root.style.setProperty("--font-print-body", bodyFont);
+              document.body.style.fontFamily = bodyFont;
+              bodyTargets.forEach((element) => {
+                element.style.fontFamily = bodyFont;
+              });
+            }
+            if (homyoFont) {
+              root.style.setProperty("--font-print-homyo", homyoFont);
+              homyoTargets.forEach((element) => {
+                element.style.fontFamily = homyoFont;
+              });
+            }
+          } catch (error) {
+            return;
+          }
+        };
+        applyStoredFonts();
+        window.TempleDBPrintSheet.setupPrintSheet();
+      })();
+    </script>
+  </body>
+</html>

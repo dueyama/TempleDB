@@ -1,0 +1,75 @@
+name: Synthetic maintenance
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check shell entry points
+        run: |
+          for script in bin/*.sh; do
+            bash -n "$script"
+          done
+      - name: Set up a synthetic demo only
+        env:
+          PYTHON_BIN: python
+        run: ./bin/setup.sh
+      - name: Run isolated maintenance tests
+        run: .venv/bin/python bin/test_maintenance.py
+      - name: Check isolated HTTP login and server shutdown
+        env:
+          SMOKE_SCRATCH: ${{ runner.temp }}
+        run: .venv/bin/python bin/check_demo_http.py --scratch-root "$SMOKE_SCRATCH"
+  windows-arm64:
+    runs-on: windows-11-arm
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        id: python
+        with:
+          python-version: '3.13'
+          architecture: arm64
+      - name: Set up the native synthetic demo from source
+        env:
+          DEMO_BOOTSTRAP_PYTHON: ${{ steps.python.outputs.python-path }}
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\windows_demo.ps1 -Action Setup -Python $env:DEMO_BOOTSTRAP_PYTHON
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify native demo and isolated maintenance
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\windows_demo.ps1 -Action Verify
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & .\.venv-windows-demo\Scripts\python.exe .\bin\test_maintenance.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Check isolated HTTP login and server shutdown
+        env:
+          SMOKE_SCRATCH: ${{ runner.temp }}
+        run: |
+          & .\.venv-windows-demo\Scripts\python.exe .\bin\check_demo_http.py --windows-native --scratch-root $env:SMOKE_SCRATCH
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Remove only the owned native demo runtime
+        if: always()
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\windows_demo.ps1 -Action Cleanup -ConfirmCleanup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

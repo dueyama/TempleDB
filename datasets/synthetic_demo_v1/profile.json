@@ -1,0 +1,38 @@
+{
+  "profile_source": "aggregate_database_profile",
+  "privacy": "aggregate-only; no real names, addresses, row notes, exact source rows, or credentials",
+  "generator_seed": 20260425,
+  "generated_household_count": 160,
+  "source_counts_bucketed": {
+    "households": "500-999",
+    "people": "1000+",
+    "deceased_profiles": "1000+",
+    "service_schedules": "50-99",
+    "offering_payments": "1-49",
+    "visit_notes": "0"
+  },
+  "district_weight_count": 10,
+  "age_bucket_weights": {
+    "0-49": 56,
+    "50-64": 67,
+    "65-74": 149,
+    "75-84": 308,
+    "85-94": 338,
+    "95+": 82
+  },
+  "service_month_weights": {
+    "1": 56,
+    "2": 96,
+    "3": 166,
+    "4": 111,
+    "5": 141,
+    "6": 74,
+    "7": 67,
+    "8": 85,
+    "9": 74,
+    "10": 43,
+    "11": 31,
+    "12": 56
+  },
+  "membership_paid_ratio": 0.78
+}

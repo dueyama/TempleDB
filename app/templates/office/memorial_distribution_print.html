@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}年回表配布準備・印刷 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  <style>
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+    {% include "office/partials/district_member_sheet_styles.html" %}
+    {% include "office/partials/memorial_notice_styles.html" %}
+    .distribution-shell { display: grid; gap: 22px; }
+    .distribution-tools { display: flex; flex-wrap: wrap; gap: 12px; }
+    .distribution-stack { display: grid; gap: 24px; min-width: 0; }
+    .distribution-item { min-width: 0; }
+    .distribution-caption { margin: 0 0 10px; color: var(--muted); }
+    .distribution-slot { margin: 0 auto; }
+    .distribution-frame { width: 210mm; transform-origin: top left; }
+    .distribution-item .district-sheet {
+      display: block;
+      overflow: visible;
+    }
+    .distribution-item .district-sheet-header { margin-bottom: 5mm; }
+    .distribution-item .district-members { display: block; }
+    .distribution-item .district-member { margin-bottom: 2.8mm; }
+    .distribution-item .district-note-block { margin-top: 6mm; }
+    .distribution-item .district-manual-note { overflow-wrap: anywhere; }
+    .distribution-item .district-last-print-record { display: none; }
+    .distribution-item .notice-page {
+      position: relative;
+      min-height: 297mm;
+      aspect-ratio: auto;
+      overflow: visible;
+    }
+    .distribution-item .page-layout { height: auto; }
+    .distribution-marker {
+      position: absolute;
+      top: 7mm;
+      right: 14mm;
+      font-size: 3.5mm;
+      line-height: 1.3;
+      color: #000;
+    }
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+      html, body { margin: 0 !important; padding: 0 !important; background: #fff; }
+      .shell { max-width: none; margin: 0; padding: 0; }
+      .session-bar, .global-nav, .office-subnav, .flash-list,
+      .distribution-screen-only { display: none !important; }
+      .distribution-shell, .distribution-stack, .distribution-item { display: block; }
+      .distribution-slot {
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+      }
+      .distribution-frame {
+        width: auto;
+        transform: none !important;
+      }
+      .distribution-item + .distribution-item { break-before: page; }
+      .distribution-item .district-sheet,
+      .distribution-item .notice-page {
+        width: 210mm;
+        min-width: 210mm;
+        max-width: 210mm;
+        min-height: 0;
+        height: auto;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+        overflow: visible;
+        background: #fff;
+      }
+      .distribution-item .district-sheet {
+        break-inside: auto;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+      }
+      .district-sheet-header { break-after: avoid; }
+      .district-member, .district-write-box { break-inside: avoid; }
+      .distribution-item .notice-page { break-inside: avoid; }
+      .notice-table tr { break-inside: avoid; }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="distribution-shell">
+    {% include "includes/office_nav.html" with current_section="distribution" %}
+    {% include "includes/office_subnav.html" with current_page="memorial_distribution" %}
+    <section class="hero distribution-screen-only">
+      <div class="eyebrow">年回表配布準備</div>
+      <h1>{{ print_title }}</h1>
+      {% if print_group == "district_without_notices" %}
+        <p>{{ target_year }}年の年回案内がない地区のリストだけを、地区設定の順で片面印刷します。人数やメモが多い地区のリストは、次のページへ続きます。</p>
+      {% else %}
+        <p>{{ target_year }}年の年回表を片面で印刷します。地区リストの後に、その地区のお宅の年回表が続きます。年回案内がない地区はリストだけを出します。人数やメモが多い地区のリストは、次のページへ続きます。</p>
+      {% endif %}
+    </section>
+    <div class="distribution-tools distribution-screen-only">
+      <a class="ghost-button" href="{{ return_url }}">配布準備へ戻る</a>
+      {% if print_items %}<button class="button" type="button" onclick="window.print()">印刷する</button>{% endif %}
+    </div>
+    {% if print_items %}
+      <div class="distribution-stack">
+        {% for item in print_items %}
+          <div class="distribution-item">
+            <p class="distribution-caption distribution-screen-only">
+              {% if item.kind == "district" %}
+                {{ item.sheet.district_name }}・地区メンバー一覧
+              {% else %}
+                {{ item.document.recipient_name }}様・年回表
+                {% if item.document.page_count > 1 %}（{{ item.document.page_number }} / {{ item.document.page_count }}枚目）{% endif %}
+              {% endif %}
+            </p>
+            <div class="distribution-slot" id="distribution-slot-{{ forloop.counter }}" data-distribution-slot>
+              <div class="distribution-frame" id="distribution-frame-{{ forloop.counter }}">
+                {% if item.kind == "district" %}
+                  {% include "office/partials/district_member_sheet.html" with sheet=item.sheet include_memorial_notice_marker=True %}
+                {% else %}
+                  {% include "office/partials/memorial_notice_page.html" with document=item.document distribution_marker=item.marker %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="callout distribution-screen-only">この区分に印刷する帳票はありません。</div>
+    {% endif %}
+  </div>
+  <script src="{% static 'office/print_sheet_tools.js' %}"></script>
+  <script>
+    document.querySelectorAll("[data-distribution-slot]").forEach((slot) => {
+      const frame = slot.querySelector(".distribution-frame");
+      window.TempleDBPrintSheet.setupPrintSheet({
+        slotSelector: `#${slot.id}`,
+        frameSelector: `#${frame.id}`,
+      });
+    });
+  </script>
+{% endblock %}

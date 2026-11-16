@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load imports_extras %}
+
+{% block title %}寺の予定 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  {% include "office/_temple_event_styles.html" %}
+{% endblock %}
+
+{% block body %}
+  <div class="temple-events-page">
+    <section class="hero">
+      <h1>寺の予定</h1>
+      <p>寺の行事・来訪・相談など、家の登録なしで予定と入金を記録できます。</p>
+      <div class="actions">
+        <a class="button" href="{% url 'office:create_temple_event' %}">寺の予定を追加</a>
+        <a class="ghost-button" href="{% url 'office:home' %}">ホーム</a>
+        <a class="ghost-button" href="{% url 'office:accounting' %}">会計</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form method="get" class="actions temple-filter-form">
+        <label class="temple-field">
+          予定年
+          <input type="number" name="year" min="1" max="9999" value="{{ year }}">
+        </label>
+        <label class="temple-field">
+          検索
+          <input type="search" name="q" value="{{ query }}" placeholder="予定名・相手先・メモ">
+        </label>
+        <button type="submit" class="button">表示</button>
+      </form>
+      <p>{{ page.paginator.count }}件 / この検索に該当する予定の入金合計 {{ total|floatformat:"0g" }}円</p>
+      <p class="muted">予定の日付で絞っています。入金日での月別・年別集計は「会計」で確認できます（納骨壇は別集計）。</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>日付・時刻</th>
+              <th>予定</th>
+              <th>相手先</th>
+              <th>場所</th>
+              <th>状態</th>
+              <th>入金</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event in page %}
+              <tr>
+                <td>{{ event.scheduled_date|date:"Y/m/d" }} {{ event.scheduled_time|time:"H:i" }}</td>
+                <td>
+                  <a href="{% url 'office:edit_temple_event' event_id=event.pk %}">{{ event.service_label }}</a>
+                  {% if event.household %}
+                    <br><span class="muted">関連する家: {{ event.household_name_snapshot }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ event.subject_name|default:"—" }}</td>
+                <td>{{ event.location|default:"—" }}</td>
+                <td>{{ event.get_status_display }}</td>
+                <td>{{ event.payment_total|floatformat:"0g" }}円（{{ event.payment_count }}件）</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6">該当する寺の予定はありません。</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="actions temple-panel-actions">
+        {% if page.has_previous %}
+          <a href="?year={{ year }}&amp;q={{ query|urlencode }}&amp;page={{ page.previous_page_number }}">前へ</a>
+        {% endif %}
+        <span>{{ page.number }} / {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}
+          <a href="?year={{ year }}&amp;q={{ query|urlencode }}&amp;page={{ page.next_page_number }}">次へ</a>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

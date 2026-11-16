@@ -1,0 +1,42 @@
+[
+  {
+    "years": 1,
+    "label": "一周忌",
+    "seq": 1
+  },
+  {
+    "years": 2,
+    "label": "三回忌",
+    "seq": 2
+  },
+  {
+    "years": 6,
+    "label": "七回忌",
+    "seq": 3
+  },
+  {
+    "years": 12,
+    "label": "十三回忌",
+    "seq": 4
+  },
+  {
+    "years": 16,
+    "label": "十七回忌",
+    "seq": 5
+  },
+  {
+    "years": 24,
+    "label": "二十五回忌",
+    "seq": 6
+  },
+  {
+    "years": 32,
+    "label": "三十三回忌",
+    "seq": 7
+  },
+  {
+    "years": 49,
+    "label": "五十回忌",
+    "seq": 8
+  }
+]

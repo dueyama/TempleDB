@@ -1,0 +1,201 @@
+.notice-page {
+  --recipient-font-size: 1.95rem;
+  --body-font-size: 1.14rem;
+  --signature-font-size: 1.12rem;
+  --table-font-size: 0.82rem;
+  width: 210mm;
+  min-width: 210mm;
+  aspect-ratio: 210 / 297;
+  max-width: none;
+  background: var(--paper);
+  border: 1px solid #d3cdc0;
+  box-shadow: 0 20px 44px rgba(33, 30, 23, 0.12);
+  margin: 0 auto;
+  padding: 14mm 14mm 12mm;
+  overflow: hidden;
+}
+.page-layout {
+  display: grid;
+  grid-template-rows: auto auto auto auto auto;
+  gap: 3mm;
+  align-content: start;
+  height: 100%;
+}
+.recipient-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 0.25em;
+  margin-top: 4mm;
+  margin-bottom: 4mm;
+}
+.recipient-name {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  font-size: var(--recipient-font-size);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+.recipient-name .suffix {
+  font-size: 1.15rem;
+}
+.intro-block,
+.outro-block,
+.signature-block {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  color: #2f2a23;
+}
+.intro-text,
+.outro-text,
+.signature-text {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.9;
+}
+.intro-text,
+.outro-text {
+  font-size: var(--body-font-size);
+  line-height: 1.82;
+}
+.signature-block {
+  border-top: 1px solid var(--line);
+  padding-top: 2.5mm;
+}
+.signature-text {
+  font-size: var(--signature-font-size);
+  line-height: 1.7;
+  text-align: right;
+}
+.table-column {
+  height: auto;
+  overflow: visible;
+  margin-top: 7mm;
+  margin-bottom: 7mm;
+}
+.notice-table {
+  width: 100%;
+  height: auto;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: rgba(255, 255, 255, 0.72);
+}
+.notice-table thead tr {
+  height: 7.2mm;
+}
+.notice-table thead th {
+  border: 1px solid var(--line);
+  padding: 4px 7px;
+  text-align: left;
+  vertical-align: middle;
+  font-family: "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
+  font-size: calc(var(--table-font-size) * 0.98);
+  font-weight: 700;
+  background: rgba(245, 239, 227, 0.9);
+  color: #53493d;
+}
+.notice-table td {
+  border: 1px solid var(--line);
+  padding: 4px 7px;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+  overflow: hidden;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  font-size: var(--table-font-size);
+  line-height: 1.2;
+}
+.notice-table td:empty::before {
+  content: "　";
+}
+.notice-table tbody tr {
+  height: 12.6mm;
+}
+.notice-table tbody tr.reference-heading-row td {
+  font-size: calc(var(--table-font-size) * 0.96);
+  font-weight: 700;
+  vertical-align: middle;
+  background: rgba(245, 239, 227, 0.45);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  white-space: normal;
+}
+.notice-table .date-cell {
+  line-height: 1.1;
+}
+.notice-table .date-cell .date-era {
+  display: block;
+  font-size: calc(var(--table-font-size) * 1);
+  color: #6d655a;
+  white-space: nowrap;
+}
+.notice-table .date-cell .date-main {
+  display: block;
+  margin-top: 4px;
+  padding-left: 0.45em;
+  font-size: calc(var(--table-font-size) * 1.32);
+  color: #1f1a14;
+  white-space: nowrap;
+}
+.notice-table .label-cell,
+.notice-table .kaimyo-cell {
+  font-size: calc(var(--table-font-size) * 1.24);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.notice-table .zokumyo-cell .name {
+  display: block;
+  font-size: calc(var(--table-font-size) * 1.24);
+  color: #1f1a14;
+  white-space: nowrap;
+}
+.notice-table .zokumyo-cell .age {
+  display: block;
+  margin-top: 4px;
+  padding-left: 0.45em;
+  font-size: calc(var(--table-font-size) * 0.9);
+  font-weight: 400;
+  color: #6d655a;
+  white-space: nowrap;
+}
+.notice-table .other-cell {
+  font-size: calc(var(--table-font-size) * 0.82);
+  line-height: 1.12;
+  max-height: 2.28em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: #453d33;
+}
+.empty-state {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.88);
+  padding: 24px;
+  text-align: center;
+}
+.notice-page {
+  color: #000;
+  background: #fff;
+  border-color: #000;
+  box-shadow: none;
+}
+.notice-page .intro-block,
+.notice-page .outro-block,
+.notice-page .signature-block,
+.notice-page .recipient-name,
+.notice-page .recipient-name .suffix,
+.notice-page .notice-table td,
+.notice-page .notice-table th,
+.notice-page .notice-table .date-cell .date-era,
+.notice-page .notice-table .date-cell .date-main,
+.notice-page .notice-table .zokumyo-cell .name,
+.notice-page .notice-table .zokumyo-cell .age,
+.notice-page .notice-table .other-cell {
+  color: #000;
+}
+.notice-page .signature-block,
+.notice-page .notice-table th,
+.notice-page .notice-table td {
+  border-color: #000;
+}
+.notice-page .notice-table,
+.notice-page .notice-table thead th {
+  background: #fff;
+}

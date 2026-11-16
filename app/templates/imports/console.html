@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block title %}外部データ取込 | TempleDB{% endblock %}
+
+{% block extra_head %}
+  {% if pipeline_running %}
+    <script>
+      window.setTimeout(function () {
+        window.location.href = "{% url 'imports:console' %}";
+      }, 2000);
+    </script>
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+  {% include "includes/office_nav.html" with selected_source_id=selected_source_id current_section="settings" %}
+  {% include "includes/office_subnav.html" with current_page="data_import_console" %}
+  <section class="hero">
+    <div class="eyebrow">Migration</div>
+    <h1>外部データ取込</h1>
+    <p>
+      current source の一括再取込、<code>export -> profile -> raw-layer -> DB import</code> の進行確認、batch 履歴の確認を行う管理画面です。
+      日常業務の入口は <a href="{% url 'office:home' %}">寺務ホーム</a> とし、ここでは移行・保守操作に集中します。
+    </p>
+    <div class="content">
+      <div class="actions" style="margin-top: 16px;">
+        <form method="post" action="{% url 'imports:run_action' 'start-import-pipeline' %}">
+          {% csrf_token %}
+          <button class="button" type="submit" {% if not primary_action_enabled %}disabled{% endif %}>
+            {% if pipeline_running %}
+              一括再取込を実行中
+            {% else %}
+              現在の source から一括再取込を開始
+            {% endif %}
+          </button>
+        </form>
+        <a class="button" href="{% url 'office:household_browser' %}">
+          戸主ブラウザを開く
+        </a>
+        <a class="button" href="{% url 'office:special_searches' %}">
+          特殊検索を開く
+        </a>
+        <a class="button" href="{% url 'office:settings_home' %}">
+          設定を開く
+        </a>
+        <a class="button" href="{% url 'office:annual_membership_fees' %}">
+          護持会費を開く
+        </a>
+        <a class="button" href="{% url 'office:service_ledger' %}">
+          法要台帳を開く
+        </a>
+        <a class="button" href="{% url 'office:memorial_notices' %}">
+          翌年回忌案内を開く
+        </a>
+        <a class="button" href="{% url 'office:record_history' %}">
+          変更履歴を見る
+        </a>
+        <a class="button" href="{% url 'office:data_science' %}">
+          統計・分析を見る
+        </a>
+      </div>
+      <p class="muted" style="margin-top: 12px;">
+        戸主ブラウザでは <code>台帳ID</code> 単位で、家・現在帳・過去帳・予定系を確認できます。
+        一括再取込は current source / latest snapshot を前提に同じパイプラインを再実行します。
+      </p>
+      {% if not legacy_reimport_operator_is_superuser %}
+        <p class="muted">一括再取込は管理者専用の保守操作です。</p>
+      {% elif not legacy_reimport_authorization.allowed %}
+        <p class="muted">{{ legacy_reimport_authorization.message }}</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="stack">
+    <section class="callout">
+      {% if pipeline_running %}
+        <strong>実行中:</strong>
+        {{ pipeline_status.current_stage_label }} を進めています。2 秒ごとにこの画面を更新します。
+        {% if pipeline_status.actor %}<span class="muted"> / 開始者 {{ pipeline_status.actor }}</span>{% endif %}
+      {% elif pipeline_status %}
+        <strong>前回実行:</strong>
+        {{ pipeline_status.summary }}
+        {% if pipeline_status.actor %}<span class="muted"> / 実行者 {{ pipeline_status.actor }}</span>{% endif %}
+        {% if pipeline_status.finished_at %}
+          <span class="muted">({{ pipeline_status.finished_at }})</span>
+        {% endif %}
+      {% else %}
+        <strong>開始前:</strong>
+        current source を更新したら、この画面から一括再取込を開始してください。
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="eyebrow">Kana normalization</div>
+      <h2>かな保存値を全角ひらがなへ統一</h2>
+      <p class="muted">
+        業務 DB 上の <code>Person.kana</code> を対象に、
+        現行運用中のデータだけを空白位置そのままで全角ひらがなへ正規化します。
+        raw provenance の <code>ﾌﾘｶﾞﾅ</code> や household 側の旧コピー列は対象外です。
+      </p>
+      <div class="actions" style="margin-top: 16px;">
+        <form method="post" action="{% url 'imports:run_action' 'normalize-kana-preview' %}">
+          {% csrf_token %}
+          <button class="ghost-button" type="submit" {% if pipeline_running %}disabled{% endif %}>
+            更新予定件数を確認
+          </button>
+        </form>
+        <form method="post" action="{% url 'imports:run_action' 'normalize-kana-execute' %}">
+          {% csrf_token %}
+          <button
+            class="button"
+            type="submit"
+            {% if pipeline_running %}disabled{% endif %}
+            onclick="return confirm('かな保存値を全角ひらがなへ正規化します。実行してよろしいですか？');"
+          >
+            かな保存値を正規化
+          </button>
+        </form>
+      </div>
+      <p class="muted" style="margin-top: 12px;">
+        先に更新予定件数を確認し、その後で本実行してください。
+        {% if pipeline_running %}
+          一括再取込の実行中はこの操作を無効化しています。
+        {% endif %}
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="eyebrow">Manual cleanup</div>
+      <h2>未設定の手入力法要残骸を整理</h2>
+      <p class="muted">
+        <code>manual_service_schedule</code> のうち、
+        <code>candidate</code> のまま予定日も実施日もない残骸だけを整理します。
+        入金・訪問メモ・非空メモがあるものは削除せず、preview で件数だけ確認します。
+      </p>
+      <div class="actions" style="margin-top: 16px;">
+        <form method="post" action="{% url 'imports:run_action' 'cleanup-manual-candidates-preview' %}">
+          {% csrf_token %}
+          <button class="ghost-button" type="submit" {% if pipeline_running %}disabled{% endif %}>
+            残骸件数を確認
+          </button>
+        </form>
+        <form method="post" action="{% url 'imports:run_action' 'cleanup-manual-candidates-execute' %}">
+          {% csrf_token %}
+          <button
+            class="button"
+            type="submit"
+            {% if pipeline_running %}disabled{% endif %}
+            onclick="return confirm('未設定の手入力法要残骸を整理します。実行してよろしいですか？');"
+          >
+            残骸を整理
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="eyebrow">Pipeline</div>
+      <h2>現在の進行状況</h2>
+      {% if pipeline_status %}
+        <p class="muted">
+          status: <code>{{ pipeline_status.status }}</code>
+          {% if pipeline_status.actor %}
+            / actor: <code>{{ pipeline_status.actor }}</code>
+          {% endif %}
+          {% if pipeline_status.updated_at %}
+            / updated: {{ pipeline_status.updated_at }}
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="muted">まだ一括再取込は実行されていません。</p>
+      {% endif %}
+
+      <section class="step-grid">
+        {% for step in pipeline_steps %}
+          <article class="step-card">
+            <div class="step-head">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span class="step-number">{{ step.number }}</span>
+                <div>
+                  <div class="eyebrow">Step {{ step.number }}</div>
+                  <h2>{{ step.label }}</h2>
+                </div>
+              </div>
+              <span class="step-status{% if step.current %} current{% endif %}">{{ step.status }}</span>
+            </div>
+            <p>{{ step.description }}</p>
+            <p class="muted">{{ step.detail }}</p>
+            <p class="muted mono-path">Output: <code>{{ step.outputs }}</code></p>
+            {% if step.live_stage and step.live_stage.stdout_tail or step.live_stage and step.live_stage.stderr_tail %}
+              <details>
+                <summary>最近の出力を見る</summary>
+                {% if step.live_stage.stdout_tail %}
+                  <pre>{% for line in step.live_stage.stdout_tail %}{{ line }}
+{% endfor %}</pre>
+                {% endif %}
+                {% if step.live_stage.stderr_tail %}
+                  <pre>{% for line in step.live_stage.stderr_tail %}{{ line }}
+{% endfor %}</pre>
+                {% endif %}
+              </details>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </section>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="eyebrow">Source</div>
+        <h2>{{ source.source_id }}</h2>
+        <p class="muted">{{ source.path }}</p>
+        <p class="metric">{% if source.exists %}{{ source.size_mb }} MB{% else %}missing{% endif %}</p>
+        <p class="muted">status: <code>{{ source.status }}</code></p>
+        <p class="muted">SHA256: <code>{% if source.sha256 %}{{ source.sha256|slice:":16" }}...{% else %}N/A{% endif %}</code></p>
+        {% if source.notes %}
+          <p class="muted">{{ source.notes }}</p>
+        {% endif %}
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Latest Export</div>
+        <h2>{% if latest_export %}{{ latest_export.snapshot_id }}{% else %}none{% endif %}</h2>
+        <p class="metric">{% if latest_export %}{{ latest_export.table_count }} tables{% else %}-{% endif %}</p>
+        <p class="muted">{% if latest_export %}{{ latest_export.created_at }}{% else %}export 未実行{% endif %}</p>
+        {% if latest_export %}
+          <p class="muted">log: <code>{{ latest_export.log_path }}</code></p>
+        {% endif %}
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Analysis</div>
+        <h2>{% if analysis.has_outputs %}ready{% else %}pending{% endif %}</h2>
+        <p class="metric">{% if analysis.updated_at %}{{ analysis.updated_at }}{% else %}-{% endif %}</p>
+        <p class="muted">schema: <code>{{ analysis.schema_report_path }}</code></p>
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Raw Layer</div>
+        <h2>{% if latest_prepared %}{{ latest_prepared.snapshot_id }}{% else %}none{% endif %}</h2>
+        <p class="metric">{% if latest_prepared %}{{ latest_prepared.table_count }} tables{% else %}-{% endif %}</p>
+        <p class="muted">{% if latest_prepared %}{{ latest_prepared.updated_at }}{% else %}prepared export 未生成{% endif %}</p>
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Latest Import</div>
+        <h2>{% if latest_import %}{{ latest_import.prepared_snapshot_id }}{% else %}none{% endif %}</h2>
+        <p class="metric">
+          {% if latest_import %}
+            households {{ latest_import.households_imported }} / persons {{ latest_import.persons_imported }} / services {{ latest_import.service_schedules_imported }}
+          {% else %}
+            -
+          {% endif %}
+        </p>
+        <p class="muted">
+          {% if latest_import %}
+            status: <code>{{ latest_import.status }}</code> / issues {{ latest_import.issues_count }}
+          {% else %}
+            DB import 未実行
+          {% endif %}
+        </p>
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Current Import</div>
+        <h2>{% if current_import %}{{ current_import.prepared_snapshot_id }}{% else %}none{% endif %}</h2>
+        <p class="metric">
+          {% if current_import %}
+            households {{ current_import.households_imported }} / persons {{ current_import.persons_imported }} / services {{ current_import.service_schedules_imported }}
+          {% else %}
+            -
+          {% endif %}
+        </p>
+        <p class="muted">
+          {% if current_import %}
+            通常業務は最新成功 batch を参照します。
+          {% else %}
+            現行運用に使える成功 batch はまだありません。
+          {% endif %}
+        </p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="eyebrow">Recent Exports</div>
+        <h2>Snapshot History</h2>
+        {% if recent_exports %}
+          <ul class="list">
+            {% for snapshot in recent_exports %}
+              <li>
+                <strong>{{ snapshot.snapshot_id }}</strong>
+                <span class="muted">({{ snapshot.table_count }} tables, {{ snapshot.created_at }})</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">まだ export snapshot はありません。</p>
+        {% endif %}
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Recent Imports</div>
+        <h2>Batch History</h2>
+        {% if recent_import_batches %}
+          <ul class="list">
+            {% for batch in recent_import_batches %}
+              <li>
+                <strong>{{ batch.prepared_snapshot_id }}</strong>
+                <span class="muted">
+                  ({{ batch.status }}, households {{ batch.households_imported }}, persons {{ batch.persons_imported }}, services {{ batch.service_schedules_imported }}, issues {{ batch.issues_count }}, {{ batch.created_at }})
+                </span>
+                {% if batch.is_current %}
+                  <div class="actions" style="margin-top: 8px;">
+                    <span class="muted"><strong>現行運用</strong></span>
+                  </div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">まだ DB import batch はありません。</p>
+        {% endif %}
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">Source Operations</div>
+        <h2>最近の source 操作</h2>
+        {% if recent_source_operations %}
+          <ul class="list">
+            {% for entry in recent_source_operations %}
+              <li>
+                <strong>{{ entry.operation_label }}</strong>
+                <span class="muted">
+                  ({{ entry.log.created_at|date:"Y-m-d H:i:s" }}{% if entry.target_label %} / {{ entry.target_label }}{% endif %}{% if entry.log.editor_label %} / {{ entry.log.editor_label }}{% endif %})
+                </span>
+                {% if entry.log.change_note %}
+                  <div class="muted" style="margin-top: 6px;">{{ entry.log.change_note }}</div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">まだ source 操作履歴はありません。</p>
+        {% endif %}
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="eyebrow">変換前 / 変換後 比較</div>
+      <h2>Export CSV と Raw JSONL を比較</h2>
+      {% if comparison.available %}
+        <p class="muted">
+          snapshot <code>{{ comparison.snapshot_id }}</code> を比較中です。
+          {{ comparison.matching_tables }}/{{ comparison.total_tables }} tables で row count が一致し、
+          {% if comparison.mismatched_tables == 0 %}
+            不一致はありません。
+          {% else %}
+            {{ comparison.mismatched_tables }} tables に不一致があります。
+          {% endif %}
+        </p>
+        <p class="muted">上位 12 テーブルを表示し、必要なら最初の 1 行も before / after で確認できます。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Table</th>
+                <th>変換前 CSV 行数</th>
+                <th>変換後 JSONL 行数</th>
+                <th>状態</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in comparison.rows %}
+                <tr>
+                  <td><code>{{ row.table_name }}</code></td>
+                  <td>{{ row.export_row_count }}</td>
+                  <td>{{ row.raw_row_count }}</td>
+                  <td>{% if row.match %}<span class="ok">一致</span>{% else %}<span class="ng">不一致</span>{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% if comparison.preview %}
+          <div class="content">
+            <h3>1 行サンプル比較</h3>
+            <p class="muted">
+              <code>{{ comparison.preview.table_name }}</code> の row {{ comparison.preview.row_number }} を表示しています。
+              CSV 側の <code>__MDB_NULL__</code> は raw JSONL では <code>null</code> になります。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Column</th>
+                    <th>変換前 (CSV)</th>
+                    <th>変換後 (Raw JSONL)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for cell in comparison.preview.comparisons %}
+                    <tr>
+                      <td><code>{{ cell.column }}</code></td>
+                      <td><code>{{ cell.before }}</code></td>
+                      <td><code>{{ cell.after }}</code></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="muted">{{ comparison.reason }}</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
