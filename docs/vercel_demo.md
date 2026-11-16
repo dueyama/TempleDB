@@ -8,7 +8,8 @@ VercelではGitHub repositoryを取り込み、root directoryはrepositoryの先
 Python 3.13と既存のruntime依存版を使い、buildで架空JSONからseedを新規生成します。
 実DB・既存.env・backup・Google/OpenAIの認証情報を渡す必要はありません。
 
-ログインは`demo` / `demo`です。ブラウザの署名cookieごとに一時copyを使い、変更履歴もそのcopyへ保存します。
+ログインは`demo` / `demo`です。ログイン画面に案内を表示し、初回表示では入力済みにします。
+そのまま「ログイン」を押して試せます。ブラウザの署名cookieごとに一時copyを使い、変更履歴もそのcopyへ保存します。
 元seedは変更しません。Vercelの実行環境が変わると編集内容が初期状態へ戻ることがあります。
 ログアウトするとそのブラウザの識別Cookieを破棄し、次回ログインは新しい初期データで始まります。
 同じブラウザの別タブはデータを共有し、別ブラウザ/端末のデータとは分離されます。

@@ -2519,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "c98aaf8eb1f2cb6cd079b83fefa7e03c9b117fe6a17c6fba0755dcd59a94c7bf",
+      "sha256": "747c6269f49195bb7cad8f4bc875823fdae5a9fd8dc72f367b6bcc4bfbaa75ec",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
@@ -3307,7 +3307,7 @@
       "mode": 420
     },
     "docs/vercel_demo.md": {
-      "sha256": "c95509c246bf7cd169a5c4bb6c975a3cf904454d12ed203d24d3b9b5699f5cae",
+      "sha256": "2a21d05f1ce6527ae13da6dc5a16620ab967aba41386f77dcc05bf6067a2098f",
       "mode": 420
     },
     "docs/windows_native_demo.md": {
@@ -3387,7 +3387,7 @@
       "mode": 420
     },
     "vercel_demo/banner.py": {
-      "sha256": "6b883c7e8d83b453773b4de49724bc92536e0b572ba0501284fecccf8546ba3c",
+      "sha256": "3adf6bdc66d28d828feb8c37500bd3528c328a44fa57c54f789342862b09813b",
       "mode": 420
     },
     "vercel_demo/build.py": {
