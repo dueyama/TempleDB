@@ -47,7 +47,7 @@
       "mode": 420
     },
     "README.md": {
-      "sha256": "4c127463837d244561649f72693f4f6d47ff32e07c8639ba2ceebbd07d03a632",
+      "sha256": "edc336168feae398c0ead372f0bd3ce937d6b806f42130fc35379671875663e8",
       "mode": 420
     },
     "SECURITY.md": {
@@ -2519,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "b6e19675518045deb0f4e70c62806e3503c7797cd6b764541f5ed9da165f074e",
+      "sha256": "5070ddcd4a18ee4b5a77dd00f441b7afde608180a96aef867a347630fccccd94",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
