@@ -1,7 +1,7 @@
 {
   "format": "templedb-handoff-source-manifest",
   "version": 1,
-  "source_commit": "ee6a8a748f89733a65d3bd5cfcf905d56f22e7e1",
+  "source_commit": "658476ccf1e3a69b994127f47abdddafe59785a4",
   "files": [
     {
       "path": ".python-version",
@@ -3020,7 +3020,7 @@
     },
     {
       "path": "config/dependencies/runtime.txt",
-      "baseline_sha256": "c146370a5a6b14ca148e56393cafd5f0946d3255e65289a57ec987cb6f75fb26",
+      "baseline_sha256": "127ec529bff0c6fd896abe2dbc333ff64de0ac0430e09ccb070a9a6a45a4ad35",
       "executable": false
     },
     {
@@ -3190,7 +3190,7 @@
     },
     {
       "path": "pyproject.toml",
-      "baseline_sha256": "19911dc24204ccf19234a91e770810d38d0cf02374ce12c443f08808a23ed3db",
+      "baseline_sha256": "ef18b98ab445f9c1233cd3a58c96ba0181a7e96e679f0f77c721d7ca4c2ad14d",
       "executable": false
     },
     {

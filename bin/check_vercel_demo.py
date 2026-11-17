@@ -16,11 +16,13 @@ def exercise(workspace: Path) -> dict:
     sys.path[:0] = [str(workspace), str(workspace / "app")]
     from http.cookies import SimpleCookie
 
+    import django
     from django.test import RequestFactory
     from vercel_demo import runtime
     from vercel_demo.wsgi import COOKIE, SIGNER, application
 
     factory = RequestFactory()
+    assert (5, 2, 19) <= django.VERSION[:3] < (5, 3, 0), django.get_version()
     seed = workspace / "demo_seed/data/runtime/demo.sqlite3"
     seed_hash = hashlib.sha256(seed.read_bytes()).hexdigest()
 
@@ -102,6 +104,7 @@ def exercise(workspace: Path) -> dict:
     runtime.MAX_STATE_BYTES = size_limit
     assert hashlib.sha256(seed.read_bytes()).hexdigest() == seed_hash
     return {
+        "django_version": django.get_version(),
         "login_home_households": "two browsers passed", "edit_save_and_audit": "passed",
         "browser_database_isolation": "passed", "logout_reset_and_other_browser_preserved": "passed",
         "logout_copy_removed_idle_reclaimed_capacity_preserved": "passed",

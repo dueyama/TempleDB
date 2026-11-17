@@ -29,6 +29,8 @@ jobs:
         env:
           PYTHON_BIN: python
         run: ./bin/setup.sh
+      - name: Verify installed Django security baseline
+        run: .venv/bin/python -c 'import django; print(django.get_version()); assert (5, 2, 19) <= django.VERSION[:3] < (5, 3, 0)'
       - name: Run isolated maintenance tests
         run: .venv/bin/python bin/test_maintenance.py
       - name: Check isolated HTTP login and server shutdown
@@ -61,6 +63,10 @@ jobs:
           DEMO_BOOTSTRAP_PYTHON: ${{ steps.python.outputs.python-path }}
         run: |
           powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\windows_demo.ps1 -Action Setup -Python $env:DEMO_BOOTSTRAP_PYTHON
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify installed Django security baseline
+        run: |
+          & .\.venv-windows-demo\Scripts\python.exe -c 'import django; print(django.get_version()); assert (5, 2, 19) <= django.VERSION[:3] < (5, 3, 0)'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify native demo and isolated maintenance
         run: |

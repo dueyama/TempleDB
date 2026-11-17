@@ -1,5 +1,5 @@
 -c app/config/dependencies/runtime.txt
-Django>=5.2.15,<5.3
+Django>=5.2.19,<5.3
 djangorestframework>=3.15,<4.0
 google-api-python-client>=2.170,<3.0
 google-auth>=2.40,<3.0
