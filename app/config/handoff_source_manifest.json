@@ -1,7 +1,7 @@
 {
   "format": "templedb-handoff-source-manifest",
   "version": 1,
-  "source_commit": "48b3fb7b652185582481a5b056d5dddb17ec2715",
+  "source_commit": "e322dfcffbd3efb6886d85190a7f3b1c5fe0da21",
   "files": [
     {
       "path": ".python-version",

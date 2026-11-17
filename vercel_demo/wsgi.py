@@ -13,9 +13,10 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "vercel_demo.settings"
 handler = get_wsgi_application()
 
 from django.conf import settings  # noqa: E402
+from django.contrib.auth import get_user_model  # noqa: E402
 from django.core import signing  # noqa: E402
 from django.core.management import call_command  # noqa: E402
-from django.db import connections  # noqa: E402
+from django.db import connections, transaction  # noqa: E402
 from django.utils import timezone  # noqa: E402
 
 from vercel_demo.runtime import (  # noqa: E402
@@ -74,12 +75,18 @@ def initialize_sandbox(tenant, *, created):
         raise RuntimeError("Synthetic export path escaped the new sandbox")
     started_on = timezone.localdate()
     # Only a newly copied, never-served synthetic DB may be rebuilt.
-    call_command(
-        "load_demo_dataset", dataset_id="synthetic_demo_v1",
-        dataset_root=str(ROOT / "datasets/synthetic_demo_v1"),
-        reference_date=started_on.isoformat(), username="demo", password="demo",
-        stdout=StringIO(), verbosity=0,
-    )
+    with transaction.atomic():
+        User = get_user_model()
+        # Signed sessions must stay valid if Vercel routes the next request to
+        # another worker that independently initializes the same browser copy.
+        seed_password = User.objects.get(username="demo").password
+        call_command(
+            "load_demo_dataset", dataset_id="synthetic_demo_v1",
+            dataset_root=str(ROOT / "datasets/synthetic_demo_v1"),
+            reference_date=started_on.isoformat(), username="demo", password="demo",
+            stdout=StringIO(), verbosity=0,
+        )
+        User.objects.filter(username="demo").update(password=seed_password)
     validate_seed(tenant)
     marker.write_text(started_on.isoformat() + "\n")
     return started_on

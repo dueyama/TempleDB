@@ -150,6 +150,15 @@ def exercise(workspace: Path) -> dict:
     with patch("django.utils.timezone.localdate", return_value=date(2033, 1, 1)):
         assert "Vercel架空デモの保存・隔離試験" in request(browsers[0], path)["body"]
     assert "Vercel架空デモの保存・隔離試験" not in request(browsers[1], path)["body"]
+    # Vercel may route the signed session to a different worker's empty /tmp.
+    # Data can reset there, but the original login must remain valid.
+    other_worker = runtime.state_root().parent / "other-worker"
+    worker_jar = SimpleCookie({name: morsel.value for name, morsel in browsers[0].items()})
+    with patch("vercel_demo.runtime.state_root", return_value=other_worker):
+        assert request(worker_jar, "/")["status"] == 200
+        assert "Vercel架空デモの保存・隔離試験" not in request(worker_jar, path)["body"]
+        assert request(worker_jar, "/logout/", {"csrfmiddlewaretoken": worker_jar["csrftoken"].value})["status"] == 302
+    assert "Vercel架空デモの保存・隔離試験" in request(browsers[0], path)["body"]
     before_failure = set(runtime.state_root().iterdir())
     with patch("vercel_demo.wsgi.call_command", side_effect=RuntimeError("synthetic init failure")):
         try:
@@ -200,6 +209,7 @@ def exercise(workspace: Path) -> dict:
         "django_version": django.get_version(),
         "trial_start_dates_year_rollover_leap_day": "passed",
         "existing_trial_edits_preserved_and_failed_init_removed": "passed",
+        "signed_login_survives_independent_worker_initialization": "passed",
         "login_home_households": "two browsers passed", "edit_save_and_audit": "passed",
         "browser_database_isolation": "passed", "logout_reset_and_other_browser_preserved": "passed",
         "logout_copy_removed_idle_reclaimed_capacity_preserved": "passed",

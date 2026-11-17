@@ -23,7 +23,7 @@
       "mode": 420
     },
     "CHANGELOG.md": {
-      "sha256": "a974796e506fd0ee2778f8578b9131493f9f41b5a0e18a9364f98bbb0d6130ab",
+      "sha256": "72f90934644f255298f15fa47624b3d37cf68f16f17cca37c73f344beeb1e931",
       "mode": 420
     },
     "CONTRIBUTING.md": {
@@ -2519,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "8d10e7921b58f43aece824c87d971cfb6c4803813880a49f665f0bf7332501d5",
+      "sha256": "b6e19675518045deb0f4e70c62806e3503c7797cd6b764541f5ed9da165f074e",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
@@ -3151,7 +3151,7 @@
       "mode": 420
     },
     "bin/check_vercel_demo.py": {
-      "sha256": "003999674b895c10ef420351e79b203b4dde49ec487ed9a7fd604f7324f42dad",
+      "sha256": "11c74ecb8ab1f9a3a97cef4e40bef1d8d2ccbd581ee26d5e1f03e4de6b9a24d0",
       "mode": 420
     },
     "bin/cleanup_demo_environment.sh": {
@@ -3407,7 +3407,7 @@
       "mode": 420
     },
     "vercel_demo/wsgi.py": {
-      "sha256": "e0ba16856df52e6225049e6af3dfd09b7af91fb106b5b3da52a30888d46362f5",
+      "sha256": "4316aeca83639322fc36d86cb98db52787a3836e92eb5fdd21c3910fa2544e78",
       "mode": 420
     }
   }
