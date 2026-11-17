@@ -46,6 +46,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--username", default="demo", help="Demo admin username.")
         parser.add_argument("--password", default="demo", help="Demo admin password.")
+        parser.add_argument("--reference-date", default="", help="Synthetic date basis (YYYY-MM-DD); defaults to today.")
         parser.add_argument(
             "--force",
             action="store_true",
@@ -58,6 +59,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         del args
         self._guard_disposable_database(force=bool(options["force"]))
+        try:
+            reference_date = str(options.get("reference_date") or "")
+            self.reference_date = date.fromisoformat(reference_date) if reference_date else timezone.localdate()
+        except ValueError as exc:
+            raise CommandError("reference-date must be YYYY-MM-DD") from exc
         dataset_root = self._resolve_dataset_root(
             dataset_id=str(options["dataset_id"]),
             dataset_root=str(options["dataset_root"] or ""),
@@ -551,7 +557,7 @@ class Command(BaseCommand):
                 household_name_snapshot=head_person.name if head_person else household_id,
                 person_name_snapshot=person.name if person else "",
                 received_on=self._payload_date(payload, "received_on", "received_offset_days")
-                or timezone.localdate(),
+                or self.reference_date,
                 amount=Decimal(str(payload.get("amount") or "0")),
                 payment_category=str(payload.get("payment_category") or OfferingPayment.Category.OFFERING),
                 payment_method=str(payload.get("payment_method") or OfferingPayment.Method.CASH),
@@ -589,7 +595,7 @@ class Command(BaseCommand):
                 household_name_snapshot=head_person.name if head_person else household_id,
                 person_name_snapshot=person.name if person else "",
                 visited_on=self._payload_date(payload, "visited_on", "visited_offset_days")
-                or timezone.localdate(),
+                or self.reference_date,
                 title=str(payload.get("title") or ""),
                 body=str(payload.get("body") or ""),
                 next_action=str(payload.get("next_action") or ""),
@@ -605,7 +611,7 @@ class Command(BaseCommand):
         payload: dict[str, Any],
         households: dict[str, Household],
     ) -> None:
-        current_year = timezone.localdate().year
+        current_year = self.reference_date.year
         for setting in payload.get("settings") or []:
             year = int(setting.get("year") or current_year + int(setting.get("year_offset") or 0))
             AnnualMembershipFeeSetting.objects.create(
@@ -631,7 +637,7 @@ class Command(BaseCommand):
                 district_name_snapshot=profile.district.name if profile and profile.district else "",
                 year=year,
                 received_on=self._payload_date(payment, "received_on", "received_offset_days")
-                or timezone.localdate(),
+                or self.reference_date,
                 amount=Decimal(str(payment.get("amount") or "0")),
                 is_exception=bool(payment.get("is_exception") or False),
                 received_by=str(payment.get("received_by") or ""),
@@ -689,7 +695,7 @@ class Command(BaseCommand):
         if payload.get(date_key):
             return date.fromisoformat(str(payload[date_key]))
         if payload.get(offset_key) not in (None, ""):
-            return timezone.localdate() + timedelta(days=int(payload[offset_key]))
+            return self.reference_date + timedelta(days=int(payload[offset_key]))
         return None
 
     def _payload_time(self, value: Any) -> time | None:

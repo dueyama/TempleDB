@@ -3,7 +3,9 @@ import os
 import re
 import secrets
 import threading
+from datetime import date
 from http.cookies import SimpleCookie
+from io import StringIO
 
 from django.core.wsgi import get_wsgi_application
 
@@ -12,7 +14,9 @@ handler = get_wsgi_application()
 
 from django.conf import settings  # noqa: E402
 from django.core import signing  # noqa: E402
+from django.core.management import call_command  # noqa: E402
 from django.db import connections  # noqa: E402
+from django.utils import timezone  # noqa: E402
 
 from vercel_demo.runtime import (  # noqa: E402
     SANDBOX_TTL,
@@ -20,6 +24,7 @@ from vercel_demo.runtime import (  # noqa: E402
     discard_sandbox,
     prepare_sandbox,
     sandbox_lock,
+    validate_seed,
 )
 
 LOCK = threading.Lock()
@@ -56,12 +61,36 @@ def select_tenant(tenant):
     connections["default"].settings_dict["NAME"] = database
 
 
+def initialize_sandbox(tenant, *, created):
+    marker = tenant / ".started_on"
+    if not created:
+        # An existing trial keeps its dates and edits, even across midnight.
+        return date.fromisoformat(marker.read_text().strip())
+    from apps.imports.source_registry_runtime import export_root
+    from vercel_demo.runtime import ROOT
+
+    validate_seed(tenant)
+    if not export_root("demo-synthetic-rich").resolve().is_relative_to(tenant.resolve()):
+        raise RuntimeError("Synthetic export path escaped the new sandbox")
+    started_on = timezone.localdate()
+    # Only a newly copied, never-served synthetic DB may be rebuilt.
+    call_command(
+        "load_demo_dataset", dataset_id="synthetic_demo_v1",
+        dataset_root=str(ROOT / "datasets/synthetic_demo_v1"),
+        reference_date=started_on.isoformat(), username="demo", password="demo",
+        stdout=StringIO(), verbosity=0,
+    )
+    validate_seed(tenant)
+    marker.write_text(started_on.isoformat() + "\n")
+    return started_on
+
+
 def application(environ, start_response):
     # The lock remains held through streaming and callbacks as well as rendering.
     with LOCK, sandbox_lock() as root:
         identifier = browser_id(environ)
         try:
-            tenant = prepare_sandbox(root, identifier)
+            tenant, created = prepare_sandbox(root, identifier)
         except SandboxCapacityError:
             body = "現在デモが混み合っています。時間をおいて再度お試しください。".encode()
             start_response("503 Service Unavailable", [
@@ -70,7 +99,14 @@ def application(environ, start_response):
             ])
             yield body
             return
-        select_tenant(tenant)
+        try:
+            select_tenant(tenant)
+            initialize_sandbox(tenant, created=created)
+        except Exception:
+            connections.close_all()
+            if created:
+                discard_sandbox(tenant)
+            raise
         token = SIGNER.sign(identifier)
         logged_out = False
 

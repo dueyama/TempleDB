@@ -67,7 +67,7 @@ def discard_sandbox(tenant: Path) -> None:
         shutil.rmtree(tenant)
 
 
-def prepare_sandbox(root: Path, identifier: str) -> Path:
+def prepare_sandbox(root: Path, identifier: str) -> tuple[Path, bool]:
     """Call only while holding sandbox_lock, through the entire response."""
     if not re.fullmatch(r"[a-f0-9]{32}", identifier):
         raise ValueError("Invalid synthetic sandbox identifier")
@@ -81,13 +81,14 @@ def prepare_sandbox(root: Path, identifier: str) -> Path:
     tenant = root / identifier
     if tenant.is_symlink():
         raise RuntimeError("Invalid synthetic sandbox path")
-    if not tenant.exists():
+    created = not tenant.exists()
+    if created:
         count = sum(bool(re.fullmatch(r"[a-f0-9]{32}", path.name)) for path in root.iterdir())
         if count >= MAX_SANDBOXES or tree_bytes(root) + tree_bytes(SEED) > MAX_STATE_BYTES:
             raise SandboxCapacityError
     copy_seed(tenant)
     (tenant / ".last_used").touch()
-    return tenant
+    return tenant, created
 
 
 def copy_seed(target: Path) -> None:

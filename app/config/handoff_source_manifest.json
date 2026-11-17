@@ -1,7 +1,7 @@
 {
   "format": "templedb-handoff-source-manifest",
   "version": 1,
-  "source_commit": "658476ccf1e3a69b994127f47abdddafe59785a4",
+  "source_commit": "48b3fb7b652185582481a5b056d5dddb17ec2715",
   "files": [
     {
       "path": ".python-version",
@@ -1205,7 +1205,7 @@
     },
     {
       "path": "apps/imports/management/commands/load_demo_dataset.py",
-      "baseline_sha256": "be3cc74301f97bbd94d885e6a55d2c4bd3eabfe5ece4e1656f02a786de6ff115",
+      "baseline_sha256": "f9a8dd83efcd21e28f6b958a93de22b37365cae02081c83cd22da8ec487cbbb9",
       "executable": false
     },
     {

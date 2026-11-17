@@ -23,7 +23,7 @@
       "mode": 420
     },
     "CHANGELOG.md": {
-      "sha256": "8465f3ef8469290091f1df687c7642448e616fa87bcc4143000ac2e2f8d06466",
+      "sha256": "a974796e506fd0ee2778f8578b9131493f9f41b5a0e18a9364f98bbb0d6130ab",
       "mode": 420
     },
     "CONTRIBUTING.md": {
@@ -1039,7 +1039,7 @@
       "mode": 420
     },
     "app/apps/imports/management/commands/load_demo_dataset.py": {
-      "sha256": "be3cc74301f97bbd94d885e6a55d2c4bd3eabfe5ece4e1656f02a786de6ff115",
+      "sha256": "f9a8dd83efcd21e28f6b958a93de22b37365cae02081c83cd22da8ec487cbbb9",
       "mode": 420
     },
     "app/apps/imports/management/commands/mark_households_extinct.py": {
@@ -2519,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "5d3e5fd73509f41188e19661628b1f5dd602c709efc9590621c57453b10187b4",
+      "sha256": "8d10e7921b58f43aece824c87d971cfb6c4803813880a49f665f0bf7332501d5",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
@@ -3151,7 +3151,7 @@
       "mode": 420
     },
     "bin/check_vercel_demo.py": {
-      "sha256": "632e8b650a30cda9d84f455c337ebf86f3d01062609afb49911dc4ed73913874",
+      "sha256": "003999674b895c10ef420351e79b203b4dde49ec487ed9a7fd604f7324f42dad",
       "mode": 420
     },
     "bin/cleanup_demo_environment.sh": {
@@ -3311,7 +3311,7 @@
       "mode": 420
     },
     "docs/vercel_demo.md": {
-      "sha256": "6cbd88402f4552dc623d42f24dcb398019dfc36737a83dadf00e3d28d9579295",
+      "sha256": "34a0b41a94830ee282f53bd49f684608aa3fcdfe266133a21191301ca29ce990",
       "mode": 420
     },
     "docs/windows_native_demo.md": {
@@ -3399,7 +3399,7 @@
       "mode": 420
     },
     "vercel_demo/runtime.py": {
-      "sha256": "7400cc41c4c50e898b0165e85780e56f357adce4262dad4c0d80936899b23599",
+      "sha256": "6e25347745f6341ff6afb0d6b57502bc11cec85662664ab1e7cac6d77847c120",
       "mode": 420
     },
     "vercel_demo/settings.py": {
@@ -3407,7 +3407,7 @@
       "mode": 420
     },
     "vercel_demo/wsgi.py": {
-      "sha256": "9bdc758a5d535fe19af3e599339cf35fe6818adb49fd3a0788bbcdcabcf318b9",
+      "sha256": "e0ba16856df52e6225049e6af3dfd09b7af91fb106b5b3da52a30888d46362f5",
       "mode": 420
     }
   }

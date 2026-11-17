@@ -9,7 +9,9 @@ import secrets
 import subprocess
 import sys
 import time
+from datetime import date, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 
 def exercise(workspace: Path) -> dict:
@@ -41,6 +43,85 @@ def exercise(workspace: Path) -> dict:
         result["body"] = b"".join(application(generated.environ, respond)).decode()
         return result
 
+    from apps.imports.models import (
+        AnnualMembershipFeePayment,
+        AnnualMembershipFeeSetting,
+        DeceasedProfile,
+        ImportBatch,
+        OfferingPayment,
+        ServiceSchedule,
+        VisitNote,
+    )
+
+    dataset = workspace / "datasets/synthetic_demo_v1"
+
+    def check_dates(started_on):
+        def load(name):
+            return json.loads((dataset / (name + ".json")).read_text())
+
+        def day(row, explicit, offset, *, fallback=None):
+            if row.get(explicit):
+                return date.fromisoformat(row[explicit])
+            if row.get(offset) not in (None, ""):
+                return started_on + timedelta(days=int(row[offset]))
+            return fallback
+
+        schedules = load("service_schedules")
+        expected = {row["schedule_id"]: (
+            day(row, "target_date", "target_offset_days"),
+            day(row, "scheduled_date", "scheduled_offset_days"),
+        ) for row in schedules}
+        actual = {uid: (target, scheduled) for uid, target, scheduled in ServiceSchedule.objects.values_list(
+            "schedule_uid", "target_date", "scheduled_date",
+        )}
+        assert actual == expected
+        assert ServiceSchedule.objects.filter(
+            scheduled_date__gte=started_on, scheduled_date__lte=started_on + timedelta(days=7),
+        ).exists()
+        for name, model, field, offset in (
+            ("offering_payments", OfferingPayment, "received_on", "received_offset_days"),
+            ("visit_notes", VisitNote, "visited_on", "visited_offset_days"),
+        ):
+            assert sorted(model.objects.values_list(field, flat=True)) == sorted(
+                day(row, field, offset, fallback=started_on) for row in load(name)
+            )
+        fees = load("membership_fees")
+        def year(row):
+            return int(row.get("year") or started_on.year + int(row.get("year_offset") or 0))
+
+        assert sorted(AnnualMembershipFeeSetting.objects.values_list("year", flat=True)) == sorted(
+            year(row) for row in fees["settings"]
+        )
+        assert sorted(AnnualMembershipFeePayment.objects.values_list("year", "received_on")) == sorted(
+            (year(row), day(row, "received_on", "received_offset_days", fallback=started_on))
+            for row in fees["payments"]
+        )
+        # Explicit historical dates retain their original meaning.
+        assert sorted(DeceasedProfile.objects.values_list("death_date", flat=True)) == sorted(
+            day(row, "death_date", "death_offset_days") for row in load("memorials")
+        )
+
+    # The same built artifact must start fresh trials years later, across New Year
+    # and on leap day, without shifting an existing trial's dates.
+    dated = SimpleCookie()
+    with patch("django.utils.timezone.localdate", return_value=date(2031, 12, 31)):
+        assert request(dated, "/login/")["status"] == 200
+        check_dates(date(2031, 12, 31))
+        batch_id = ImportBatch.objects.get().pk
+    with patch("django.utils.timezone.localdate", return_value=date(2032, 1, 1)):
+        assert request(dated, "/login/")["status"] == 200
+        check_dates(date(2031, 12, 31))
+        assert ImportBatch.objects.get().pk == batch_id
+        response = request(dated, "/logout/", {"csrfmiddlewaretoken": dated["csrftoken"].value})
+        assert response["status"] == 302
+        assert request(dated, "/login/")["status"] == 200
+        check_dates(date(2032, 1, 1))
+        assert request(dated, "/logout/", {"csrfmiddlewaretoken": dated["csrftoken"].value})["status"] == 302
+    with patch("django.utils.timezone.localdate", return_value=date(2032, 2, 29)):
+        assert request(dated, "/login/")["status"] == 200
+        check_dates(date(2032, 2, 29))
+        assert request(dated, "/logout/", {"csrfmiddlewaretoken": dated["csrftoken"].value})["status"] == 302
+
     browsers = [SimpleCookie(), SimpleCookie()]
     for jar in browsers:
         response = request(jar, "/login/")
@@ -66,7 +147,19 @@ def exercise(workspace: Path) -> dict:
     assert response["status"] == 302, response["body"][-4000:]
     assert "Vercel架空デモの保存・隔離試験" in request(browsers[0], path)["body"]
     assert RecordEditLog.objects.count() > audit_before
+    with patch("django.utils.timezone.localdate", return_value=date(2033, 1, 1)):
+        assert "Vercel架空デモの保存・隔離試験" in request(browsers[0], path)["body"]
     assert "Vercel架空デモの保存・隔離試験" not in request(browsers[1], path)["body"]
+    before_failure = set(runtime.state_root().iterdir())
+    with patch("vercel_demo.wsgi.call_command", side_effect=RuntimeError("synthetic init failure")):
+        try:
+            request(SimpleCookie(), "/login/")
+        except RuntimeError as exc:
+            assert str(exc) == "synthetic init failure"
+        else:
+            raise AssertionError("Initialization failure was swallowed")
+    assert set(runtime.state_root().iterdir()) == before_failure
+    assert request(browsers[1], "/")["status"] == 200
     first = runtime.state_root() / SIGNER.unsign(browsers[0][COOKIE].value)
     second = runtime.state_root() / SIGNER.unsign(browsers[1][COOKIE].value)
     assert first.is_dir() and second.is_dir()
@@ -105,6 +198,8 @@ def exercise(workspace: Path) -> dict:
     assert hashlib.sha256(seed.read_bytes()).hexdigest() == seed_hash
     return {
         "django_version": django.get_version(),
+        "trial_start_dates_year_rollover_leap_day": "passed",
+        "existing_trial_edits_preserved_and_failed_init_removed": "passed",
         "login_home_households": "two browsers passed", "edit_save_and_audit": "passed",
         "browser_database_isolation": "passed", "logout_reset_and_other_browser_preserved": "passed",
         "logout_copy_removed_idle_reclaimed_capacity_preserved": "passed",
