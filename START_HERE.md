@@ -4,6 +4,10 @@
 まず「架空データで試す」か「空DBから導入を準備する」かを選んでください。
 OS全体への導入や既存データの変更が必要な場合は、実行前に説明を受けて判断してください。
 
+使いたいOSやCPUが下の手順と異なる場合も、その環境をAIに伝えて導入を相談してください。
+Pythonと必要なライブラリを用意できれば、依存関係や起動方法を調整して使える環境を広げられます。
+まず架空データで試し、調整した手順とログインまでの確認結果を残す進め方を推奨します。
+
 ## 架空データで試す
 
 macOS / Linux / WSL2で、Python 3.13以上を用意します。
@@ -30,7 +34,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\windows_demo.ps1 -
 Setupが同梱の架空データから`runtime/windows-demo/demo.sqlite3`を作成します。
 既存DBは再投入せず保持します。停止は起動したPowerShellで`Ctrl+C`です。
 Windows nativeの入口は合成デモ専用です。詳細・撤去は[専用手順](docs/windows_native_demo.md)へ。
-OSごとの正式な対応範囲と未確認事項は[環境と受入範囲](docs/platforms.md)を参照してください。
+確認済みの環境と、ほかの環境へ広げる進め方は[環境と受入範囲](docs/platforms.md)を参照してください。
 
 ## 空のDBで導入を準備する
 

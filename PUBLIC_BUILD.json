@@ -47,7 +47,7 @@
       "mode": 420
     },
     "README.md": {
-      "sha256": "edc336168feae398c0ead372f0bd3ce937d6b806f42130fc35379671875663e8",
+      "sha256": "d4d8d36b15715bd705030a6e604963b19b9ce77efb9f0077b2b8a995b17b2a82",
       "mode": 420
     },
     "SECURITY.md": {
@@ -55,7 +55,7 @@
       "mode": 420
     },
     "START_HERE.md": {
-      "sha256": "f8daa8553738b404fc3d56190772349d1ec20493a23fe1a5c7758a690cbe2190",
+      "sha256": "0fc04b20dbf17ab6702121c90c9c807db431496dea014884cf72b5bf097fa0ac",
       "mode": 420
     },
     "THIRD_PARTY_NOTICES.md": {
@@ -2519,7 +2519,7 @@
       "mode": 420
     },
     "app/config/handoff_source_manifest.json": {
-      "sha256": "5070ddcd4a18ee4b5a77dd00f441b7afde608180a96aef867a347630fccccd94",
+      "sha256": "58ff199665e41b83028378cbe644660c90907caacd473970d0051fa7bbbddfdb",
       "mode": 420
     },
     "app/config/instance_runtime.py": {
@@ -3295,7 +3295,7 @@
       "mode": 420
     },
     "docs/platforms.md": {
-      "sha256": "6887ed123f98488afdff35a9a05cf47bdb1f0bc97987f266ab360aa4f7ae1f79",
+      "sha256": "249446f9c0492ea8276ae3aa275cba71aa10a2b414c045d785296fc7ecf2214d",
       "mode": 420
     },
     "docs/postgresql_demo_service.md": {
